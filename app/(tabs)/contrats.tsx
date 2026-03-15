@@ -15,7 +15,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useContrats } from "../../contexts/ContratsContext";
 import { Contrat } from "../../types/contrat";
-import { formatDate, parseDate } from "../../utils/date";
+import { formatDate, formatDateISO, parseDate } from "../../utils/date";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
@@ -194,8 +194,8 @@ export default function ContratsScreen() {
               <>
                 <input
                   type="date"
-                  value={dateDebut ? dateDebut.toISOString().slice(0, 10) : ""}
-                  max={dateFin ? dateFin.toISOString().slice(0, 10) : undefined}
+                  value={dateDebut ? formatDateISO(dateDebut) : ""}
+                  max={dateFin ? formatDateISO(dateFin) : undefined}
                   onChange={(e) => {
                     const d = e.target.value ? new Date(e.target.value + "T00:00:00") : undefined;
                     if (d) setDateDebutSafe(d);
@@ -208,8 +208,8 @@ export default function ContratsScreen() {
                 />
                 <input
                   type="date"
-                  value={dateFin ? dateFin.toISOString().slice(0, 10) : ""}
-                  min={dateDebut ? dateDebut.toISOString().slice(0, 10) : undefined}
+                  value={dateFin ? formatDateISO(dateFin) : ""}
+                  min={dateDebut ? formatDateISO(dateDebut) : undefined}
                   onChange={(e) => {
                     const d = e.target.value ? new Date(e.target.value + "T00:00:00") : undefined;
                     if (d) setDateFinSafe(d);
