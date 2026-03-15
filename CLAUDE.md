@@ -15,12 +15,14 @@ Ce projet sert aussi de formation à React Native / Expo pour l'utilisateur.
 - **Langage** : TypeScript
 - **Navigation** : Expo Router (file-based routing avec onglets)
 - **State management** : React Context (ContratsContext)
+- **Tests** : Jest + jest-expo + React Native Testing Library + jest-cucumber (Gherkin)
 - **État du projet** : Formulaire de contrats + dashboard fonctionnels
 
 ## Git
 - Remote : git@github-perso:lucas-dormoy1/intermittence.git
 - Identité : lucas-dormoy1 <luludorm@gmail.com>
 - Branche principale : main
+- **Conventional commits** (feat:, fix:, refactor:, docs:, chore:, etc.)
 
 ## Architecture
 ```
@@ -34,6 +36,9 @@ app/                    ← Dossier des routes (Expo Router)
 types/contrat.ts        ← Interface TypeScript du contrat
 contexts/ContratsContext.tsx ← State partagé entre les écrans
 docs/                   ← Fiches pédagogiques sur les concepts RN/Expo
+features/               ← Fichiers Gherkin (.feature)
+__tests__/              ← Step definitions Jest/Cucumber (.steps.tsx)
+jest.config.js          ← Configuration Jest
 app.json                ← Configuration Expo
 assets/                 ← Images et ressources
 ```
