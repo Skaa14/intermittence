@@ -15,6 +15,7 @@ import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { Annexe } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
+import { calculerAJ } from "../../utils/calculerAJ";
 
 export default function AccueilScreen() {
   const { contrats } = useContrats();
@@ -97,7 +98,34 @@ export default function AccueilScreen() {
         <Text style={styles.cardValue}>{contrats.length}</Text>
       </View>
 
-      {formulaireOuvert ? (
+      {profil && !formulaireOuvert && (
+        <Pressable style={styles.ajCard} onPress={ouvrirFormulaire}>
+          <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
+          <Text style={styles.ajValue}>
+            {calculerAJ(
+              profil.annexe,
+              profil.salaireReference,
+              profil.heuresTravaillees
+            ).toFixed(2)}{" "}
+            €/jour
+          </Text>
+          <Text style={styles.ajDetail}>
+            Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
+            {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
+            {profil.dateAnniversaire}
+          </Text>
+        </Pressable>
+      )}
+
+      {!profil && !formulaireOuvert && (
+        <Pressable style={styles.configurerBtn} onPress={ouvrirFormulaire}>
+          <Text style={styles.configurerBtnText}>
+            Configurer mon profil pour estimer mon indemnité journalière
+          </Text>
+        </Pressable>
+      )}
+
+      {formulaireOuvert && (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Mon profil intermittent</Text>
 
@@ -214,23 +242,6 @@ export default function AccueilScreen() {
             </Pressable>
           </View>
         </View>
-      ) : (
-        <Pressable style={styles.profilBtn} onPress={ouvrirFormulaire}>
-          {profil ? (
-            <View>
-              <Text style={styles.profilBtnTitle}>Mon profil</Text>
-              <Text style={styles.profilResume}>
-                Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
-                {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
-                {profil.dateAnniversaire}
-              </Text>
-            </View>
-          ) : (
-            <Text style={styles.profilBtnTitle}>
-              Configurer mon profil
-            </Text>
-          )}
-        </Pressable>
       )}
     </ScrollView>
   );
@@ -302,21 +313,39 @@ const styles = StyleSheet.create({
     backgroundColor: "#2563eb",
     borderRadius: 4,
   },
-  profilBtn: {
+  ajCard: {
     backgroundColor: "#1e293b",
     borderRadius: 12,
     padding: 20,
     marginBottom: 12,
   },
-  profilBtnTitle: {
-    fontSize: 16,
+  ajLabel: {
+    fontSize: 13,
+    color: "#94a3b8",
+    marginBottom: 4,
+  },
+  ajValue: {
+    fontSize: 32,
     fontWeight: "bold",
     color: "#fff",
   },
-  profilResume: {
+  ajDetail: {
     fontSize: 13,
     color: "#94a3b8",
-    marginTop: 4,
+    marginTop: 8,
+  },
+  configurerBtn: {
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    borderRadius: 12,
+    borderStyle: "dashed",
+    padding: 16,
+    marginBottom: 12,
+    alignItems: "center",
+  },
+  configurerBtnText: {
+    fontSize: 14,
+    color: "#64748b",
   },
   label: {
     fontSize: 14,
