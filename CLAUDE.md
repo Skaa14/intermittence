@@ -11,24 +11,35 @@ Ce projet sert aussi de formation à React Native / Expo pour l'utilisateur.
 **À chaque étape** : expliquer clairement ce qu'on fait et pourquoi, pour que l'utilisateur apprenne et retienne.
 
 ## Stack technique
-- **Framework** : Expo (React Native) — template blank-typescript
+- **Framework** : Expo SDK 54 (React Native)
 - **Langage** : TypeScript
-- **État du projet** : Projet initialisé, Git configuré avec compte perso GitHub
+- **Navigation** : Expo Router (file-based routing avec onglets)
+- **State management** : React Context (ContratsContext)
+- **État du projet** : Formulaire de contrats + dashboard fonctionnels
 
 ## Git
-- Repo local initialisé
+- Remote : git@github-perso:lucas-dormoy1/intermittence.git
 - Identité : lucas-dormoy1 <luludorm@gmail.com>
-- Remote à configurer avec `github-perso` comme host SSH
+- Branche principale : main
 
 ## Architecture
-- `App.tsx` — Point d'entrée de l'app (composant racine)
-- `index.ts` — Fichier d'amorçage qui enregistre le composant racine auprès d'Expo
-- `app.json` — Configuration Expo (nom de l'app, icône, splash screen, etc.)
-- `assets/` — Images et ressources statiques
-- `tsconfig.json` — Configuration TypeScript
+```
+app/                    ← Dossier des routes (Expo Router)
+├── _layout.tsx         ← Layout racine (Stack global)
+└── (tabs)/             ← Groupe d'onglets
+    ├── _layout.tsx     ← Config des onglets (barre du bas)
+    ├── index.tsx       ← Onglet Accueil (dashboard)
+    ├── contrats.tsx    ← Onglet Contrats (saisie)
+    └── simulation.tsx  ← Onglet Simulation (calcul ARE)
+types/contrat.ts        ← Interface TypeScript du contrat
+contexts/ContratsContext.tsx ← State partagé entre les écrans
+docs/                   ← Fiches pédagogiques sur les concepts RN/Expo
+app.json                ← Configuration Expo
+assets/                 ← Images et ressources
+```
 
 ## Règles de développement
-- Expliquer chaque fichier créé/modifié et son rôle
-- Commenter les choix techniques
+- **Pas de commentaires explicatifs dans le code** — les explications de concepts vont dans des fiches Markdown dans `docs/`
 - Garder le code simple et lisible
 - Mettre à jour ce fichier à chaque étape
+- L'utilisateur connaît TypeScript, ne pas expliquer les bases TS
