@@ -15,13 +15,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useContrats } from "../../contexts/ContratsContext";
 import { Contrat } from "../../types/contrat";
-
-function formatDate(date: Date): string {
-  const jour = String(date.getDate()).padStart(2, "0");
-  const mois = String(date.getMonth() + 1).padStart(2, "0");
-  const annee = date.getFullYear();
-  return `${jour}/${mois}/${annee}`;
-}
+import { formatDate } from "../../utils/date";
 
 export default function ContratsScreen() {
   const { contrats, ajouterContrat, supprimerContrat } = useContrats();
@@ -266,7 +260,7 @@ export default function ContratsScreen() {
   );
 }
 
-const webDateInputStyle: Record<string, unknown> = {
+const webDateInputStyle: React.CSSProperties = {
   flex: 1,
   border: "1px solid #cbd5e1",
   borderRadius: 8,

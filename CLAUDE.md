@@ -35,7 +35,9 @@ app/                    ← Dossier des routes (Expo Router)
     └── simulation.tsx  ← Onglet Simulation (calcul ARE)
 types/contrat.ts        ← Interface TypeScript du contrat
 contexts/ContratsContext.tsx ← State partagé entre les écrans
-docs/                   ← Fiches pédagogiques sur les concepts RN/Expo
+docs/                   ← Documentation du projet
+├── tech/               ← Fiches pédagogiques React Native / Expo
+└── metier/             ← Fiches règles métier ARE intermittents + guide officiel PDF
 tests/                  ← Tests
 ├── features/           ← Fichiers Gherkin (.feature)
 └── steps/              ← Step definitions Jest/Cucumber (.steps.tsx)
