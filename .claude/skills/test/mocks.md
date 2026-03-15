@@ -2,37 +2,28 @@
 
 Catalogue des mocks existants dans le projet. Réutilise-les tel quel au lieu de les réinventer.
 
+Les mocks partagés sont dans `tests/helpers/mocks.tsx`.
+
 ## DateTimePicker
 
-Le mock capture les callbacks `onChange` via `testID` pour pouvoir simuler la sélection de dates :
+Le mock est défini dans `tests/helpers/mocks.tsx`. Pour l'utiliser dans un fichier de steps :
 
 ```tsx
-type MockPickerCallback = (event: any, date?: Date) => void;
-const mockPickerCallbacksByTestID: Record<string, MockPickerCallback> = {};
+import {
+  mockPickerCallbacksByTestID,
+  resetPickerCallbacks,
+} from "../helpers/mocks";
 
-jest.mock("@react-native-community/datetimepicker", () => {
-  const { View, Text } = require("react-native");
-  return {
-    __esModule: true,
-    default: (props: any) => {
-      if (props.testID) {
-        mockPickerCallbacksByTestID[props.testID] = props.onChange;
-      }
-      return (
-        <View testID={props.testID ?? "datetime-picker"}>
-          <Text testID="picker-value">{props.value?.toISOString()}</Text>
-        </View>
-      );
-    },
-  };
-});
+jest.mock("@react-native-community/datetimepicker", () =>
+  require("../helpers/mocks").mockDateTimePickerFactory()
+);
 ```
+
+**Important** : `jest.mock()` est hoisted au-dessus des imports par Jest. On ne peut pas référencer des variables importées dans la factory, sauf si elles commencent par `mock`. C'est pourquoi on utilise `require()` dans la factory au lieu de l'import direct.
 
 Réinitialiser dans `beforeEach` :
 ```tsx
-Object.keys(mockPickerCallbacksByTestID).forEach(
-  (key) => delete mockPickerCallbacksByTestID[key]
-);
+resetPickerCallbacks();
 ```
 
 Simuler une sélection :

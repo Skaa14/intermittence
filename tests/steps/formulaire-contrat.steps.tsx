@@ -8,27 +8,14 @@ import {
 import { Alert, Platform } from "react-native";
 import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
+import {
+  mockPickerCallbacksByTestID,
+  resetPickerCallbacks,
+} from "../helpers/mocks";
 
-type MockPickerCallback = (event: any, date?: Date) => void;
-
-const mockPickerCallbacksByTestID: Record<string, MockPickerCallback> = {};
-
-jest.mock("@react-native-community/datetimepicker", () => {
-  const { View, Text } = require("react-native");
-  return {
-    __esModule: true,
-    default: (props: any) => {
-      if (props.testID) {
-        mockPickerCallbacksByTestID[props.testID] = props.onChange;
-      }
-      return (
-        <View testID={props.testID ?? "datetime-picker"}>
-          <Text testID="picker-value">{props.value?.toISOString()}</Text>
-        </View>
-      );
-    },
-  };
-});
+jest.mock("@react-native-community/datetimepicker", () =>
+  require("../helpers/mocks").mockDateTimePickerFactory()
+);
 
 const feature = loadFeature("tests/features/formulaire-contrat.feature");
 
@@ -60,9 +47,7 @@ const originalPlatformOS = Platform.OS;
 defineFeature(feature, (test) => {
   beforeEach(() => {
     Platform.OS = originalPlatformOS as any;
-    Object.keys(mockPickerCallbacksByTestID).forEach(
-      (key) => delete mockPickerCallbacksByTestID[key]
-    );
+    resetPickerCallbacks();
     lastAlertButtons = [];
     alertSpy = jest.spyOn(Alert, "alert").mockImplementation(
       (_title, _message, buttons) => {

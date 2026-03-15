@@ -101,3 +101,46 @@ when(
   (employeur: string, salaire: string) => { ... }
 );
 ```
+
+### Data Tables dans les steps
+
+Gherkin permet de passer un tableau de données à un step. `jest-cucumber` le parse en tableau d'objets (clés = headers).
+
+```gherkin
+Given ces contrats existent
+  | Employeur      | Début      | Fin        | Heures | Salaire |
+  | Ancien Théâtre | 01/01/2026 | 31/01/2026 | 40     | 1500    |
+  | Studio Actuel  | 01/06/2026 | 30/06/2026 | 40     | 1500    |
+```
+
+```tsx
+type ContratRow = {
+  Employeur: string;
+  "Début": string;
+  Fin: string;
+  Heures: string;
+  Salaire: string;
+};
+
+given("ces contrats existent", (table: ContratRow[]) => {
+  renderScreen();
+  table.forEach((row) => ajouterContratViaFormulaire(row));
+});
+```
+
+La table est toujours le **dernier argument** de la step function, après les captures regex.
+
+### Fake timers pour les dates
+
+Quand un test dépend de la date du jour, fixer le temps avec `jest.useFakeTimers()` pour éviter que le test casse dans le futur :
+
+```tsx
+beforeEach(() => {
+  jest.useFakeTimers();
+  jest.setSystemTime(new Date("2026-06-15T12:00:00"));
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
+```

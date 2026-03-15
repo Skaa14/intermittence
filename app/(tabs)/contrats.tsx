@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -15,7 +15,17 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useContrats } from "../../contexts/ContratsContext";
 import { Contrat } from "../../types/contrat";
-import { formatDate } from "../../utils/date";
+import { formatDate, parseDate } from "../../utils/date";
+
+type ContratAvecStatut = Contrat & { passe: boolean };
+
+const isContratPasse = (contrat: Contrat): boolean => {
+  const fin = parseDate(contrat.dateFin);
+  if (!fin) return false;
+  const aujourdhui = new Date();
+  aujourdhui.setHours(0, 0, 0, 0);
+  return fin.getTime() < aujourdhui.getTime();
+};
 
 export default function ContratsScreen() {
   const { contrats, ajouterContrat, supprimerContrat } = useContrats();
@@ -28,6 +38,21 @@ export default function ContratsScreen() {
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
   const [showPickerDebut, setShowPickerDebut] = useState(false);
   const [showPickerFin, setShowPickerFin] = useState(false);
+  const [afficherPasses, setAfficherPasses] = useState(false);
+
+  const { contratsActifs, contratsPasses } = useMemo(() => {
+    const actifs: ContratAvecStatut[] = [];
+    const passes: ContratAvecStatut[] = [];
+    for (const c of contrats) {
+      if (isContratPasse(c)) passes.push({ ...c, passe: true });
+      else actifs.push({ ...c, passe: false });
+    }
+    return { contratsActifs: actifs, contratsPasses: passes };
+  }, [contrats]);
+
+  const contratsAffiches: ContratAvecStatut[] = afficherPasses
+    ? [...contratsActifs, ...contratsPasses]
+    : contratsActifs;
 
   const setDateDebutSafe = (d: Date) => {
     setDateDebut(d);
@@ -229,8 +254,21 @@ export default function ContratsScreen() {
         </Pressable>
       )}
 
+      {contratsPasses.length > 0 && (
+        <Pressable
+          style={styles.btnTogglePasses}
+          onPress={() => setAfficherPasses(!afficherPasses)}
+        >
+          <Text style={styles.btnTogglePassesText}>
+            {afficherPasses
+              ? `Masquer les contrats passés (${contratsPasses.length})`
+              : `Afficher les contrats passés (${contratsPasses.length})`}
+          </Text>
+        </Pressable>
+      )}
+
       <FlatList
-        data={contrats}
+        data={contratsAffiches}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.liste}
         ListEmptyComponent={
@@ -239,22 +277,35 @@ export default function ContratsScreen() {
           </Text>
         }
         renderItem={({ item }) => (
-          <View style={styles.contratCard}>
-            <View style={styles.contratHeader}>
-              <Text style={styles.contratEmployeur}>{item.employeur}</Text>
-              <Pressable onPress={() => confirmerSuppression(item)}>
-                <Text style={styles.supprimer}>✕</Text>
-              </Pressable>
+            <View style={[styles.contratCard, item.passe && styles.contratCardPasse]}>
+              <View style={styles.contratHeader}>
+                <View style={styles.contratTitre}>
+                  <Text style={[styles.contratEmployeur, item.passe && styles.contratTextPasse]}>
+                    {item.employeur}
+                  </Text>
+                  {item.passe && (
+                    <View style={styles.badgePasse}>
+                      <Text style={styles.badgePasseText}>Passé</Text>
+                    </View>
+                  )}
+                </View>
+                <Pressable onPress={() => confirmerSuppression(item)}>
+                  <Text style={styles.supprimer}>✕</Text>
+                </Pressable>
+              </View>
+              <Text style={[styles.contratDates, item.passe && styles.contratTextPasse]}>
+                {item.dateDebut} → {item.dateFin}
+              </Text>
+              <View style={styles.contratDetails}>
+                <Text style={[styles.contratDetail, item.passe && styles.contratDetailPasse]}>
+                  {item.heures}h
+                </Text>
+                <Text style={[styles.contratDetail, item.passe && styles.contratDetailPasse]}>
+                  {item.salaireBrut}€ brut
+                </Text>
+              </View>
             </View>
-            <Text style={styles.contratDates}>
-              {item.dateDebut} → {item.dateFin}
-            </Text>
-            <View style={styles.contratDetails}>
-              <Text style={styles.contratDetail}>{item.heures}h</Text>
-              <Text style={styles.contratDetail}>{item.salaireBrut}€ brut</Text>
-            </View>
-          </View>
-        )}
+          )}
       />
     </KeyboardAvoidingView>
   );
@@ -409,5 +460,46 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#2563eb",
     fontWeight: "600",
+  },
+  btnTogglePasses: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: "#f1f5f9",
+    alignItems: "center",
+  },
+  btnTogglePassesText: {
+    fontSize: 14,
+    color: "#64748b",
+    fontWeight: "500",
+  },
+  contratCardPasse: {
+    opacity: 0.6,
+    borderLeftWidth: 3,
+    borderLeftColor: "#94a3b8",
+  },
+  contratTitre: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    flex: 1,
+  },
+  contratTextPasse: {
+    color: "#94a3b8",
+  },
+  badgePasse: {
+    backgroundColor: "#e2e8f0",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgePasseText: {
+    fontSize: 11,
+    color: "#64748b",
+    fontWeight: "600",
+  },
+  contratDetailPasse: {
+    color: "#94a3b8",
   },
 });

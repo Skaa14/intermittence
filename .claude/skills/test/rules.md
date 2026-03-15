@@ -6,3 +6,4 @@
 - Extraire les helpers récurrents en fonctions dans le fichier steps (ex: `renderScreen`, `ouvrirFormulaire`, `selectDate`, `ajouterUnContrat`)
 - Les scénarios Gherkin sont en français, les noms de fonctions helpers en français aussi
 - Pas de commentaires dans le code de test (comme dans le reste du projet)
+- Les valeurs de test (noms d'employeurs, montants, dates, etc.) doivent venir du Gherkin, jamais en dur dans les step definitions. Utiliser des regex avec captures (`/^le contrat "(.*)" est visible$/`) pour que les steps soient paramétrées.

@@ -1,7 +1,6 @@
 ---
 name: commit
 description: Stage, review en profondeur, commit et push les changements
-disable-model-invocation: true
 ---
 
 # Skill /commit — Review + Commit + Push
@@ -56,16 +55,35 @@ Si tout est clean, réponds exactement : "LGTM"
 Termine par un résumé : nombre de bloquants, nombre de suggestions.
 ```
 
-## Étape 4 : Décision
+## Étape 4 : Affichage du résultat
+
+**TOUJOURS afficher le résultat complet de la review à l'utilisateur**, quel que soit le résultat (LGTM ou problèmes trouvés). Le format d'affichage est :
+
+```
+## Review - X bloquant(s), Y suggestion(s)
+
+### Bloquants (si présents)
+1. **Description courte** — fichier:ligne
+   Explication + fix proposé
+
+### Suggestions (si présentes)
+1. **Description courte** — fichier:ligne
+   Explication
+```
+
+## Étape 5 : Décision
 
 ### Si le sub-agent répond "LGTM" (aucun bloquant, aucune suggestion) :
-1. Génère un message de commit **conventional commit** basé sur le diff
-2. Commite avec ce message (ajoute le co-author Claude)
-3. Push sur la branche courante avec `git push -u origin HEAD`
-4. Affiche le résultat final
+
+1. Affiche le résultat de la review (LGTM)
+2. Génère un message de commit **conventional commit** basé sur le diff
+3. Demande confirmation à l'utilisateur avant de commiter
+4. Commite avec ce message (ajoute le co-author Claude)
+5. Push sur la branche courante avec `git push -u origin HEAD`
 
 ### Si le sub-agent trouve des **suggestions** et/ou des **bloquants** :
-1. Présente tous les problèmes à l'utilisateur
+
+1. Affiche le résultat complet de la review
 2. Demande ce qu'il veut faire :
    - Corriger automatiquement (Claude applique les fixes)
    - Corriger manuellement (l'utilisateur corrige lui-même)
@@ -84,6 +102,7 @@ Termine par un résumé : nombre de bloquants, nombre de suggestions.
   Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
   ```
 - Utilise un HEREDOC pour le message :
+
   ```bash
   git commit -m "$(cat <<'EOF'
   feat: description courte
