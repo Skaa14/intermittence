@@ -73,23 +73,12 @@ defineFeature(feature, (test) => {
 });
 ```
 
-### Deux types de tests
+### Tests d'écrans/composants (seul type autorisé)
 
-1. **Tests de hooks/contexte** (logique pure, sans rendu) :
-   - Utiliser `renderHook` + `act` de RNTL
-   - Wrapper avec le Provider
-   ```tsx
-   const wrapper = ({ children }: { children: React.ReactNode }) => (
-     <ContratsProvider>{children}</ContratsProvider>
-   );
-   const hook = renderHook(() => useContrats(), { wrapper });
-   act(() => { hook.result.current.ajouterContrat({...}); });
-   ```
-
-2. **Tests d'écrans/composants** (rendu + interactions) :
-   - Utiliser `render` + `fireEvent` + `screen`
-   - Toujours wrapper avec `ContratsProvider`
-   - Queries : `getByText`, `getByPlaceholderText`, `queryByText` (pour absence)
+- Toujours tester via le rendu UI : `render` + `fireEvent` + `screen`
+- Toujours wrapper avec `ContratsProvider`
+- Queries : `getByText`, `getByPlaceholderText`, `queryByText` (pour absence)
+- Pas de tests renderHook — on teste le comportement tel que l'utilisateur le voit
 
 ### Regex dans les steps
 

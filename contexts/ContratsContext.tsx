@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, ReactNode } from "react";
 import { Contrat } from "../types/contrat";
 
 interface ContratsContextType {
@@ -10,20 +10,37 @@ interface ContratsContextType {
 
 const ContratsContext = createContext<ContratsContextType | null>(null);
 
+function parseDateFR(date: string): number {
+  const parts = date.split("/");
+  if (parts.length !== 3) return 0;
+  const [jour, mois, annee] = parts;
+  const timestamp = new Date(`${annee}-${mois}-${jour}`).getTime();
+  return isNaN(timestamp) ? 0 : timestamp;
+}
+
+function trierParDate(contrats: Contrat[]): Contrat[] {
+  return [...contrats].sort(
+    (a, b) => parseDateFR(a.dateDebut) - parseDateFR(b.dateDebut)
+  );
+}
+
 export function ContratsProvider({ children }: { children: ReactNode }) {
   const [contrats, setContrats] = useState<Contrat[]>([]);
+  const nextId = useRef(1);
 
   const ajouterContrat = (contratSansId: Omit<Contrat, "id">) => {
     const nouveau: Contrat = {
       ...contratSansId,
-      id: Date.now().toString(),
+      id: String(nextId.current++),
     };
-    setContrats((prev) => [...prev, nouveau]);
+    setContrats((prev) => trierParDate([...prev, nouveau]));
   };
 
   const modifierContrat = (id: string, contratSansId: Omit<Contrat, "id">) => {
     setContrats((prev) =>
-      prev.map((c) => (c.id === id ? { ...contratSansId, id } : c))
+      trierParDate(
+        prev.map((c) => (c.id === id ? { ...contratSansId, id } : c))
+      )
     );
   };
 

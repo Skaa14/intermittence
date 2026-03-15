@@ -1,64 +1,18 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import {
-  render,
-  fireEvent,
-  screen,
-  act,
-} from "@testing-library/react-native";
-import ContratsScreen from "../../app/(tabs)/contrats";
-import { ContratsProvider } from "../../contexts/ContratsContext";
-import {
-  mockPickerCallbacksByTestID,
-  resetPickerCallbacks,
-} from "../helpers/mocks";
-import { ddmmyyyyToIso } from "../helpers/date";
+import { fireEvent, screen } from "@testing-library/react-native";
+import { resetPickerCallbacks } from "../helpers/mocks";
 import { ContratRow } from "../helpers/types";
+import {
+  renderScreen,
+  ajouterContratViaFormulaire,
+  fixerDate,
+} from "../helpers/form";
 
 jest.mock("@react-native-community/datetimepicker", () =>
   require("../helpers/mocks").mockDateTimePickerFactory()
 );
 
 const feature = loadFeature("tests/features/contrats-passes.feature");
-
-const renderScreen = () =>
-  render(
-    <ContratsProvider>
-      <ContratsScreen />
-    </ContratsProvider>
-  );
-
-const ouvrirFormulaire = () => {
-  fireEvent.press(screen.getByText("+ Nouveau contrat"));
-};
-
-const selectDate = (buttonLabel: string, dateStr: string) => {
-  fireEvent.press(screen.getByText(buttonLabel));
-  const date = new Date(dateStr + "T00:00:00");
-  const testID = buttonLabel === "Date début" ? "picker-debut" : "picker-fin";
-  const callback = mockPickerCallbacksByTestID[testID];
-  act(() => {
-    callback({ type: "set" }, date);
-  });
-};
-
-const ajouterContratViaFormulaire = (row: ContratRow) => {
-  ouvrirFormulaire();
-  fireEvent.changeText(screen.getByPlaceholderText("Employeur"), row.Employeur);
-  selectDate("Date début", ddmmyyyyToIso(row["Début"]));
-  selectDate("Date fin", ddmmyyyyToIso(row.Fin));
-  fireEvent.changeText(screen.getByPlaceholderText("Heures"), row.Heures);
-  fireEvent.changeText(
-    screen.getByPlaceholderText("Salaire brut (€)"),
-    row.Salaire
-  );
-  fireEvent.press(screen.getByText("Ajouter"));
-};
-
-const fixerDate = (ddmmyyyy: string) => {
-  jest.useFakeTimers();
-  const isoDate = ddmmyyyyToIso(ddmmyyyy);
-  jest.setSystemTime(new Date(isoDate + "T12:00:00"));
-};
 
 defineFeature(feature, (test) => {
   beforeEach(() => {

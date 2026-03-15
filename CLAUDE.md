@@ -53,3 +53,4 @@ assets/                 ← Images et ressources
 - L'utilisateur connaît TypeScript, ne pas expliquer les bases TS
 - **Toujours lancer les tests** (`npm test`) après une modification qui peut les impacter
 - **Toujours écrire des tests** pour chaque feature ou fix (Gherkin + step definitions dans `tests/`)
+- **Avant d'écrire des tests** : charger le skill `/test` pour connaître les conventions, patterns et mocks du projet

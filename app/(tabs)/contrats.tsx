@@ -333,7 +333,7 @@ export default function ContratsScreen() {
             <View testID={`contrat-${item.id}`} style={[styles.contratCard, item.passe && styles.contratCardPasse]}>
               <View style={styles.contratHeader}>
                 <View style={styles.contratTitre}>
-                  <Text style={[styles.contratEmployeur, item.passe && styles.contratTextPasse]}>
+                  <Text testID={`employeur-${item.id}`} style={[styles.contratEmployeur, item.passe && styles.contratTextPasse]}>
                     {item.employeur}
                   </Text>
                   {item.passe && (
