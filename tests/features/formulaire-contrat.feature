@@ -29,6 +29,17 @@ Feature: Formulaire de saisie d'un contrat
     When j'appuie sur "Ajouter" sans remplir le formulaire
     Then aucun contrat n'est ajouté
 
+  Scenario: Soumission avec champs manquants affiche les erreurs visuelles
+    Given le formulaire de saisie est ouvert
+    When j'appuie sur "Ajouter" sans remplir le formulaire
+    Then tous les champs ont une bordure rouge
+
+  Scenario: La bordure rouge disparaît quand on corrige un champ
+    Given le formulaire de saisie est ouvert
+    And j'appuie sur "Ajouter" sans remplir le formulaire
+    When je remplis le champ "Employeur"
+    Then le champ "Employeur" n'a plus de bordure rouge
+
   Scenario: Ajout d'un contrat complet via le formulaire
     Given le formulaire de saisie est ouvert
     When je remplis le formulaire avec des données valides

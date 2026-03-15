@@ -18,6 +18,9 @@ import { Contrat } from "../../types/contrat";
 import { formatDate, parseDate } from "../../utils/date";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
+type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
+
+const COULEUR_ERREUR = "#ef4444";
 
 const isContratPasse = (contrat: Contrat): boolean => {
   const fin = parseDate(contrat.dateFin);
@@ -40,6 +43,7 @@ export default function ContratsScreen() {
   const [showPickerFin, setShowPickerFin] = useState(false);
   const [afficherPasses, setAfficherPasses] = useState(false);
   const [contratEnEdition, setContratEnEdition] = useState<string | null>(null);
+  const [erreurs, setErreurs] = useState<Partial<Record<ChampContrat, boolean>>>({});
 
   const { contratsActifs, contratsPasses } = useMemo(() => {
     const actifs: ContratAvecStatut[] = [];
@@ -57,11 +61,13 @@ export default function ContratsScreen() {
 
   const setDateDebutSafe = (d: Date) => {
     setDateDebut(d);
+    setErreurs((e) => ({ ...e, dateDebut: false }));
     if (dateFin && d.getTime() > dateFin.getTime()) setDateFin(undefined);
   };
 
   const setDateFinSafe = (d: Date) => {
     setDateFin(d);
+    setErreurs((e) => ({ ...e, dateFin: false }));
     if (dateDebut && d.getTime() < dateDebut.getTime()) setDateDebut(undefined);
   };
 
@@ -109,6 +115,7 @@ export default function ContratsScreen() {
     setSalaireBrut("");
     setContratEnEdition(null);
     setFormulaireOuvert(false);
+    setErreurs({});
   };
 
   const lancerEdition = (contrat: Contrat) => {
@@ -122,12 +129,21 @@ export default function ContratsScreen() {
   };
 
   const handleValider = () => {
-    if (!employeur || !dateDebut || !dateFin || !heures || !salaireBrut) return;
+    const nouvellesErreurs: Record<string, boolean> = {
+      employeur: !employeur,
+      dateDebut: !dateDebut,
+      dateFin: !dateFin,
+      heures: !heures,
+      salaireBrut: !salaireBrut,
+    };
+    setErreurs(nouvellesErreurs);
+
+    if (Object.values(nouvellesErreurs).some(Boolean)) return;
 
     const donnees = {
       employeur,
-      dateDebut: formatDate(dateDebut),
-      dateFin: formatDate(dateFin),
+      dateDebut: formatDate(dateDebut!),
+      dateFin: formatDate(dateFin!),
       heures: parseFloat(heures),
       salaireBrut: parseFloat(salaireBrut),
     };
@@ -167,10 +183,11 @@ export default function ContratsScreen() {
       {formulaireOuvert ? (
         <View style={styles.formulaire}>
           <TextInput
-            style={styles.input}
+            testID="input-employeur"
+            style={[styles.input, erreurs.employeur && styles.inputErreur]}
             placeholder="Employeur"
             value={employeur}
-            onChangeText={setEmployeur}
+            onChangeText={(v) => { setEmployeur(v); setErreurs((e) => ({ ...e, employeur: false })); }}
           />
           <View style={styles.row}>
             {Platform.OS === "web" ? (
@@ -184,7 +201,10 @@ export default function ContratsScreen() {
                     if (d) setDateDebutSafe(d);
                     else setDateDebut(undefined);
                   }}
-                  style={webDateInputStyle}
+                  style={{
+                    ...webDateInputStyle,
+                    ...(erreurs.dateDebut && { borderColor: COULEUR_ERREUR }),
+                  }}
                 />
                 <input
                   type="date"
@@ -195,13 +215,17 @@ export default function ContratsScreen() {
                     if (d) setDateFinSafe(d);
                     else setDateFin(undefined);
                   }}
-                  style={webDateInputStyle}
+                  style={{
+                    ...webDateInputStyle,
+                    ...(erreurs.dateFin && { borderColor: COULEUR_ERREUR }),
+                  }}
                 />
               </>
             ) : (
               <>
                 <Pressable
-                  style={[styles.input, styles.inputHalf]}
+                  testID="input-date-debut"
+                  style={[styles.input, styles.inputHalf, erreurs.dateDebut && styles.inputErreur]}
                   onPress={() => setShowPickerDebut(true)}
                 >
                   <Text style={dateDebut ? styles.dateText : styles.datePlaceholder}>
@@ -209,7 +233,8 @@ export default function ContratsScreen() {
                   </Text>
                 </Pressable>
                 <Pressable
-                  style={[styles.input, styles.inputHalf]}
+                  testID="input-date-fin"
+                  style={[styles.input, styles.inputHalf, erreurs.dateFin && styles.inputErreur]}
                   onPress={() => setShowPickerFin(true)}
                 >
                   <Text style={dateFin ? styles.dateText : styles.datePlaceholder}>
@@ -241,17 +266,19 @@ export default function ContratsScreen() {
           )}
           <View style={styles.row}>
             <TextInput
-              style={[styles.input, styles.inputHalf]}
+              testID="input-heures"
+              style={[styles.input, styles.inputHalf, erreurs.heures && styles.inputErreur]}
               placeholder="Heures"
               value={heures}
-              onChangeText={setHeures}
+              onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
               keyboardType="numeric"
             />
             <TextInput
-              style={[styles.input, styles.inputHalf]}
+              testID="input-salaire-brut"
+              style={[styles.input, styles.inputHalf, erreurs.salaireBrut && styles.inputErreur]}
               placeholder="Salaire brut (€)"
               value={salaireBrut}
-              onChangeText={setSalaireBrut}
+              onChangeText={(v) => { setSalaireBrut(v); setErreurs((e) => ({ ...e, salaireBrut: false })); }}
               keyboardType="numeric"
             />
           </View>
@@ -542,5 +569,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#2563eb",
     padding: 4,
+  },
+  inputErreur: {
+    borderColor: COULEUR_ERREUR,
   },
 });

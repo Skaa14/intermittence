@@ -206,6 +206,64 @@ defineFeature(feature, (test) => {
     });
   });
 
+  const getStyleProp = (testID: string, prop: string) => {
+    const el = screen.getByTestId(testID);
+    const style = el.props.style;
+    const flat = Array.isArray(style) ? Object.assign({}, ...style.filter(Boolean)) : style;
+    return flat[prop];
+  };
+
+  test("Soumission avec champs manquants affiche les erreurs visuelles", ({
+    given,
+    when,
+    then,
+  }) => {
+    given("le formulaire de saisie est ouvert", () => {
+      renderScreen();
+      ouvrirFormulaire();
+    });
+
+    when(/^j'appuie sur "(.*)" sans remplir le formulaire$/, (texte: string) => {
+      fireEvent.press(screen.getByText(texte));
+    });
+
+    then("tous les champs ont une bordure rouge", () => {
+      const ids = ["input-employeur", "input-date-debut", "input-date-fin", "input-heures", "input-salaire-brut"];
+      for (const id of ids) {
+        expect(getStyleProp(id, "borderColor")).toBe("#ef4444");
+      }
+    });
+  });
+
+  test("La bordure rouge disparaît quand on corrige un champ", ({
+    given,
+    and,
+    when,
+    then,
+  }) => {
+    given("le formulaire de saisie est ouvert", () => {
+      renderScreen();
+      ouvrirFormulaire();
+    });
+
+    and(/^j'appuie sur "(.*)" sans remplir le formulaire$/, (texte: string) => {
+      fireEvent.press(screen.getByText(texte));
+    });
+
+    when(/^je remplis le champ "(.*)"$/, (champ: string) => {
+      fireEvent.changeText(screen.getByPlaceholderText(champ), "Test");
+    });
+
+    then(/^le champ "(.*)" n'a plus de bordure rouge$/, (champ: string) => {
+      const testIdMap: Record<string, string> = {
+        Employeur: "input-employeur",
+        Heures: "input-heures",
+        "Salaire brut (€)": "input-salaire-brut",
+      };
+      expect(getStyleProp(testIdMap[champ], "borderColor")).not.toBe("#ef4444");
+    });
+  });
+
   const ajouterUnContrat = () => {
     renderScreen();
     ouvrirFormulaire();
