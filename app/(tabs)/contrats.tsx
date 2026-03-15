@@ -14,6 +14,7 @@ import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
 import { useContrats } from "../../contexts/ContratsContext";
+import { Contrat } from "../../types/contrat";
 
 function formatDate(date: Date): string {
   const jour = String(date.getDate()).padStart(2, "0");
@@ -52,6 +53,32 @@ export default function ContratsScreen() {
   const onChangeDateFin = (_event: DateTimePickerEvent, date?: Date) => {
     setShowPickerFin(Platform.OS === "ios");
     if (date) setDateFinSafe(date);
+  };
+
+  const confirmerSuppression = (contrat: Contrat) => {
+    if (Platform.OS === "web") {
+      if (
+        typeof window !== "undefined" &&
+        window.confirm(
+          `Supprimer le contrat ${contrat.employeur} — ${contrat.dateDebut} → ${contrat.dateFin} ?`
+        )
+      ) {
+        supprimerContrat(contrat.id);
+      }
+    } else {
+      Alert.alert(
+        "Supprimer ce contrat ?",
+        `${contrat.employeur} — ${contrat.dateDebut} → ${contrat.dateFin}`,
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Supprimer",
+            style: "destructive",
+            onPress: () => supprimerContrat(contrat.id),
+          },
+        ],
+      );
+    }
   };
 
   const handleAjouter = () => {
@@ -221,22 +248,7 @@ export default function ContratsScreen() {
           <View style={styles.contratCard}>
             <View style={styles.contratHeader}>
               <Text style={styles.contratEmployeur}>{item.employeur}</Text>
-              <Pressable
-                onPress={() =>
-                  Alert.alert(
-                    "Supprimer ce contrat ?",
-                    `${item.employeur} — ${item.dateDebut} → ${item.dateFin}`,
-                    [
-                      { text: "Annuler", style: "cancel" },
-                      {
-                        text: "Supprimer",
-                        style: "destructive",
-                        onPress: () => supprimerContrat(item.id),
-                      },
-                    ],
-                  )
-                }
-              >
+              <Pressable onPress={() => confirmerSuppression(item)}>
                 <Text style={styles.supprimer}>✕</Text>
               </Pressable>
             </View>

@@ -46,3 +46,15 @@ Feature: Formulaire de saisie d'un contrat
     When j'appuie sur supprimer
     And je confirme la suppression
     Then le contrat n'est plus dans la liste
+
+  Scenario: Suppression web avec confirmation retire le contrat
+    Given un contrat existe dans la liste sur le web
+    When j'appuie sur supprimer sur le web
+    And je confirme via window.confirm
+    Then le contrat n'est plus dans la liste
+
+  Scenario: Suppression web avec annulation conserve le contrat
+    Given un contrat existe dans la liste sur le web
+    When j'appuie sur supprimer sur le web
+    And j'annule via window.confirm
+    Then le contrat est toujours dans la liste

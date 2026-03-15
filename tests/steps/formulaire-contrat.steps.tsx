@@ -5,7 +5,7 @@ import {
   screen,
   act,
 } from "@testing-library/react-native";
-import { Alert } from "react-native";
+import { Alert, Platform } from "react-native";
 import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 
@@ -55,9 +55,11 @@ const selectDate = (buttonLabel: string, dateStr: string) => {
 
 let alertSpy: jest.SpyInstance;
 let lastAlertButtons: any[];
+const originalPlatformOS = Platform.OS;
 
 defineFeature(feature, (test) => {
   beforeEach(() => {
+    Platform.OS = originalPlatformOS as any;
     Object.keys(mockPickerCallbacksByTestID).forEach(
       (key) => delete mockPickerCallbacksByTestID[key]
     );
@@ -71,6 +73,10 @@ defineFeature(feature, (test) => {
 
   afterEach(() => {
     alertSpy.mockRestore();
+    Platform.OS = originalPlatformOS as any;
+    if (typeof window.confirm === "function" && "mockRestore" in window.confirm) {
+      (window.confirm as jest.Mock).mockRestore();
+    }
   });
 
   test("Ouverture du formulaire", ({ given, when, then }) => {
@@ -289,6 +295,60 @@ defineFeature(feature, (test) => {
 
     then("le contrat n'est plus dans la liste", () => {
       expect(screen.queryByText("Studio Canal")).toBeNull();
+    });
+  });
+
+  const ajouterUnContratPuisBasculerWeb = () => {
+    ajouterUnContrat();
+    Platform.OS = "web" as any;
+  };
+
+  test("Suppression web avec confirmation retire le contrat", ({
+    given,
+    when,
+    and,
+    then,
+  }) => {
+    given("un contrat existe dans la liste sur le web", () => {
+      ajouterUnContratPuisBasculerWeb();
+    });
+
+    when("j'appuie sur supprimer sur le web", () => {
+      const mockConfirm = jest.fn().mockReturnValue(true);
+      window.confirm = mockConfirm;
+      fireEvent.press(screen.getByText("✕"));
+    });
+
+    and("je confirme via window.confirm", () => {
+      expect(window.confirm).toHaveBeenCalled();
+    });
+
+    then("le contrat n'est plus dans la liste", () => {
+      expect(screen.queryByText("Studio Canal")).toBeNull();
+    });
+  });
+
+  test("Suppression web avec annulation conserve le contrat", ({
+    given,
+    when,
+    and,
+    then,
+  }) => {
+    given("un contrat existe dans la liste sur le web", () => {
+      ajouterUnContratPuisBasculerWeb();
+    });
+
+    when("j'appuie sur supprimer sur le web", () => {
+      window.confirm = jest.fn().mockReturnValue(false);
+      fireEvent.press(screen.getByText("✕"));
+    });
+
+    and("j'annule via window.confirm", () => {
+      expect(window.confirm).toHaveBeenCalled();
+    });
+
+    then("le contrat est toujours dans la liste", () => {
+      expect(screen.getByText("Studio Canal")).toBeTruthy();
     });
   });
 });
