@@ -273,7 +273,9 @@ export default function ContratsScreen() {
         contentContainerStyle={styles.liste}
         ListEmptyComponent={
           <Text style={styles.vide}>
-            Aucun contrat. Ajoute ton premier contrat !
+            {contrats.length === 0
+              ? "Aucun contrat. Ajoute ton premier contrat !"
+              : "Aucun contrat en cours. Utilise le bouton ci-dessus pour afficher les contrats passés."}
           </Text>
         }
         renderItem={({ item }) => (

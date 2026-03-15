@@ -175,6 +175,41 @@ defineFeature(feature, (test) => {
     });
   });
 
+  test("Message vide quand tous les contrats sont passés et masqués", ({
+    given,
+    then,
+  }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("ces contrats existent", (table: ContratRow[]) => {
+      renderScreen();
+      table.forEach((row) => ajouterContratViaFormulaire(row));
+    });
+
+    then(/^le message "(.*)" est visible$/, (message: string) => {
+      expect(screen.getByText(message)).toBeTruthy();
+    });
+  });
+
+  test("Message vide quand aucun contrat n'existe", ({
+    given,
+    then,
+  }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("aucun contrat n'existe", () => {
+      renderScreen();
+    });
+
+    then(/^le message "(.*)" est visible$/, (message: string) => {
+      expect(screen.getByText(message)).toBeTruthy();
+    });
+  });
+
   test("Pas de bouton quand il n'y a aucun contrat passé", ({
     given,
     then,
