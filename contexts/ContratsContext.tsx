@@ -4,6 +4,7 @@ import { Contrat } from "../types/contrat";
 interface ContratsContextType {
   contrats: Contrat[];
   ajouterContrat: (contrat: Omit<Contrat, "id">) => void;
+  modifierContrat: (id: string, contrat: Omit<Contrat, "id">) => void;
   supprimerContrat: (id: string) => void;
 }
 
@@ -20,13 +21,19 @@ export function ContratsProvider({ children }: { children: ReactNode }) {
     setContrats((prev) => [...prev, nouveau]);
   };
 
+  const modifierContrat = (id: string, contratSansId: Omit<Contrat, "id">) => {
+    setContrats((prev) =>
+      prev.map((c) => (c.id === id ? { ...contratSansId, id } : c))
+    );
+  };
+
   const supprimerContrat = (id: string) => {
     setContrats((prev) => prev.filter((c) => c.id !== id));
   };
 
   return (
     <ContratsContext.Provider
-      value={{ contrats, ajouterContrat, supprimerContrat }}
+      value={{ contrats, ajouterContrat, modifierContrat, supprimerContrat }}
     >
       {children}
     </ContratsContext.Provider>

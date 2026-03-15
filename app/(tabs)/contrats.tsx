@@ -28,7 +28,7 @@ const isContratPasse = (contrat: Contrat): boolean => {
 };
 
 export default function ContratsScreen() {
-  const { contrats, ajouterContrat, supprimerContrat } = useContrats();
+  const { contrats, ajouterContrat, modifierContrat, supprimerContrat } = useContrats();
 
   const [employeur, setEmployeur] = useState("");
   const [dateDebut, setDateDebut] = useState<Date | undefined>();
@@ -39,6 +39,7 @@ export default function ContratsScreen() {
   const [showPickerDebut, setShowPickerDebut] = useState(false);
   const [showPickerFin, setShowPickerFin] = useState(false);
   const [afficherPasses, setAfficherPasses] = useState(false);
+  const [contratEnEdition, setContratEnEdition] = useState<string | null>(null);
 
   const { contratsActifs, contratsPasses } = useMemo(() => {
     const actifs: ContratAvecStatut[] = [];
@@ -100,23 +101,44 @@ export default function ContratsScreen() {
     }
   };
 
-  const handleAjouter = () => {
-    if (!employeur || !dateDebut || !dateFin || !heures || !salaireBrut) return;
-
-    ajouterContrat({
-      employeur,
-      dateDebut: formatDate(dateDebut),
-      dateFin: formatDate(dateFin),
-      heures: parseFloat(heures),
-      salaireBrut: parseFloat(salaireBrut),
-    });
-
+  const reinitialiserFormulaire = () => {
     setEmployeur("");
     setDateDebut(undefined);
     setDateFin(undefined);
     setHeures("");
     setSalaireBrut("");
+    setContratEnEdition(null);
     setFormulaireOuvert(false);
+  };
+
+  const lancerEdition = (contrat: Contrat) => {
+    setEmployeur(contrat.employeur);
+    setDateDebut(parseDate(contrat.dateDebut));
+    setDateFin(parseDate(contrat.dateFin));
+    setHeures(contrat.heures.toString());
+    setSalaireBrut(contrat.salaireBrut.toString());
+    setContratEnEdition(contrat.id);
+    setFormulaireOuvert(true);
+  };
+
+  const handleValider = () => {
+    if (!employeur || !dateDebut || !dateFin || !heures || !salaireBrut) return;
+
+    const donnees = {
+      employeur,
+      dateDebut: formatDate(dateDebut),
+      dateFin: formatDate(dateFin),
+      heures: parseFloat(heures),
+      salaireBrut: parseFloat(salaireBrut),
+    };
+
+    if (contratEnEdition) {
+      modifierContrat(contratEnEdition, donnees);
+    } else {
+      ajouterContrat(donnees);
+    }
+
+    reinitialiserFormulaire();
   };
 
   const totalHeures = contrats.reduce((sum, c) => sum + c.heures, 0);
@@ -236,12 +258,14 @@ export default function ContratsScreen() {
           <View style={styles.row}>
             <Pressable
               style={styles.btnAnnuler}
-              onPress={() => setFormulaireOuvert(false)}
+              onPress={reinitialiserFormulaire}
             >
               <Text style={styles.btnAnnulerText}>Annuler</Text>
             </Pressable>
-            <Pressable style={styles.btnAjouter} onPress={handleAjouter}>
-              <Text style={styles.btnAjouterText}>Ajouter</Text>
+            <Pressable style={styles.btnAjouter} onPress={handleValider}>
+              <Text style={styles.btnAjouterText}>
+                {contratEnEdition ? "Modifier" : "Ajouter"}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -279,7 +303,7 @@ export default function ContratsScreen() {
           </Text>
         }
         renderItem={({ item }) => (
-            <View style={[styles.contratCard, item.passe && styles.contratCardPasse]}>
+            <View testID={`contrat-${item.id}`} style={[styles.contratCard, item.passe && styles.contratCardPasse]}>
               <View style={styles.contratHeader}>
                 <View style={styles.contratTitre}>
                   <Text style={[styles.contratEmployeur, item.passe && styles.contratTextPasse]}>
@@ -291,9 +315,14 @@ export default function ContratsScreen() {
                     </View>
                   )}
                 </View>
-                <Pressable onPress={() => confirmerSuppression(item)}>
-                  <Text style={styles.supprimer}>✕</Text>
-                </Pressable>
+                <View style={styles.contratActions}>
+                  <Pressable onPress={() => lancerEdition(item)}>
+                    <Text style={styles.modifier}>✎</Text>
+                  </Pressable>
+                  <Pressable onPress={() => confirmerSuppression(item)}>
+                    <Text style={styles.supprimer}>✕</Text>
+                  </Pressable>
+                </View>
               </View>
               <Text style={[styles.contratDates, item.passe && styles.contratTextPasse]}>
                 {item.dateDebut} → {item.dateFin}
@@ -503,5 +532,15 @@ const styles = StyleSheet.create({
   },
   contratDetailPasse: {
     color: "#94a3b8",
+  },
+  contratActions: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  modifier: {
+    fontSize: 18,
+    color: "#2563eb",
+    padding: 4,
   },
 });

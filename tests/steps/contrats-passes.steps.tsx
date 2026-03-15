@@ -12,20 +12,13 @@ import {
   resetPickerCallbacks,
 } from "../helpers/mocks";
 import { ddmmyyyyToIso } from "../helpers/date";
+import { ContratRow } from "../helpers/types";
 
 jest.mock("@react-native-community/datetimepicker", () =>
   require("../helpers/mocks").mockDateTimePickerFactory()
 );
 
 const feature = loadFeature("tests/features/contrats-passes.feature");
-
-type ContratRow = {
-  Employeur: string;
-  "Début": string;
-  Fin: string;
-  Heures: string;
-  Salaire: string;
-};
 
 const renderScreen = () =>
   render(
