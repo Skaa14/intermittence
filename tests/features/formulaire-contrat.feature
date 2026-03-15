@@ -34,3 +34,15 @@ Feature: Formulaire de saisie d'un contrat
     When je remplis le formulaire avec des données valides
     And j'appuie sur "Ajouter"
     Then le contrat apparaît dans la liste
+
+  Scenario: Annulation de la suppression conserve le contrat
+    Given un contrat existe dans la liste
+    When j'appuie sur supprimer
+    And j'annule la confirmation
+    Then le contrat est toujours dans la liste
+
+  Scenario: Confirmation de la suppression retire le contrat
+    Given un contrat existe dans la liste
+    When j'appuie sur supprimer
+    And je confirme la suppression
+    Then le contrat n'est plus dans la liste

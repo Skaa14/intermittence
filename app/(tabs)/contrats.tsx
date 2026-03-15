@@ -8,6 +8,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
@@ -220,7 +221,22 @@ export default function ContratsScreen() {
           <View style={styles.contratCard}>
             <View style={styles.contratHeader}>
               <Text style={styles.contratEmployeur}>{item.employeur}</Text>
-              <Pressable onPress={() => supprimerContrat(item.id)}>
+              <Pressable
+                onPress={() =>
+                  Alert.alert(
+                    "Supprimer ce contrat ?",
+                    `${item.employeur} — ${item.dateDebut} → ${item.dateFin}`,
+                    [
+                      { text: "Annuler", style: "cancel" },
+                      {
+                        text: "Supprimer",
+                        style: "destructive",
+                        onPress: () => supprimerContrat(item.id),
+                      },
+                    ],
+                  )
+                }
+              >
                 <Text style={styles.supprimer}>✕</Text>
               </Pressable>
             </View>

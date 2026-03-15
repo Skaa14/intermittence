@@ -5,6 +5,7 @@ import {
   screen,
   act,
 } from "@testing-library/react-native";
+import { Alert } from "react-native";
 import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 
@@ -52,11 +53,24 @@ const selectDate = (buttonLabel: string, dateStr: string) => {
   });
 };
 
+let alertSpy: jest.SpyInstance;
+let lastAlertButtons: any[];
+
 defineFeature(feature, (test) => {
   beforeEach(() => {
     Object.keys(mockPickerCallbacksByTestID).forEach(
       (key) => delete mockPickerCallbacksByTestID[key]
     );
+    lastAlertButtons = [];
+    alertSpy = jest.spyOn(Alert, "alert").mockImplementation(
+      (_title, _message, buttons) => {
+        lastAlertButtons = buttons ?? [];
+      }
+    );
+  });
+
+  afterEach(() => {
+    alertSpy.mockRestore();
   });
 
   test("Ouverture du formulaire", ({ given, when, then }) => {
@@ -198,6 +212,83 @@ defineFeature(feature, (test) => {
 
     then("le contrat apparaît dans la liste", () => {
       expect(screen.getByText("Opéra de Paris")).toBeTruthy();
+    });
+  });
+
+  const ajouterUnContrat = () => {
+    renderScreen();
+    ouvrirFormulaire();
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Employeur"),
+      "Studio Canal"
+    );
+    selectDate("Date début", "2026-03-01");
+    selectDate("Date fin", "2026-03-15");
+    fireEvent.changeText(screen.getByPlaceholderText("Heures"), "40");
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Salaire brut (€)"),
+      "1500"
+    );
+    fireEvent.press(screen.getByText("Ajouter"));
+  };
+
+  test("Annulation de la suppression conserve le contrat", ({
+    given,
+    when,
+    and,
+    then,
+  }) => {
+    given("un contrat existe dans la liste", () => {
+      ajouterUnContrat();
+      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    });
+
+    when("j'appuie sur supprimer", () => {
+      fireEvent.press(screen.getByText("✕"));
+    });
+
+    and("j'annule la confirmation", () => {
+      expect(alertSpy).toHaveBeenCalled();
+      const cancelButton = lastAlertButtons.find(
+        (b: any) => b.style === "cancel"
+      );
+      expect(cancelButton).toBeDefined();
+      cancelButton?.onPress?.();
+    });
+
+    then("le contrat est toujours dans la liste", () => {
+      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    });
+  });
+
+  test("Confirmation de la suppression retire le contrat", ({
+    given,
+    when,
+    and,
+    then,
+  }) => {
+    given("un contrat existe dans la liste", () => {
+      ajouterUnContrat();
+      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    });
+
+    when("j'appuie sur supprimer", () => {
+      fireEvent.press(screen.getByText("✕"));
+    });
+
+    and("je confirme la suppression", () => {
+      expect(alertSpy).toHaveBeenCalled();
+      const confirmButton = lastAlertButtons.find(
+        (b: any) => b.style === "destructive"
+      );
+      expect(confirmButton).toBeDefined();
+      act(() => {
+        confirmButton?.onPress?.();
+      });
+    });
+
+    then("le contrat n'est plus dans la liste", () => {
+      expect(screen.queryByText("Studio Canal")).toBeNull();
     });
   });
 });
