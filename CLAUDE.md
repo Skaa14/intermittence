@@ -36,8 +36,9 @@ app/                    ← Dossier des routes (Expo Router)
 types/contrat.ts        ← Interface TypeScript du contrat
 contexts/ContratsContext.tsx ← State partagé entre les écrans
 docs/                   ← Fiches pédagogiques sur les concepts RN/Expo
-features/               ← Fichiers Gherkin (.feature)
-__tests__/              ← Step definitions Jest/Cucumber (.steps.tsx)
+tests/                  ← Tests
+├── features/           ← Fichiers Gherkin (.feature)
+└── steps/              ← Step definitions Jest/Cucumber (.steps.tsx)
 jest.config.js          ← Configuration Jest
 app.json                ← Configuration Expo
 assets/                 ← Images et ressources
@@ -48,3 +49,5 @@ assets/                 ← Images et ressources
 - Garder le code simple et lisible
 - Mettre à jour ce fichier à chaque étape
 - L'utilisateur connaît TypeScript, ne pas expliquer les bases TS
+- **Toujours lancer les tests** (`npm test`) après une modification qui peut les impacter
+- **Toujours écrire des tests** pour chaque feature ou fix (Gherkin + step definitions dans `tests/`)

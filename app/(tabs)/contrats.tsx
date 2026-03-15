@@ -9,32 +9,64 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { useContrats } from "../../contexts/ContratsContext";
+
+function formatDate(date: Date): string {
+  const jour = String(date.getDate()).padStart(2, "0");
+  const mois = String(date.getMonth() + 1).padStart(2, "0");
+  const annee = date.getFullYear();
+  return `${jour}/${mois}/${annee}`;
+}
 
 export default function ContratsScreen() {
   const { contrats, ajouterContrat, supprimerContrat } = useContrats();
 
   const [employeur, setEmployeur] = useState("");
-  const [dateDebut, setDateDebut] = useState("");
-  const [dateFin, setDateFin] = useState("");
+  const [dateDebut, setDateDebut] = useState<Date | undefined>();
+  const [dateFin, setDateFin] = useState<Date | undefined>();
   const [heures, setHeures] = useState("");
   const [salaireBrut, setSalaireBrut] = useState("");
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
+  const [showPickerDebut, setShowPickerDebut] = useState(false);
+  const [showPickerFin, setShowPickerFin] = useState(false);
+
+  const setDateDebutSafe = (d: Date) => {
+    setDateDebut(d);
+    if (dateFin && d.getTime() > dateFin.getTime()) setDateFin(undefined);
+  };
+
+  const setDateFinSafe = (d: Date) => {
+    setDateFin(d);
+    if (dateDebut && d.getTime() < dateDebut.getTime()) setDateDebut(undefined);
+  };
+
+  const onChangeDateDebut = (_event: DateTimePickerEvent, date?: Date) => {
+    setShowPickerDebut(Platform.OS === "ios");
+    if (date) setDateDebutSafe(date);
+  };
+
+  const onChangeDateFin = (_event: DateTimePickerEvent, date?: Date) => {
+    setShowPickerFin(Platform.OS === "ios");
+    if (date) setDateFinSafe(date);
+  };
 
   const handleAjouter = () => {
     if (!employeur || !dateDebut || !dateFin || !heures || !salaireBrut) return;
 
     ajouterContrat({
       employeur,
-      dateDebut,
-      dateFin,
+      dateDebut: formatDate(dateDebut),
+      dateFin: formatDate(dateFin),
       heures: parseFloat(heures),
       salaireBrut: parseFloat(salaireBrut),
     });
 
     setEmployeur("");
-    setDateDebut("");
-    setDateFin("");
+    setDateDebut(undefined);
+    setDateFin(undefined);
     setHeures("");
     setSalaireBrut("");
     setFormulaireOuvert(false);
@@ -48,7 +80,6 @@ export default function ContratsScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* Résumé */}
       <View style={styles.resume}>
         <View style={styles.resumeItem}>
           <Text style={styles.resumeValue}>{totalHeures}h</Text>
@@ -64,7 +95,6 @@ export default function ContratsScreen() {
         </View>
       </View>
 
-      {/* Bouton ajouter / Formulaire */}
       {formulaireOuvert ? (
         <View style={styles.formulaire}>
           <TextInput
@@ -74,19 +104,72 @@ export default function ContratsScreen() {
             onChangeText={setEmployeur}
           />
           <View style={styles.row}>
-            <TextInput
-              style={[styles.input, styles.inputHalf]}
-              placeholder="Début (JJ/MM/AAAA)"
-              value={dateDebut}
-              onChangeText={setDateDebut}
-            />
-            <TextInput
-              style={[styles.input, styles.inputHalf]}
-              placeholder="Fin (JJ/MM/AAAA)"
-              value={dateFin}
-              onChangeText={setDateFin}
-            />
+            {Platform.OS === "web" ? (
+              <>
+                <input
+                  type="date"
+                  value={dateDebut ? dateDebut.toISOString().slice(0, 10) : ""}
+                  max={dateFin ? dateFin.toISOString().slice(0, 10) : undefined}
+                  onChange={(e) => {
+                    const d = e.target.value ? new Date(e.target.value + "T00:00:00") : undefined;
+                    if (d) setDateDebutSafe(d);
+                    else setDateDebut(undefined);
+                  }}
+                  style={webDateInputStyle}
+                />
+                <input
+                  type="date"
+                  value={dateFin ? dateFin.toISOString().slice(0, 10) : ""}
+                  min={dateDebut ? dateDebut.toISOString().slice(0, 10) : undefined}
+                  onChange={(e) => {
+                    const d = e.target.value ? new Date(e.target.value + "T00:00:00") : undefined;
+                    if (d) setDateFinSafe(d);
+                    else setDateFin(undefined);
+                  }}
+                  style={webDateInputStyle}
+                />
+              </>
+            ) : (
+              <>
+                <Pressable
+                  style={[styles.input, styles.inputHalf]}
+                  onPress={() => setShowPickerDebut(true)}
+                >
+                  <Text style={dateDebut ? styles.dateText : styles.datePlaceholder}>
+                    {dateDebut ? formatDate(dateDebut) : "Date début"}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={[styles.input, styles.inputHalf]}
+                  onPress={() => setShowPickerFin(true)}
+                >
+                  <Text style={dateFin ? styles.dateText : styles.datePlaceholder}>
+                    {dateFin ? formatDate(dateFin) : "Date fin"}
+                  </Text>
+                </Pressable>
+              </>
+            )}
           </View>
+          {Platform.OS !== "web" && showPickerDebut && (
+            <DateTimePicker
+              testID="picker-debut"
+              value={dateDebut ?? new Date()}
+              mode="date"
+              display="default"
+              maximumDate={dateFin}
+              onChange={onChangeDateDebut}
+            />
+          )}
+          {Platform.OS !== "web" && showPickerFin && (
+            <DateTimePicker
+              testID="picker-fin"
+              value={dateFin ?? new Date()}
+              mode="date"
+              display="default"
+              minimumDate={dateDebut}
+              onChange={onChangeDateFin}
+            />
+          )}
           <View style={styles.row}>
             <TextInput
               style={[styles.input, styles.inputHalf]}
@@ -124,7 +207,6 @@ export default function ContratsScreen() {
         </Pressable>
       )}
 
-      {/* Liste des contrats */}
       <FlatList
         data={contrats}
         keyExtractor={(item) => item.id}
@@ -155,6 +237,17 @@ export default function ContratsScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+const webDateInputStyle: Record<string, unknown> = {
+  flex: 1,
+  border: "1px solid #cbd5e1",
+  borderRadius: 8,
+  padding: 12,
+  marginBottom: 8,
+  fontSize: 16,
+  backgroundColor: "#f8fafc",
+  fontFamily: "inherit",
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -200,6 +293,14 @@ const styles = StyleSheet.create({
   },
   inputHalf: {
     flex: 1,
+  },
+  dateText: {
+    fontSize: 16,
+    color: "#1e293b",
+  },
+  datePlaceholder: {
+    fontSize: 16,
+    color: "#94a3b8",
   },
   btnAjouter: {
     flex: 1,

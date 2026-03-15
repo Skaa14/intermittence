@@ -4,11 +4,11 @@ import {
   act,
   RenderHookResult,
 } from "@testing-library/react-native";
-import { ContratsProvider, useContrats } from "../contexts/ContratsContext";
+import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 
 type ContratsHook = RenderHookResult<ReturnType<typeof useContrats>, unknown>;
 
-const feature = loadFeature("features/contrats.feature");
+const feature = loadFeature("tests/features/contrats.feature");
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ContratsProvider>{children}</ContratsProvider>

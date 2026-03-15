@@ -2,6 +2,7 @@ const expoPreset = require("jest-expo/jest-preset");
 
 module.exports = {
   ...expoPreset,
+  testMatch: ["<rootDir>/tests/steps/**/*.steps.tsx"],
   setupFiles: expoPreset.setupFiles?.filter(
     (f) => !f.replace(/\\/g, "/").includes("jest-expo/src/preset/setup")
   ),
