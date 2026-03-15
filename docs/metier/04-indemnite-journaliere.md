@@ -27,6 +27,10 @@ B = AJ_min × [0.26 × min(NHT, 690) + 0.08 × max(NHT - 690, 0)] / 507
 C = AJ_min × 0.70
 ```
 
+## Arrondis
+
+Chaque composante A, B et C est **tronquée au centime** (partie entière inférieure) avant d'être sommée. C'est la convention utilisée par France Travail dans ses exemples de calcul (Guide Intermittent, exemple 6).
+
 ## Plancher et plafond
 
 | Paramètre | Annexe 8 | Annexe 10 |

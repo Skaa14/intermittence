@@ -57,6 +57,16 @@ defineFeature(feature, (test) => {
     thenAJ(then);
   });
 
+  test("Exemple 6 du guide France Travail (annexe 8, 800h, 18000 euros)", ({
+    given,
+    when,
+    then,
+  }) => {
+    givenProfil(given);
+    whenCalcul(when);
+    thenAJ(then);
+  });
+
   test("AJ avec heures au-dessus du seuil NHT annexe 8", ({
     given,
     when,

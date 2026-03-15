@@ -27,6 +27,10 @@ const PARAMS = {
   },
 } as const;
 
+function tronquerCentime(valeur: number): number {
+  return Math.floor(valeur * 100) / 100;
+}
+
 export function calculerAJ(
   annexe: Annexe,
   salaireReference: number,
@@ -34,19 +38,21 @@ export function calculerAJ(
 ): number {
   const p = PARAMS[annexe];
 
-  const A =
+  const A = tronquerCentime(
     (AJ_MIN *
       (p.coefSR1 * Math.min(salaireReference, p.seuilSR) +
         p.coefSR2 * Math.max(salaireReference - p.seuilSR, 0))) /
-    5000;
+      5000
+  );
 
-  const B =
+  const B = tronquerCentime(
     (AJ_MIN *
       (p.coefNHT1 * Math.min(heuresTravaillees, p.seuilNHT) +
         p.coefNHT2 * Math.max(heuresTravaillees - p.seuilNHT, 0))) /
-    507;
+      507
+  );
 
-  const C = AJ_MIN * p.coefC;
+  const C = tronquerCentime(AJ_MIN * p.coefC);
 
   const brut = A + B + C;
 
