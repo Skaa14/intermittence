@@ -74,9 +74,6 @@ export default function AccueilScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Intermittence</Text>
-      <Text style={styles.subtitle}>Simulateur ARE</Text>
-
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Progression vers les 507h</Text>
         <Text style={styles.cardValue}>{totalHeures}h / 507h</Text>

@@ -8,7 +8,7 @@ export const styles = StyleSheet.create({
   bannerWrapper: {
     paddingHorizontal: 16,
     paddingBottom: 8,
-    backgroundColor: colors.bgBase,
+    backgroundColor: colors.bgSubtle,
   },
   banner: {
     backgroundColor: colors.bgCard,

@@ -12,17 +12,6 @@ export const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: colors.bgBase,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: colors.textDark,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: colors.textMuted,
-    marginBottom: 24,
-  },
   card: {
     backgroundColor: colors.bgCard,
     borderRadius: 12,
