@@ -1,0 +1,38 @@
+Feature: Vue mensuelle
+
+  Background:
+    Given nous sommes le "15/06/2026"
+
+  Scenario: Profil non configuré - invitation à configurer
+    Given le profil n'est pas configuré
+    Then le message d'invitation à configurer le profil est visible
+
+  Scenario: 12 cartes affichées avec profil configuré
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    Then 12 cartes de mois sont affichées
+
+  Scenario: Badges d'état des mois
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    Then la carte du mois 0 porte le badge "Passé"
+    And la carte du mois 2 porte le badge "En cours"
+    And la carte du mois 3 porte le badge "À venir"
+
+  Scenario: Salaire brut affiché sur la carte d'un mois avec contrat
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Théâtre   | 01/04/2026 | 30/04/2026 | 40     | 1500    |
+    Then la carte du mois 0 affiche le salaire brut "1500 €"
+
+  Scenario: Navigation vers le détail d'un mois
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    When je tape sur la carte du mois 1
+    Then je suis redirigé vers "/mois/1"

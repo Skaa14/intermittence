@@ -24,10 +24,10 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="simulation"
+        name="vue-mensuelle"
         options={{
-          title: "Simulation",
-          tabBarLabel: "Simulation",
+          title: "Vue mensuelle",
+          tabBarLabel: "Vue mensuelle",
         }}
       />
     </Tabs>

@@ -32,6 +32,28 @@ const callback = mockPickerCallbacksByTestID["picker-debut"];
 act(() => { callback({ type: "set" }, new Date("2026-03-01T00:00:00")); });
 ```
 
+## expo-router (useRouter)
+
+Pour tester la navigation, mocker `expo-router` avec une variable commençant par `mock` (règle Jest anti-TDZ) :
+
+```tsx
+const mockPush = jest.fn();
+
+jest.mock("expo-router", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
+```
+
+Réinitialiser dans `beforeEach` :
+```tsx
+mockPush.mockClear();
+```
+
+Vérifier la navigation :
+```tsx
+expect(mockPush).toHaveBeenCalledWith("/mois/0");
+```
+
 ## Alert.alert
 
 Pour tester les dialogues de confirmation, spy sur `Alert.alert` :

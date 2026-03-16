@@ -30,11 +30,15 @@ app/                    ← Dossier des routes (Expo Router)
 ├── _layout.tsx         ← Layout racine (Stack global)
 └── (tabs)/             ← Groupe d'onglets
     ├── _layout.tsx     ← Config des onglets (barre du bas)
-    ├── index.tsx       ← Onglet Accueil (dashboard)
-    ├── contrats.tsx    ← Onglet Contrats (saisie)
-    └── simulation.tsx  ← Onglet Simulation (calcul ARE)
-types/contrat.ts        ← Interface TypeScript du contrat
+    ├── index.tsx           ← Onglet Accueil (dashboard)
+    ├── contrats.tsx        ← Onglet Contrats (saisie)
+    └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
+types/contrat.ts            ← Interface TypeScript du contrat
+types/profil.ts             ← Interface TypeScript du profil intermittent
 contexts/ContratsContext.tsx ← State partagé entre les écrans
+contexts/ProfilContext.tsx   ← Profil intermittent (annexe, salaire référence, heures)
+utils/calculerAJ.ts         ← Calcul de l'indemnité journalière
+utils/calculerMoisIndemnisation.ts ← Calcul des 12 mois de la période d'indemnisation
 docs/                   ← Documentation du projet
 ├── tech/               ← Fiches pédagogiques React Native / Expo
 └── metier/             ← Fiches règles métier ARE intermittents + guide officiel PDF
