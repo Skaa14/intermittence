@@ -1,37 +1,41 @@
 export const colors = {
   // Primaire
-  primary: "#2563eb",
-  primaryDark: "#1d4ed8",
-  primaryLight: "#bfdbfe",
-  primaryBg: "#dbeafe",
+  primary: "#2A5C47",
+  primaryDark: "#1A3D2E",
+  primaryLight: "#A8BFB7",
+  primaryBg: "#E8F0EC",
 
   // Textes
-  textDark: "#1e293b",
-  textMedium: "#475569",
-  textMuted: "#64748b",
-  textFaint: "#94a3b8",
+  textDark: "#001C2F",
+  textMedium: "#2A4E62",
+  textMuted: "#6B7A8D",
+  textFaint: "#8A95A3",
 
   // Fonds
-  bgBase: "#f8fafc",
-  bgSubtle: "#f1f5f9",
-  bgCard: "#fff",
-  bgDark: "#1e293b",
+  bgBase: "#FFFFFF",
+  bgSubtle: "#FFF2DC",
+  bgCard: "#FFFFFF",
+  bgDark: "#001C2F",
 
   // Bordures
-  border: "#cbd5e1",
-  borderLight: "#e2e8f0",
+  border: "#B1BAC7",
+  borderLight: "#D8DCE1",
+
+  // Accent
+  accent: "#FFC9A3",
 
   // États
-  error: "#ef4444",
-  successBg: "#dcfce7",
-  successText: "#15803d",
+  error: "#C0483A",
+  errorBg: "#FDDDD9",
+  successBg: "#D6EDE5",
+  successText: "#1F6B58",
 
   // Bannière démo
-  warning: "#f59e0b",
-  warningDark: "#1c1917",
-  warningLight: "#fef3c7",
+  warning: "#D4831E",
+  warningDark: "#001C2F",
+  warningLight: "#FFF2DC",
 
   // Divers
-  shadow: "#000",
-  textOnPrimary: "#fff",
+  shadow: "#001C2F",
+  textOnPrimary: "#FFFFFF",
 } as const;

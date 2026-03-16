@@ -8,4 +8,6 @@ export const webDateInputBase: React.CSSProperties = {
   fontSize: 16,
   backgroundColor: colors.bgBase,
   fontFamily: "inherit",
+  boxSizing: "border-box",
+  width: "100%",
 };

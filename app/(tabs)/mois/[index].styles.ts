@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../../theme/colors";
+import { colors } from "../../../theme/colors";
 
 export const styles = StyleSheet.create({
   container: {
@@ -27,13 +27,15 @@ export const styles = StyleSheet.create({
   section: {
     backgroundColor: colors.bgCard,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
     padding: 16,
     marginBottom: 16,
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   titreSection: {
     fontSize: 13,
@@ -89,3 +91,6 @@ export const styles = StyleSheet.create({
     color: colors.primary,
   },
 });
+
+export const pageScrollStyle = (width: number) =>
+  StyleSheet.create({ page: { width } });

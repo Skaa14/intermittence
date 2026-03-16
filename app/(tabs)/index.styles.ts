@@ -4,7 +4,6 @@ import { webDateInputBase } from "../../theme/webStyles";
 
 export const webDateInputStyle: React.CSSProperties = {
   ...webDateInputBase,
-  width: "100%",
 };
 
 export const styles = StyleSheet.create({
@@ -70,7 +69,7 @@ export const styles = StyleSheet.create({
   },
   ajLabel: {
     fontSize: 13,
-    color: colors.textFaint,
+    color: colors.primaryLight,
     marginBottom: 4,
   },
   ajValue: {
@@ -80,7 +79,7 @@ export const styles = StyleSheet.create({
   },
   ajDetail: {
     fontSize: 13,
-    color: colors.textFaint,
+    color: colors.primaryLight,
     marginTop: 8,
   },
   configurerBtn: {

@@ -3,17 +3,18 @@ import {
   Text,
   FlatList,
   ScrollView,
-  Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { useMemo, useRef, useEffect } from "react";
-import { useLocalSearchParams, Stack } from "expo-router";
-import { useContrats } from "../../contexts/ContratsContext";
-import { useProfil } from "../../contexts/ProfilContext";
+import { useLocalSearchParams } from "expo-router";
+import { useContrats } from "../../../contexts/ContratsContext";
+import { useProfil } from "../../../contexts/ProfilContext";
 import {
   calculerMoisIndemnisation,
   MoisIndemnisation,
-} from "../../utils/calculerMoisIndemnisation";
-import { styles } from "./[index].styles";
+} from "../../../utils/calculerMoisIndemnisation";
+import { styles, pageScrollStyle } from "./[index].styles";
+
 const NOMS_MOIS = [
   "Janvier",
   "Février",
@@ -28,10 +29,6 @@ const NOMS_MOIS = [
   "Novembre",
   "Décembre",
 ];
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const FALLBACK_WIDTH = 390;
-const PAGE_WIDTH = SCREEN_WIDTH > 0 ? SCREEN_WIDTH : FALLBACK_WIDTH;
 
 function formatMois(date: Date): string {
   return `${NOMS_MOIS[date.getMonth()]} ${date.getFullYear()}`;
@@ -67,10 +64,10 @@ function LigneDetail({
   );
 }
 
-function PageMois({ mois }: { mois: MoisIndemnisation }) {
+function PageMois({ mois, width }: { mois: MoisIndemnisation; width: number }) {
   return (
     <ScrollView
-      style={{ width: PAGE_WIDTH }}
+      style={pageScrollStyle(width).page}
       contentContainerStyle={styles.pageContent}
       testID={`detail-mois-${mois.index}`}
     >
@@ -150,6 +147,7 @@ function PageMois({ mois }: { mois: MoisIndemnisation }) {
 }
 
 export default function DetailMoisScreen() {
+  const { width: pageWidth } = useWindowDimensions();
   const { index } = useLocalSearchParams<{ index: string }>();
   const indexNum = Math.max(0, parseInt(index ?? "0", 10) || 0);
   const { contrats } = useContrats();
@@ -167,24 +165,26 @@ export default function DetailMoisScreen() {
     }
   }, [indexNum, mois.length]);
 
+  if (!profil) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.empty}>Configurez votre profil</Text>
+      </View>
+    );
+  }
+
   return (
-    <>
-      <Stack.Screen options={{ headerShown: true, title: "Détail du mois" }} />
-      {!profil ? (
-        <View style={styles.container}>
-          <Text style={styles.empty}>Configurez votre profil</Text>
-        </View>
-      ) : (
-        <FlatList
+    <FlatList
       ref={flatListRef}
       data={mois}
       horizontal
       pagingEnabled
       showsHorizontalScrollIndicator={false}
+      extraData={pageWidth}
       keyExtractor={(item) => String(item.index)}
       getItemLayout={(_, i) => ({
-        length: PAGE_WIDTH,
-        offset: PAGE_WIDTH * i,
+        length: pageWidth,
+        offset: pageWidth * i,
         index: i,
       })}
       onScrollToIndexFailed={(info) => {
@@ -193,10 +193,7 @@ export default function DetailMoisScreen() {
           animated: false,
         });
       }}
-      renderItem={({ item }) => <PageMois mois={item} />}
+      renderItem={({ item }) => <PageMois mois={item} width={pageWidth} />}
     />
-      )}
-    </>
   );
 }
-

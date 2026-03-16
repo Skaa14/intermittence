@@ -32,12 +32,14 @@ export const styles = StyleSheet.create({
   carte: {
     backgroundColor: colors.bgCard,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
     padding: 16,
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
   carteHeader: {
     flexDirection: "row",
