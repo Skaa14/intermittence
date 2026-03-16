@@ -17,7 +17,7 @@ export const renderScreen = () =>
   );
 
 export const ouvrirFormulaire = () => {
-  fireEvent.press(screen.getByText("+ Nouveau contrat"));
+  fireEvent.press(screen.getByTestId("btn-ouvrir-formulaire"));
 };
 
 export const selectDate = (pickerTestID: string, dateStr: string) => {

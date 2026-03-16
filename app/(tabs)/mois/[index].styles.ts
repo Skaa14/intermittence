@@ -1,7 +1,15 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../../theme/colors";
 
+export const backIconColor = colors.textOnPrimary;
+
 export const styles = StyleSheet.create({
+  flatList: {
+    flex: 1,
+  },
+  backButton: {
+    paddingHorizontal: 8,
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -92,5 +100,5 @@ export const styles = StyleSheet.create({
   },
 });
 
-export const pageScrollStyle = (width: number) =>
-  StyleSheet.create({ page: { width } });
+export const pageScrollStyle = (width: number, height: number) =>
+  StyleSheet.create({ page: { width, height } });

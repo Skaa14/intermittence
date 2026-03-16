@@ -122,7 +122,7 @@ defineFeature(feature, (test) => {
     );
 
     and("j'affiche les contrats passés", () => {
-      fireEvent.press(screen.getByText(/Afficher les contrats passés/));
+      fireEvent.press(screen.getByTestId("btn-toggle-passes"));
     });
 
     then(

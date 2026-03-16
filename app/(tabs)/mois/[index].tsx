@@ -3,17 +3,19 @@ import {
   Text,
   FlatList,
   ScrollView,
+  Pressable,
   useWindowDimensions,
 } from "react-native";
-import { useMemo, useRef, useEffect } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useMemo, useRef, useEffect, useLayoutEffect, useState, useCallback } from "react";
+import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../../contexts/ContratsContext";
 import { useProfil } from "../../../contexts/ProfilContext";
 import {
   calculerMoisIndemnisation,
   MoisIndemnisation,
 } from "../../../utils/calculerMoisIndemnisation";
-import { styles, pageScrollStyle } from "./[index].styles";
+import { styles, pageScrollStyle, backIconColor } from "./[index].styles";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -64,11 +66,14 @@ function LigneDetail({
   );
 }
 
-function PageMois({ mois, width }: { mois: MoisIndemnisation; width: number }) {
+type PageMoisProps = { mois: MoisIndemnisation; width: number; height: number };
+
+function PageMois({ mois, width, height }: PageMoisProps) {
   return (
     <ScrollView
-      style={pageScrollStyle(width).page}
+      style={pageScrollStyle(width, height).page}
       contentContainerStyle={styles.pageContent}
+      nestedScrollEnabled
       testID={`detail-mois-${mois.index}`}
     >
       <Text style={styles.titreMois}>{formatMois(mois.mois)}</Text>
@@ -147,12 +152,28 @@ function PageMois({ mois, width }: { mois: MoisIndemnisation; width: number }) {
 }
 
 export default function DetailMoisScreen() {
-  const { width: pageWidth } = useWindowDimensions();
+  const { width: pageWidth, height: windowHeight } = useWindowDimensions();
   const { index } = useLocalSearchParams<{ index: string }>();
   const indexNum = Math.max(0, parseInt(index ?? "0", 10) || 0);
   const { contrats } = useContrats();
   const { profil } = useProfil();
   const flatListRef = useRef<FlatList>(null);
+  const [listHeight, setListHeight] = useState(0);
+  const router = useRouter();
+  const navigation = useNavigation();
+
+  const BackButton = useCallback(
+    () => (
+      <Pressable onPress={() => router.navigate("/(tabs)/vue-mensuelle")} style={styles.backButton}>
+        <Ionicons name="chevron-back" size={26} color={backIconColor} />
+      </Pressable>
+    ),
+    [router]
+  );
+
+  useLayoutEffect(() => {
+    navigation.setOptions({ headerLeft: BackButton });
+  }, [navigation, BackButton]);
 
   const mois = useMemo(
     () => (profil ? calculerMoisIndemnisation(profil, contrats) : []),
@@ -176,6 +197,8 @@ export default function DetailMoisScreen() {
   return (
     <FlatList
       ref={flatListRef}
+      style={styles.flatList}
+      onLayout={(e) => setListHeight(e.nativeEvent.layout.height)}
       data={mois}
       horizontal
       pagingEnabled
@@ -193,7 +216,7 @@ export default function DetailMoisScreen() {
           animated: false,
         });
       }}
-      renderItem={({ item }) => <PageMois mois={item} width={pageWidth} />}
+      renderItem={({ item }) => <PageMois mois={item} width={pageWidth} height={listHeight || windowHeight} />}
     />
   );
 }

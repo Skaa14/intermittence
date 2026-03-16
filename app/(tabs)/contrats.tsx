@@ -12,11 +12,11 @@ import {
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../contexts/ContratsContext";
 import { Contrat } from "../../types/contrat";
 import { formatDate, formatDateISO, parseDate } from "../../utils/date";
-import { styles, webDateInputStyle } from "./contrats.styles";
-import { colors } from "../../theme/colors";
+import { styles, webDateInputStyle, addIconColor, errorBorderColor } from "./contrats.styles";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
@@ -170,29 +170,11 @@ export default function ContratsScreen() {
     reinitialiserFormulaire();
   };
 
-  const totalHeures = contrats.reduce((sum, c) => sum + c.heures, 0);
-  const totalSalaire = contrats.reduce((sum, c) => sum + c.salaireBrut, 0);
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.resume}>
-        <View style={styles.resumeItem}>
-          <Text style={styles.resumeValue}>{totalHeures}h</Text>
-          <Text style={styles.resumeLabel}>cumulées</Text>
-        </View>
-        <View style={styles.resumeItem}>
-          <Text style={styles.resumeValue}>{totalSalaire.toFixed(0)}€</Text>
-          <Text style={styles.resumeLabel}>brut total</Text>
-        </View>
-        <View style={styles.resumeItem}>
-          <Text style={styles.resumeValue}>{contrats.length}</Text>
-          <Text style={styles.resumeLabel}>contrats</Text>
-        </View>
-      </View>
-
       {formulaireOuvert ? (
         <View style={styles.formulaire}>
           <TextInput
@@ -216,7 +198,7 @@ export default function ContratsScreen() {
                   }}
                   style={{
                     ...webDateInputStyle,
-                    ...(erreurs.dateDebut && { borderColor: colors.error }),
+                    ...(erreurs.dateDebut && { borderColor: errorBorderColor }),
                   }}
                 />
                 <input
@@ -230,7 +212,7 @@ export default function ContratsScreen() {
                   }}
                   style={{
                     ...webDateInputStyle,
-                    ...(erreurs.dateFin && { borderColor: colors.error }),
+                    ...(erreurs.dateFin && { borderColor: errorBorderColor }),
                   }}
                 />
               </>
@@ -313,25 +295,28 @@ export default function ContratsScreen() {
           </View>
         </View>
       ) : (
-        <Pressable
-          style={styles.btnOuvrir}
-          onPress={() => setFormulaireOuvert(true)}
-        >
-          <Text style={styles.btnOuvrirText}>+ Nouveau contrat</Text>
-        </Pressable>
-      )}
-
-      {contratsPasses.length > 0 && (
-        <Pressable
-          style={styles.btnTogglePasses}
-          onPress={() => setAfficherPasses(!afficherPasses)}
-        >
-          <Text style={styles.btnTogglePassesText}>
-            {afficherPasses
-              ? `Masquer les contrats passés (${contratsPasses.length})`
-              : `Afficher les contrats passés (${contratsPasses.length})`}
-          </Text>
-        </Pressable>
+        <View style={styles.buttonsRow}>
+          <Pressable
+            testID="btn-ouvrir-formulaire"
+            style={styles.btnOuvrir}
+            onPress={() => setFormulaireOuvert(true)}
+          >
+            <Ionicons name="add-circle" size={44} color={addIconColor} />
+          </Pressable>
+          {contratsPasses.length > 0 && (
+            <Pressable
+              testID="btn-toggle-passes"
+              style={styles.btnTogglePasses}
+              onPress={() => setAfficherPasses(!afficherPasses)}
+            >
+              <Text style={styles.btnTogglePassesText}>
+                {afficherPasses
+                  ? `Masquer passés (${contratsPasses.length})`
+                  : `Passés (${contratsPasses.length})`}
+              </Text>
+            </Pressable>
+          )}
+        </View>
       )}
 
       <FlatList

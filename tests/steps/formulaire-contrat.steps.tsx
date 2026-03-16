@@ -52,8 +52,8 @@ defineFeature(feature, (test) => {
       renderScreen();
     });
 
-    when(/^j'appuie sur "(.*)"$/, (texte: string) => {
-      fireEvent.press(screen.getByText(`+ ${texte}`));
+    when('j\'appuie sur "Nouveau contrat"', () => {
+      fireEvent.press(screen.getByTestId("btn-ouvrir-formulaire"));
     });
 
     then("le formulaire de saisie est visible", () => {
@@ -199,7 +199,7 @@ defineFeature(feature, (test) => {
     then("tous les champs ont une bordure rouge", () => {
       const ids = ["input-employeur", "input-date-debut", "input-date-fin", "input-heures", "input-salaire-brut"];
       for (const id of ids) {
-        expect(getStyleProp(id, "borderColor")).toBe("#ef4444");
+        expect(getStyleProp(id, "borderColor")).toBe("#C0483A");
       }
     });
   });

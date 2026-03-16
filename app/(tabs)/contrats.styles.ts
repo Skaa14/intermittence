@@ -2,6 +2,9 @@ import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
 import { webDateInputBase } from "../../theme/webStyles";
 
+export const addIconColor = colors.warning;
+export const errorBorderColor = colors.error;
+
 export const webDateInputStyle: React.CSSProperties = {
   ...webDateInputBase,
   flex: 1,
@@ -12,23 +15,11 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bgBase,
   },
-  resume: {
+  buttonsRow: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 16,
-    backgroundColor: colors.primary,
-  },
-  resumeItem: {
     alignItems: "center",
-  },
-  resumeValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.bgCard,
-  },
-  resumeLabel: {
-    fontSize: 12,
-    color: colors.primaryLight,
+    margin: 16,
+    gap: 8,
   },
   formulaire: {
     padding: 16,
@@ -63,7 +54,7 @@ export const styles = StyleSheet.create({
   },
   btnAjouter: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.warning,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
@@ -75,27 +66,21 @@ export const styles = StyleSheet.create({
   },
   btnAnnuler: {
     flex: 1,
-    backgroundColor: colors.borderLight,
+    backgroundColor: colors.bgSubtle,
     padding: 14,
     borderRadius: 8,
     alignItems: "center",
   },
   btnAnnulerText: {
     color: colors.textMuted,
-    fontWeight: "bold",
-    fontSize: 16,
+    fontWeight: "500",
+    fontSize: 14,
   },
   btnOuvrir: {
-    margin: 16,
-    backgroundColor: colors.primary,
-    padding: 14,
-    borderRadius: 8,
+    width: 44,
+    height: 44,
     alignItems: "center",
-  },
-  btnOuvrirText: {
-    color: colors.bgCard,
-    fontWeight: "bold",
-    fontSize: 16,
+    justifyContent: "center",
   },
   liste: {
     padding: 16,
@@ -150,12 +135,13 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
   },
   btnTogglePasses: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    padding: 10,
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderRadius: 8,
     backgroundColor: colors.bgSubtle,
     alignItems: "center",
+    justifyContent: "center",
   },
   btnTogglePassesText: {
     fontSize: 14,

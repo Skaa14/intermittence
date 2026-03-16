@@ -60,7 +60,7 @@ defineFeature(feature, (test) => {
     });
 
     then(/^le bouton affiche (\d+) contrat passé$/, (count: string) => {
-      expect(screen.getByText(`Afficher les contrats passés (${count})`)).toBeTruthy();
+      expect(screen.getByText(`Passés (${count})`)).toBeTruthy();
     });
   });
 
@@ -75,9 +75,7 @@ defineFeature(feature, (test) => {
     });
 
     when("j'appuie sur le bouton d'affichage des contrats passés", () => {
-      fireEvent.press(
-        screen.getByText(/Afficher les contrats passés/)
-      );
+      fireEvent.press(screen.getByTestId("btn-toggle-passes"));
     });
 
     then(/^le contrat "(.*)" est visible$/, (employeur: string) => {
@@ -106,15 +104,11 @@ defineFeature(feature, (test) => {
     });
 
     and("les contrats passés sont affichés", () => {
-      fireEvent.press(
-        screen.getByText(/Afficher les contrats passés/)
-      );
+      fireEvent.press(screen.getByTestId("btn-toggle-passes"));
     });
 
     when("j'appuie sur le bouton de masquage des contrats passés", () => {
-      fireEvent.press(
-        screen.getByText(/Masquer les contrats passés/)
-      );
+      fireEvent.press(screen.getByTestId("btn-toggle-passes"));
     });
 
     then(/^le contrat "(.*)" n'est pas visible$/, (employeur: string) => {
