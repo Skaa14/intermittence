@@ -11,7 +11,8 @@ Feature: Détail d'un mois
     Then les jours calendaires affichés sont "30"
     And les jours travaillés affichés sont "0"
     And le délai d'attente affiché est "7"
-    And les jours indemnisés affichés sont "23"
+    And la franchise congés payés affichée est "2"
+    And les jours indemnisés affichés sont "21"
 
   Scenario: Contrat du mois affiché dans le détail
     Given le profil est configuré
@@ -34,6 +35,35 @@ Feature: Détail d'un mois
       | Annexe | Heures | Salaire | Date anniversaire |
       | 8      | 507    | 13800   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
-    Then l'ARE versée affichée est "1337 €"
+    Then l'ARE versée affichée est "1221 €"
     And le salaire brut affiché est "0 €"
-    And le total reçu affiché est "1337 €"
+    And le total reçu affiché est "1221 €"
+
+  Scenario: Franchise salaire affichée quand le salaire de référence est élevé
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 400    | 30000   | 01/04/2026        |
+    And je suis sur le détail du mois d'index 0
+    Then la franchise salaire affichée est "4"
+
+  Scenario: Franchises nulles quand les heures travaillées sont zéro
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 0      | 13800   | 01/04/2026        |
+    And je suis sur le détail du mois d'index 0
+    Then les jours indemnisés affichés sont "23"
+
+  Scenario: Exemple officiel 6 — AJ technicien annexe 8 avec 800h et 18000 euros
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 800    | 18000   | 01/04/2026        |
+    And je suis sur le détail du mois d'index 0
+    Then l'ARE versée affichée est "1360 €"
+    And la franchise congés payés affichée est "2"
+
+  Scenario: Exemple officiel 10 — Franchise CP musicien annexe 10 avec 176 jours travaillés
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 10     | 1760   | 20000   | 01/04/2026        |
+    And je suis sur le détail du mois d'index 0
+    Then la franchise congés payés affichée est "2"

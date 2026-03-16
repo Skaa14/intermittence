@@ -1,6 +1,6 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, screen, act, within } from "@testing-library/react-native";
-import DetailMoisScreen from "../../app/mois/[index]";
+import DetailMoisScreen from "../../app/(tabs)/mois/[index]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
 import { ProfilIntermittent } from "../../types/profil";
@@ -12,6 +12,8 @@ let mockIndex = "0";
 
 jest.mock("expo-router", () => ({
   useLocalSearchParams: () => ({ index: mockIndex }),
+  useRouter: () => ({ navigate: jest.fn() }),
+  useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 type ProfilRow = {
@@ -48,6 +50,26 @@ const fixerDateStep = (
 ) => {
   given(/^nous sommes le "(.*)"$/, (date: string) => {
     fixerDate(date);
+  });
+};
+
+const franchiseCPStep = (
+  and: (pattern: RegExp, fn: (valeur: string) => void) => void
+) => {
+  and(/^la franchise congés payés affichée est "(\d+)"$/, (valeur: string) => {
+    expect(
+      screen.getByTestId(`franchise-cp-${mockIndex}`).props.children
+    ).toBe(`-${valeur} j`);
+  });
+};
+
+const franchiseSalaireStep = (
+  and: (pattern: RegExp, fn: (valeur: string) => void) => void
+) => {
+  and(/^la franchise salaire affichée est "(\d+)"$/, (valeur: string) => {
+    expect(
+      screen.getByTestId(`franchise-salaire-${mockIndex}`).props.children
+    ).toBe(`-${valeur} j`);
   });
 };
 
@@ -110,14 +132,16 @@ defineFeature(feature, (test) => {
     and(/^les jours travaillés affichés sont "(\d+)"$/, (valeur: string) => {
       expect(
         screen.getByTestId(`jours-travailles-${mockIndex}`).props.children
-      ).toBe(`${valeur} j`);
+      ).toBe(`-${valeur} j`);
     });
 
     and(/^le délai d'attente affiché est "(\d+)"$/, (valeur: string) => {
       expect(
         screen.getByTestId(`delai-attente-${mockIndex}`).props.children
-      ).toBe(`${valeur} j`);
+      ).toBe(`-${valeur} j`);
     });
+
+    franchiseCPStep(and);
 
     and(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
       expect(
@@ -203,4 +227,82 @@ defineFeature(feature, (test) => {
       ).toBe(valeur);
     });
   });
+
+  test(
+    "Exemple officiel 6 — AJ technicien annexe 8 avec 800h et 18000 euros",
+    ({ given, and, then }) => {
+      fixerDateStep(given);
+
+      given("le profil est configuré", (table: ProfilRow[]) => {
+        pendingProfil = table[0];
+      });
+
+      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+        setupMoisScreen(index);
+      });
+
+      then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
+        expect(
+          screen.getByTestId(`are-versee-${mockIndex}`).props.children
+        ).toBe(valeur);
+      });
+
+      franchiseCPStep(and);
+    }
+  );
+
+  test(
+    "Exemple officiel 10 — Franchise CP musicien annexe 10 avec 176 jours travaillés",
+    ({ given, and, then }) => {
+      fixerDateStep(given);
+
+      given("le profil est configuré", (table: ProfilRow[]) => {
+        pendingProfil = table[0];
+      });
+
+      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+        setupMoisScreen(index);
+      });
+
+      franchiseCPStep(then);
+    }
+  );
+
+  test(
+    "Franchise salaire affichée quand le salaire de référence est élevé",
+    ({ given, and, then }) => {
+      fixerDateStep(given);
+
+      given("le profil est configuré", (table: ProfilRow[]) => {
+        pendingProfil = table[0];
+      });
+
+      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+        setupMoisScreen(index);
+      });
+
+      franchiseSalaireStep(then);
+    }
+  );
+
+  test(
+    "Franchises nulles quand les heures travaillées sont zéro",
+    ({ given, and, then }) => {
+      fixerDateStep(given);
+
+      given("le profil est configuré", (table: ProfilRow[]) => {
+        pendingProfil = table[0];
+      });
+
+      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+        setupMoisScreen(index);
+      });
+
+      then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
+        expect(
+          screen.getByTestId(`jours-indemnises-${mockIndex}`).props.children
+        ).toBe(`${valeur} j`);
+      });
+    }
+  );
 });

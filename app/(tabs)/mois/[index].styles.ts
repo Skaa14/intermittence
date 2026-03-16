@@ -98,6 +98,20 @@ export const styles = StyleSheet.create({
     fontWeight: "600",
     color: colors.primary,
   },
+  separateur: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderLight,
+    marginVertical: 8,
+  },
+  ligneFormule: {
+    paddingVertical: 4,
+    alignItems: "flex-end",
+  },
+  texteFormule: {
+    fontSize: 13,
+    color: colors.textMuted,
+    fontStyle: "italic",
+  },
 });
 
 export const pageScrollStyle = (width: number, height: number) =>

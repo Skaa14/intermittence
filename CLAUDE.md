@@ -60,6 +60,11 @@ app.json                ← Configuration Expo
 assets/                 ← Images et ressources
 ```
 
+## Lecture de fichiers PDF
+- Utiliser le **Read tool sans paramètre `pages`** : `Read("chemin/fichier.pdf")` (sans spécifier de pages)
+- Ne PAS utiliser `pages:` ni Bash/Python — `pdftoppm` n'est pas installé sur cette machine
+- Cette méthode fonctionne et retourne le contenu complet du PDF page par page
+
 ## Règles de développement
 - **Pas de commentaires explicatifs dans le code** — les explications de concepts vont dans des fiches Markdown dans `docs/`
 - Garder le code simple et lisible

@@ -111,14 +111,28 @@ function PageMois({ mois, width, height }: PageMoisProps) {
         />
         <LigneDetail
           label="Jours travaillés"
-          valeur={`${mois.joursTravailles} j`}
+          valeur={`-${mois.joursTravailles} j`}
           testID={`jours-travailles-${mois.index}`}
         />
         {mois.delaiAttente > 0 && (
           <LigneDetail
             label="Délai d'attente"
-            valeur={`${mois.delaiAttente} j`}
+            valeur={`-${mois.delaiAttente} j`}
             testID={`delai-attente-${mois.index}`}
+          />
+        )}
+        {mois.franchiseCP > 0 && (
+          <LigneDetail
+            label="Franchise congés payés"
+            valeur={`-${mois.franchiseCP} j`}
+            testID={`franchise-cp-${mois.index}`}
+          />
+        )}
+        {mois.franchiseSalaire > 0 && (
+          <LigneDetail
+            label="Franchise salaire"
+            valeur={`-${mois.franchiseSalaire} j`}
+            testID={`franchise-salaire-${mois.index}`}
           />
         )}
         <LigneDetail
@@ -126,6 +140,16 @@ function PageMois({ mois, width, height }: PageMoisProps) {
           valeur={`${mois.joursIndemnises} j`}
           testID={`jours-indemnises-${mois.index}`}
         />
+        {mois.joursIndemnises > 0 && (
+          <>
+            <View style={styles.separateur} />
+            <View style={styles.ligneFormule}>
+              <Text style={styles.texteFormule}>
+                {`${mois.joursIndemnises} j × ${mois.aj.toFixed(2).replace(".", ",")} €/j = ${mois.areVersee} €`}
+              </Text>
+            </View>
+          </>
+        )}
       </View>
 
       <View style={styles.section}>
