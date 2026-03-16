@@ -44,6 +44,7 @@ export default function ContratsScreen() {
   const [afficherPasses, setAfficherPasses] = useState(false);
   const [contratEnEdition, setContratEnEdition] = useState<string | null>(null);
   const [erreurs, setErreurs] = useState<Partial<Record<ChampContrat, boolean>>>({});
+  const [erreurMois, setErreurMois] = useState<string | null>(null);
 
   const { contratsActifs, contratsPasses } = useMemo(() => {
     const actifs: ContratAvecStatut[] = [];
@@ -62,12 +63,14 @@ export default function ContratsScreen() {
   const setDateDebutSafe = (d: Date) => {
     setDateDebut(d);
     setErreurs((e) => ({ ...e, dateDebut: false }));
+    setErreurMois(null);
     if (dateFin && d.getTime() > dateFin.getTime()) setDateFin(undefined);
   };
 
   const setDateFinSafe = (d: Date) => {
     setDateFin(d);
     setErreurs((e) => ({ ...e, dateFin: false }));
+    setErreurMois(null);
     if (dateDebut && d.getTime() < dateDebut.getTime()) setDateDebut(undefined);
   };
 
@@ -116,6 +119,7 @@ export default function ContratsScreen() {
     setContratEnEdition(null);
     setFormulaireOuvert(false);
     setErreurs({});
+    setErreurMois(null);
   };
 
   const lancerEdition = (contrat: Contrat) => {
@@ -139,6 +143,15 @@ export default function ContratsScreen() {
     setErreurs(nouvellesErreurs);
 
     if (Object.values(nouvellesErreurs).some(Boolean)) return;
+
+    const memesMois =
+      dateDebut!.getMonth() === dateFin!.getMonth() &&
+      dateDebut!.getFullYear() === dateFin!.getFullYear();
+    if (!memesMois) {
+      setErreurMois("Les dates doivent être dans le même mois calendaire.");
+      return;
+    }
+    setErreurMois(null);
 
     const donnees = {
       employeur,
@@ -244,6 +257,9 @@ export default function ContratsScreen() {
               </>
             )}
           </View>
+          {erreurMois && (
+            <Text testID="erreur-mois" style={styles.erreurMois}>{erreurMois}</Text>
+          )}
           {Platform.OS !== "web" && showPickerDebut && (
             <DateTimePicker
               testID="picker-debut"
@@ -572,5 +588,10 @@ const styles = StyleSheet.create({
   },
   inputErreur: {
     borderColor: COULEUR_ERREUR,
+  },
+  erreurMois: {
+    color: COULEUR_ERREUR,
+    fontSize: 13,
+    marginBottom: 8,
   },
 });
