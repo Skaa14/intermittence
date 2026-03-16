@@ -99,9 +99,9 @@ export default function AccueilScreen() {
       </View>
 
       {profil && !formulaireOuvert && (
-        <Pressable style={styles.ajCard} onPress={ouvrirFormulaire}>
+        <Pressable testID="aj-card" style={styles.ajCard} onPress={ouvrirFormulaire}>
           <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
-          <Text style={styles.ajValue}>
+          <Text testID="aj-value" style={styles.ajValue}>
             {calculerAJ(
               profil.annexe,
               profil.salaireReference,
@@ -118,7 +118,7 @@ export default function AccueilScreen() {
       )}
 
       {!profil && !formulaireOuvert && (
-        <Pressable style={styles.configurerBtn} onPress={ouvrirFormulaire}>
+        <Pressable testID="btn-configurer-profil" style={styles.configurerBtn} onPress={ouvrirFormulaire}>
           <Text style={styles.configurerBtnText}>
             Configurer mon profil pour estimer mon indemnité journalière
           </Text>
@@ -132,6 +132,7 @@ export default function AccueilScreen() {
           <Text style={styles.label}>Annexe</Text>
           <View style={styles.row}>
             <Pressable
+              testID="btn-annexe-8"
               style={[
                 styles.annexeBtn,
                 annexe === "8" && styles.annexeBtnActive,
@@ -148,6 +149,7 @@ export default function AccueilScreen() {
               </Text>
             </Pressable>
             <Pressable
+              testID="btn-annexe-10"
               style={[
                 styles.annexeBtn,
                 annexe === "10" && styles.annexeBtnActive,
@@ -185,6 +187,7 @@ export default function AccueilScreen() {
           ) : (
             <>
               <Pressable
+                testID="btn-date-anniversaire"
                 style={styles.input}
                 onPress={() => setShowPicker(true)}
               >
@@ -214,6 +217,7 @@ export default function AccueilScreen() {
 
           <Text style={styles.label}>Salaire de référence (€ brut)</Text>
           <TextInput
+            testID="input-salaire-reference"
             style={styles.input}
             placeholder="Ex : 18000"
             value={salaireReference}
@@ -223,6 +227,7 @@ export default function AccueilScreen() {
 
           <Text style={styles.label}>Heures travaillées</Text>
           <TextInput
+            testID="input-heures-travaillees"
             style={styles.input}
             placeholder="Ex : 600"
             value={heuresTravaillees}

@@ -2,11 +2,10 @@ import {
   render,
   fireEvent,
   screen,
-  act,
 } from "@testing-library/react-native";
 import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
-import { mockPickerCallbacksByTestID } from "./mocks";
+import { selectDatePicker } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
 import { ContratRow } from "./types";
 
@@ -23,12 +22,7 @@ export const ouvrirFormulaire = () => {
 
 export const selectDate = (pickerTestID: string, dateStr: string) => {
   const inputTestID = pickerTestID === "picker-debut" ? "input-date-debut" : "input-date-fin";
-  fireEvent.press(screen.getByTestId(inputTestID));
-  const date = new Date(dateStr + "T00:00:00");
-  const callback = mockPickerCallbacksByTestID[pickerTestID];
-  act(() => {
-    callback({ type: "set" }, date);
-  });
+  selectDatePicker(inputTestID, pickerTestID, dateStr);
 };
 
 export const ajouterContratViaFormulaire = (row: ContratRow) => {

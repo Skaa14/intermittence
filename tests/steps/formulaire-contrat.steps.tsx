@@ -1,12 +1,16 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import { fireEvent, screen, act } from "@testing-library/react-native";
-import { Alert, Platform } from "react-native";
+import { Alert, AlertButton, Platform } from "react-native";
 import { resetPickerCallbacks } from "../helpers/mocks";
+import { ContratRow } from "../helpers/types";
 import {
   renderScreen,
   ouvrirFormulaire,
   selectDate,
+  ajouterContratViaFormulaire,
+  fixerDate,
 } from "../helpers/form";
+import { ddmmyyyyToIso } from "../helpers/date";
 
 jest.mock("@react-native-community/datetimepicker", () =>
   require("../helpers/mocks").mockDateTimePickerFactory()
@@ -15,7 +19,7 @@ jest.mock("@react-native-community/datetimepicker", () =>
 const feature = loadFeature("tests/features/formulaire-contrat.feature");
 
 let alertSpy: jest.SpyInstance;
-let lastAlertButtons: any[];
+let lastAlertButtons: AlertButton[];
 const originalPlatformOS = Platform.OS;
 
 defineFeature(feature, (test) => {
@@ -33,12 +37,17 @@ defineFeature(feature, (test) => {
   afterEach(() => {
     alertSpy.mockRestore();
     Platform.OS = originalPlatformOS as any;
+    jest.useRealTimers();
     if (typeof window.confirm === "function" && "mockRestore" in window.confirm) {
       (window.confirm as jest.Mock).mockRestore();
     }
   });
 
   test("Ouverture du formulaire", ({ given, when, then }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("l'écran contrats est affiché", () => {
       renderScreen();
     });
@@ -55,6 +64,10 @@ defineFeature(feature, (test) => {
   });
 
   test("Sélection des dates via le picker", ({ given, when, and, then }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("le formulaire de saisie est ouvert", () => {
       renderScreen();
       ouvrirFormulaire();
@@ -83,6 +96,10 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("le formulaire de saisie est ouvert", () => {
       renderScreen();
       ouvrirFormulaire();
@@ -108,6 +125,10 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("le formulaire de saisie est ouvert", () => {
       renderScreen();
       ouvrirFormulaire();
@@ -132,6 +153,10 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("le formulaire de saisie est ouvert", () => {
       renderScreen();
       ouvrirFormulaire();
@@ -143,40 +168,6 @@ defineFeature(feature, (test) => {
 
     then("aucun contrat n'est ajouté", () => {
       expect(screen.getByText("Aucun contrat. Ajoute ton premier contrat !")).toBeTruthy();
-    });
-  });
-
-  test("Ajout d'un contrat complet via le formulaire", ({
-    given,
-    when,
-    and,
-    then,
-  }) => {
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
-      ouvrirFormulaire();
-    });
-
-    when("je remplis le formulaire avec des données valides", () => {
-      fireEvent.changeText(
-        screen.getByTestId("input-employeur"),
-        "Opéra de Paris"
-      );
-      selectDate("picker-debut", "2026-03-01");
-      selectDate("picker-fin", "2026-03-15");
-      fireEvent.changeText(screen.getByTestId("input-heures"), "80");
-      fireEvent.changeText(
-        screen.getByTestId("input-salaire-brut"),
-        "2500"
-      );
-    });
-
-    and(/^j'appuie sur "(.*)"$/, (texte: string) => {
-      fireEvent.press(screen.getByText(texte));
-    });
-
-    then("le contrat apparaît dans la liste", () => {
-      expect(screen.getByText("Opéra de Paris")).toBeTruthy();
     });
   });
 
@@ -192,6 +183,10 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("le formulaire de saisie est ouvert", () => {
       renderScreen();
       ouvrirFormulaire();
@@ -215,6 +210,10 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("le formulaire de saisie est ouvert", () => {
       renderScreen();
       ouvrirFormulaire();
@@ -243,22 +242,38 @@ defineFeature(feature, (test) => {
     });
   });
 
-  const ajouterUnContrat = () => {
-    renderScreen();
-    ouvrirFormulaire();
-    fireEvent.changeText(
-      screen.getByTestId("input-employeur"),
-      "Studio Canal"
-    );
-    selectDate("picker-debut", "2026-03-01");
-    selectDate("picker-fin", "2026-03-15");
-    fireEvent.changeText(screen.getByTestId("input-heures"), "40");
-    fireEvent.changeText(
-      screen.getByTestId("input-salaire-brut"),
-      "1500"
-    );
-    fireEvent.press(screen.getByText("Ajouter"));
-  };
+  test("Ajout d'un contrat complet via le formulaire", ({
+    given,
+    when,
+    and,
+    then,
+  }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("le formulaire de saisie est ouvert", () => {
+      renderScreen();
+      ouvrirFormulaire();
+    });
+
+    when("je remplis le formulaire avec les données suivantes", (table: ContratRow[]) => {
+      const row = table[0];
+      fireEvent.changeText(screen.getByTestId("input-employeur"), row.Employeur);
+      selectDate("picker-debut", ddmmyyyyToIso(row["Début"]));
+      selectDate("picker-fin", ddmmyyyyToIso(row.Fin));
+      fireEvent.changeText(screen.getByTestId("input-heures"), row.Heures);
+      fireEvent.changeText(screen.getByTestId("input-salaire-brut"), row.Salaire);
+    });
+
+    and(/^j'appuie sur "(.*)"$/, (texte: string) => {
+      fireEvent.press(screen.getByText(texte));
+    });
+
+    then(/^le contrat "(.*)" apparaît dans la liste$/, (employeur: string) => {
+      expect(screen.getByText(employeur)).toBeTruthy();
+    });
+  });
 
   test("Annulation de la suppression conserve le contrat", ({
     given,
@@ -266,9 +281,13 @@ defineFeature(feature, (test) => {
     and,
     then,
   }) => {
-    given("un contrat existe dans la liste", () => {
-      ajouterUnContrat();
-      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("un contrat existe dans la liste", (table: ContratRow[]) => {
+      renderScreen();
+      ajouterContratViaFormulaire(table[0]);
     });
 
     when("j'appuie sur supprimer", () => {
@@ -277,15 +296,13 @@ defineFeature(feature, (test) => {
 
     and("j'annule la confirmation", () => {
       expect(alertSpy).toHaveBeenCalled();
-      const cancelButton = lastAlertButtons.find(
-        (b: any) => b.style === "cancel"
-      );
+      const cancelButton = lastAlertButtons.find((b) => b.style === "cancel");
       expect(cancelButton).toBeDefined();
       cancelButton?.onPress?.();
     });
 
-    then("le contrat est toujours dans la liste", () => {
-      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    then(/^le contrat "(.*)" est toujours dans la liste$/, (employeur: string) => {
+      expect(screen.getByText(employeur)).toBeTruthy();
     });
   });
 
@@ -295,9 +312,13 @@ defineFeature(feature, (test) => {
     and,
     then,
   }) => {
-    given("un contrat existe dans la liste", () => {
-      ajouterUnContrat();
-      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("un contrat existe dans la liste", (table: ContratRow[]) => {
+      renderScreen();
+      ajouterContratViaFormulaire(table[0]);
     });
 
     when("j'appuie sur supprimer", () => {
@@ -306,24 +327,17 @@ defineFeature(feature, (test) => {
 
     and("je confirme la suppression", () => {
       expect(alertSpy).toHaveBeenCalled();
-      const confirmButton = lastAlertButtons.find(
-        (b: any) => b.style === "destructive"
-      );
+      const confirmButton = lastAlertButtons.find((b) => b.style === "destructive");
       expect(confirmButton).toBeDefined();
       act(() => {
         confirmButton?.onPress?.();
       });
     });
 
-    then("le contrat n'est plus dans la liste", () => {
-      expect(screen.queryByText("Studio Canal")).toBeNull();
+    then(/^le contrat "(.*)" n'est plus dans la liste$/, (employeur: string) => {
+      expect(screen.queryByText(employeur)).toBeNull();
     });
   });
-
-  const ajouterUnContratPuisBasculerWeb = () => {
-    ajouterUnContrat();
-    Platform.OS = "web" as any;
-  };
 
   test("Suppression web avec confirmation retire le contrat", ({
     given,
@@ -331,8 +345,14 @@ defineFeature(feature, (test) => {
     and,
     then,
   }) => {
-    given("un contrat existe dans la liste sur le web", () => {
-      ajouterUnContratPuisBasculerWeb();
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("un contrat existe dans la liste sur le web", (table: ContratRow[]) => {
+      renderScreen();
+      ajouterContratViaFormulaire(table[0]);
+      Platform.OS = "web" as any;
     });
 
     when("j'appuie sur supprimer sur le web", () => {
@@ -345,8 +365,8 @@ defineFeature(feature, (test) => {
       expect(window.confirm).toHaveBeenCalled();
     });
 
-    then("le contrat n'est plus dans la liste", () => {
-      expect(screen.queryByText("Studio Canal")).toBeNull();
+    then(/^le contrat "(.*)" n'est plus dans la liste$/, (employeur: string) => {
+      expect(screen.queryByText(employeur)).toBeNull();
     });
   });
 
@@ -356,8 +376,14 @@ defineFeature(feature, (test) => {
     and,
     then,
   }) => {
-    given("un contrat existe dans la liste sur le web", () => {
-      ajouterUnContratPuisBasculerWeb();
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
+    given("un contrat existe dans la liste sur le web", (table: ContratRow[]) => {
+      renderScreen();
+      ajouterContratViaFormulaire(table[0]);
+      Platform.OS = "web" as any;
     });
 
     when("j'appuie sur supprimer sur le web", () => {
@@ -369,8 +395,8 @@ defineFeature(feature, (test) => {
       expect(window.confirm).toHaveBeenCalled();
     });
 
-    then("le contrat est toujours dans la liste", () => {
-      expect(screen.getByText("Studio Canal")).toBeTruthy();
+    then(/^le contrat "(.*)" est toujours dans la liste$/, (employeur: string) => {
+      expect(screen.getByText(employeur)).toBeTruthy();
     });
   });
 });

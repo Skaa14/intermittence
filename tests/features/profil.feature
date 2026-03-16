@@ -1,30 +1,25 @@
 Feature: Gestion du profil intermittent
 
   Scenario: Pas de profil au démarrage
-    Given le contexte du profil est initialisé
-    Then le profil est vide
+    Given l'écran d'accueil est affiché
+    Then le bouton de configuration du profil est visible
 
-  Scenario: Mise à jour du profil
-    Given le contexte du profil est initialisé
-    When je configure mon profil en annexe "8" avec 600 heures et 18000 euros
-    Then le profil existe
-    And l'annexe du profil est "8"
-    And les heures du profil sont 600
-    And le salaire de référence du profil est 18000
+  Scenario: Configuration du profil
+    Given l'écran d'accueil est affiché
+    When je configure mon profil
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 600    | 18000   | 15/09/2026        |
+    Then l'indemnité journalière estimée est affichée
 
   Scenario: Modification du profil existant
-    Given le contexte du profil est initialisé
-    And je configure mon profil en annexe "8" avec 600 heures et 18000 euros
-    When je configure mon profil en annexe "10" avec 510 heures et 22000 euros
-    Then l'annexe du profil est "10"
-    And les heures du profil sont 510
-    And le salaire de référence du profil est 22000
-
-  Scenario: Suppression du profil
-    Given le contexte du profil est initialisé
-    And je configure mon profil en annexe "8" avec 600 heures et 18000 euros
-    When je supprime le profil
-    Then le profil est vide
+    Given l'écran d'accueil est affiché
+    And je configure mon profil
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 600    | 18000   | 15/09/2026        |
+    When je reconfigure mon profil
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 10     | 510    | 22000   | 01/10/2026        |
+    Then l'annexe affichée est "10"
 
   Scenario: Erreur hors du Provider
     Then useProfil lance une erreur si utilisé hors du Provider

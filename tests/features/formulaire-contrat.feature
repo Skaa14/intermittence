@@ -1,5 +1,8 @@
 Feature: Formulaire de saisie d'un contrat
 
+  Background:
+    Given nous sommes le "01/01/2026"
+
   Scenario: Ouverture du formulaire
     Given l'écran contrats est affiché
     When j'appuie sur "Nouveau contrat"
@@ -42,30 +45,40 @@ Feature: Formulaire de saisie d'un contrat
 
   Scenario: Ajout d'un contrat complet via le formulaire
     Given le formulaire de saisie est ouvert
-    When je remplis le formulaire avec des données valides
+    When je remplis le formulaire avec les données suivantes
+      | Employeur      | Début      | Fin        | Heures | Salaire |
+      | Opéra de Paris | 01/03/2026 | 15/03/2026 | 80     | 2500    |
     And j'appuie sur "Ajouter"
-    Then le contrat apparaît dans la liste
+    Then le contrat "Opéra de Paris" apparaît dans la liste
 
   Scenario: Annulation de la suppression conserve le contrat
     Given un contrat existe dans la liste
+      | Employeur    | Début      | Fin        | Heures | Salaire |
+      | Studio Canal | 01/03/2026 | 15/03/2026 | 40     | 1500    |
     When j'appuie sur supprimer
     And j'annule la confirmation
-    Then le contrat est toujours dans la liste
+    Then le contrat "Studio Canal" est toujours dans la liste
 
   Scenario: Confirmation de la suppression retire le contrat
     Given un contrat existe dans la liste
+      | Employeur    | Début      | Fin        | Heures | Salaire |
+      | Studio Canal | 01/03/2026 | 15/03/2026 | 40     | 1500    |
     When j'appuie sur supprimer
     And je confirme la suppression
-    Then le contrat n'est plus dans la liste
+    Then le contrat "Studio Canal" n'est plus dans la liste
 
   Scenario: Suppression web avec confirmation retire le contrat
     Given un contrat existe dans la liste sur le web
+      | Employeur    | Début      | Fin        | Heures | Salaire |
+      | Studio Canal | 01/03/2026 | 15/03/2026 | 40     | 1500    |
     When j'appuie sur supprimer sur le web
     And je confirme via window.confirm
-    Then le contrat n'est plus dans la liste
+    Then le contrat "Studio Canal" n'est plus dans la liste
 
   Scenario: Suppression web avec annulation conserve le contrat
     Given un contrat existe dans la liste sur le web
+      | Employeur    | Début      | Fin        | Heures | Salaire |
+      | Studio Canal | 01/03/2026 | 15/03/2026 | 40     | 1500    |
     When j'appuie sur supprimer sur le web
     And j'annule via window.confirm
-    Then le contrat est toujours dans la liste
+    Then le contrat "Studio Canal" est toujours dans la liste

@@ -1,59 +1,64 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { calculerAJ } from "../../utils/calculerAJ";
-import { Annexe } from "../../types/profil";
+import { screen } from "@testing-library/react-native";
+import { resetPickerCallbacks } from "../helpers/mocks";
+import {
+  renderAccueilScreen,
+  configurerProfilViaFormulaire,
+  ProfilRow,
+} from "../helpers/accueil";
+
+jest.mock("@react-native-community/datetimepicker", () =>
+  require("../helpers/mocks").mockDateTimePickerFactory()
+);
 
 const feature = loadFeature("tests/features/indemnite-journaliere.feature");
 
 defineFeature(feature, (test) => {
-  let annexe: Annexe;
-  let heures: number;
-  let salaire: number;
-  let resultat: number;
+  beforeEach(() => {
+    resetPickerCallbacks();
+  });
 
-  const givenProfil = (given: Function) => {
-    given(
-      /^un profil annexe "(.*)" avec (\d+) heures et (\d+) euros de salaire$/,
-      (a: string, h: string, s: string) => {
-        annexe = a as Annexe;
-        heures = Number(h);
-        salaire = Number(s);
-      }
-    );
+  const givenAccueil = (given: Function) => {
+    given("l'écran d'accueil est affiché", () => {
+      renderAccueilScreen();
+    });
   };
 
-  const whenCalcul = (when: Function) => {
-    when("je calcule l'indemnité journalière", () => {
-      resultat = calculerAJ(annexe, salaire, heures);
+  const whenProfil = (when: Function) => {
+    when("je configure mon profil", (table: ProfilRow[]) => {
+      configurerProfilViaFormulaire(table[0]);
     });
   };
 
   const thenAJ = (then: Function) => {
-    then(/^l'AJ brute est ([\d.]+) euros$/, (montant: string) => {
-      expect(resultat).toBeCloseTo(Number(montant), 2);
+    then(/^l'AJ affichée est "(.*)"$/, (montant: string) => {
+      expect(screen.getByTestId("aj-value")).toHaveTextContent(
+        new RegExp(montant.replace(".", "\\."))
+      );
     });
   };
 
   test("Calcul AJ annexe 8 cas standard", ({ given, when, then }) => {
-    givenProfil(given);
-    whenCalcul(when);
+    givenAccueil(given);
+    whenProfil(when);
     thenAJ(then);
   });
 
   test("Calcul AJ annexe 10 cas standard", ({ given, when, then }) => {
-    givenProfil(given);
-    whenCalcul(when);
+    givenAccueil(given);
+    whenProfil(when);
     thenAJ(then);
   });
 
   test("Plancher annexe 8", ({ given, when, then }) => {
-    givenProfil(given);
-    whenCalcul(when);
+    givenAccueil(given);
+    whenProfil(when);
     thenAJ(then);
   });
 
   test("Plancher annexe 10", ({ given, when, then }) => {
-    givenProfil(given);
-    whenCalcul(when);
+    givenAccueil(given);
+    whenProfil(when);
     thenAJ(then);
   });
 
@@ -62,8 +67,8 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
-    givenProfil(given);
-    whenCalcul(when);
+    givenAccueil(given);
+    whenProfil(when);
     thenAJ(then);
   });
 
@@ -72,8 +77,8 @@ defineFeature(feature, (test) => {
     when,
     then,
   }) => {
-    givenProfil(given);
-    whenCalcul(when);
+    givenAccueil(given);
+    whenProfil(when);
     thenAJ(then);
   });
 });

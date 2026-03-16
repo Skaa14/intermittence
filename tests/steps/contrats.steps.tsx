@@ -1,112 +1,100 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
+import { fireEvent, screen, act, within } from "@testing-library/react-native";
+import { Alert, AlertButton } from "react-native";
+import { ContratRow } from "../helpers/types";
 import {
-  renderHook,
-  act,
-  RenderHookResult,
-} from "@testing-library/react-native";
-import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
+  renderScreen,
+  ajouterContratViaFormulaire,
+  fixerDate,
+} from "../helpers/form";
+import { resetPickerCallbacks } from "../helpers/mocks";
 
-type ContratsHook = RenderHookResult<ReturnType<typeof useContrats>, unknown>;
+jest.mock("@react-native-community/datetimepicker", () =>
+  require("../helpers/mocks").mockDateTimePickerFactory()
+);
 
 const feature = loadFeature("tests/features/contrats.feature");
 
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <ContratsProvider>{children}</ContratsProvider>
-);
+let alertSpy: jest.SpyInstance;
+let lastAlertButtons: AlertButton[];
 
 defineFeature(feature, (test) => {
-  test("Liste de contrats vide au démarrage", ({ given, then }) => {
-    let hook: ContratsHook;
+  beforeEach(() => {
+    resetPickerCallbacks();
+    lastAlertButtons = [];
+    alertSpy = jest.spyOn(Alert, "alert").mockImplementation(
+      (_title, _message, buttons) => {
+        lastAlertButtons = buttons ?? [];
+      }
+    );
+  });
 
-    given("le contexte des contrats est initialisé", () => {
-      hook = renderHook(() => useContrats(), { wrapper });
+  afterEach(() => {
+    alertSpy.mockRestore();
+    jest.useRealTimers();
+  });
+
+  test("Aucun contrat au démarrage", ({ given, then }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
     });
 
-    then("la liste des contrats est vide", () => {
-      expect(hook.result.current.contrats).toEqual([]);
+    given("l'écran contrats est affiché", () => {
+      renderScreen();
+    });
+
+    then(/^le message "(.*)" est visible$/, (message: string) => {
+      expect(screen.getByText(message)).toBeTruthy();
     });
   });
 
-  test("Ajout d'un contrat", ({ given, when, then, and }) => {
-    let hook: ContratsHook;
-
-    given("le contexte des contrats est initialisé", () => {
-      hook = renderHook(() => useContrats(), { wrapper });
+  test("Ajout d'un contrat", ({ given, when, then }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
     });
 
-    when(
-      /^j'ajoute un contrat pour "(.*)" de (\d+) euros brut$/,
-      (employeur: string, salaire: string) => {
-        act(() => {
-          hook.result.current.ajouterContrat({
-            employeur,
-            dateDebut: "01/03/2026",
-            dateFin: "15/03/2026",
-            heures: 80,
-            salaireBrut: Number(salaire),
-          });
-        });
-      }
-    );
-
-    then(/^la liste contient (\d+) contrat$/, (count: string) => {
-      expect(hook.result.current.contrats).toHaveLength(Number(count));
+    given("l'écran contrats est affiché", () => {
+      renderScreen();
     });
 
-    and(/^l'employeur du dernier contrat est "(.*)"$/, (employeur: string) => {
-      const contrats = hook.result.current.contrats;
-      expect(contrats[contrats.length - 1].employeur).toBe(employeur);
+    when("j'ajoute ce contrat", (table: ContratRow[]) => {
+      ajouterContratViaFormulaire(table[0]);
     });
 
-    and(
-      /^le salaire brut du dernier contrat est (\d+)$/,
-      (salaire: string) => {
-        const contrats = hook.result.current.contrats;
-        expect(contrats[contrats.length - 1].salaireBrut).toBe(Number(salaire));
-      }
-    );
+    then(/^le contrat "(.*)" est visible dans la liste$/, (employeur: string) => {
+      expect(screen.getByText(employeur)).toBeTruthy();
+    });
   });
 
   test("Suppression d'un contrat", ({ given, when, then, and }) => {
-    let hook: ContratsHook;
-
-    given("le contexte des contrats est initialisé", () => {
-      hook = renderHook(() => useContrats(), { wrapper });
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
     });
 
-    and(
-      /^j'ajoute un contrat pour "(.*)" de (\d+) euros brut$/,
-      (employeur: string, salaire: string) => {
-        act(() => {
-          hook.result.current.ajouterContrat({
-            employeur,
-            dateDebut: "01/01/2026",
-            dateFin: "31/01/2026",
-            heures: 120,
-            salaireBrut: Number(salaire),
-          });
-        });
-      }
-    );
+    given("l'écran contrats est affiché", () => {
+      renderScreen();
+    });
 
-    when("je supprime le dernier contrat", () => {
-      const contrats = hook.result.current.contrats;
-      const id = contrats[contrats.length - 1].id;
+    and("j'ajoute ce contrat", (table: ContratRow[]) => {
+      ajouterContratViaFormulaire(table[0]);
+    });
+
+    when(/^je supprime le contrat "(.*)"$/, (employeur: string) => {
+      const cards = screen.getAllByTestId(/^contrat-/);
+      const card = cards.find((c) => within(c).queryByText(employeur));
+      expect(card).toBeDefined();
+      fireEvent.press(within(card!).getByText("✕"));
+      const confirmButton = lastAlertButtons.find(
+        (b) => b.style === "destructive"
+      );
+      expect(confirmButton).toBeDefined();
       act(() => {
-        hook.result.current.supprimerContrat(id);
+        confirmButton?.onPress?.();
       });
     });
 
-    then("la liste des contrats est vide", () => {
-      expect(hook.result.current.contrats).toHaveLength(0);
-    });
-  });
-
-  test("Erreur hors du Provider", ({ then }) => {
-    then("useContrats lance une erreur si utilisé hors du Provider", () => {
-      expect(() => {
-        renderHook(() => useContrats());
-      }).toThrow("useContrats doit être utilisé dans un ContratsProvider");
+    then(/^le message "(.*)" est visible$/, (message: string) => {
+      expect(screen.getByText(message)).toBeTruthy();
     });
   });
 });

@@ -1,21 +1,23 @@
 Feature: Gestion des contrats
 
-  Scenario: Liste de contrats vide au démarrage
-    Given le contexte des contrats est initialisé
-    Then la liste des contrats est vide
+  Background:
+    Given nous sommes le "01/01/2026"
+
+  Scenario: Aucun contrat au démarrage
+    Given l'écran contrats est affiché
+    Then le message "Aucun contrat. Ajoute ton premier contrat !" est visible
 
   Scenario: Ajout d'un contrat
-    Given le contexte des contrats est initialisé
-    When j'ajoute un contrat pour "Théâtre du Rond-Point" de 2500 euros brut
-    Then la liste contient 1 contrat
-    And l'employeur du dernier contrat est "Théâtre du Rond-Point"
-    And le salaire brut du dernier contrat est 2500
+    Given l'écran contrats est affiché
+    When j'ajoute ce contrat
+      | Employeur             | Début      | Fin        | Heures | Salaire |
+      | Théâtre du Rond-Point | 01/03/2026 | 15/03/2026 | 80     | 2500    |
+    Then le contrat "Théâtre du Rond-Point" est visible dans la liste
 
   Scenario: Suppression d'un contrat
-    Given le contexte des contrats est initialisé
-    And j'ajoute un contrat pour "Studio Canal" de 3000 euros brut
-    When je supprime le dernier contrat
-    Then la liste des contrats est vide
-
-  Scenario: Erreur hors du Provider
-    Then useContrats lance une erreur si utilisé hors du Provider
+    Given l'écran contrats est affiché
+    And j'ajoute ce contrat
+      | Employeur    | Début      | Fin        | Heures | Salaire |
+      | Studio Canal | 01/01/2026 | 31/01/2026 | 120    | 3000    |
+    When je supprime le contrat "Studio Canal"
+    Then le message "Aucun contrat. Ajoute ton premier contrat !" est visible

@@ -11,6 +11,7 @@ import {
   renderScreen,
   selectDate,
   ajouterContratViaFormulaire,
+  fixerDate,
 } from "../helpers/form";
 
 jest.mock("@react-native-community/datetimepicker", () =>
@@ -49,6 +50,10 @@ defineFeature(feature, (test) => {
   });
 
   test("Modifier l'employeur d'un contrat", ({ given, when, then }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("un contrat existant :", (table: ContratRow[]) => {
       renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
@@ -69,6 +74,10 @@ defineFeature(feature, (test) => {
   });
 
   test("Modifier le salaire d'un contrat", ({ given, when, then }) => {
+    given(/^nous sommes le "(.*)"$/, (date: string) => {
+      fixerDate(date);
+    });
+
     given("un contrat existant :", (table: ContratRow[]) => {
       renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
@@ -93,8 +102,7 @@ defineFeature(feature, (test) => {
 
   test("Un contrat modifié avec des dates passées devient passé", ({ given, when, then, and }) => {
     given(/^nous sommes le "(.*)"$/, (date: string) => {
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date(ddmmyyyyToIso(date) + "T12:00:00"));
+      fixerDate(date);
     });
 
     and("un contrat existant :", (table: ContratRow[]) => {
