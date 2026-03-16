@@ -30,7 +30,12 @@
     },
     "scheme": "intermittence",
     "plugins": [
-      "expo-router"
+      [
+        "expo-router",
+        {
+          "origin": "https://intermittence.app"
+        }
+      ]
     ],
     "extra": {
       "router": {},
