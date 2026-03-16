@@ -4,6 +4,7 @@ import { ProfilIntermittent } from "../types/profil";
 interface ProfilContextType {
   profil: ProfilIntermittent | null;
   mettreAJourProfil: (profil: ProfilIntermittent) => void;
+  reinitialiserProfil: () => void;
 }
 
 const ProfilContext = createContext<ProfilContextType | null>(null);
@@ -15,9 +16,13 @@ export function ProfilProvider({ children }: { children: ReactNode }) {
     setProfil(nouveauProfil);
   };
 
+  const reinitialiserProfil = () => {
+    setProfil(null);
+  };
+
   return (
     <ProfilContext.Provider
-      value={{ profil, mettreAJourProfil }}
+      value={{ profil, mettreAJourProfil, reinitialiserProfil }}
     >
       {children}
     </ProfilContext.Provider>

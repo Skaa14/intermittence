@@ -13,6 +13,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
+import { useDonneesTest } from "../../contexts/DonneesTestContext";
 import { Annexe } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
 import { calculerAJ } from "../../utils/calculerAJ";
@@ -20,6 +21,7 @@ import { calculerAJ } from "../../utils/calculerAJ";
 export default function AccueilScreen() {
   const { contrats } = useContrats();
   const { profil, mettreAJourProfil } = useProfil();
+  const { chargerDonneesTest } = useDonneesTest();
 
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
   const [annexe, setAnnexe] = useState<Annexe>(profil?.annexe ?? "8");
@@ -123,6 +125,33 @@ export default function AccueilScreen() {
             Configurer mon profil pour estimer mon indemnité journalière
           </Text>
         </Pressable>
+      )}
+
+      {!formulaireOuvert && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Données de test</Text>
+          <Text style={styles.demoHint}>
+            Charge un profil fictif pour explorer l'application
+          </Text>
+          <View style={styles.row}>
+            <Pressable
+              testID="btn-demo-artiste"
+              style={styles.demoBtn}
+              onPress={() => chargerDonneesTest("artiste")}
+            >
+              <Text style={styles.demoBtnLabel}>Artiste</Text>
+              <Text style={styles.demoBtnSub}>Anx. 10</Text>
+            </Pressable>
+            <Pressable
+              testID="btn-demo-technicien"
+              style={styles.demoBtn}
+              onPress={() => chargerDonneesTest("technicien")}
+            >
+              <Text style={styles.demoBtnLabel}>Technicien</Text>
+              <Text style={styles.demoBtnSub}>Anx. 8</Text>
+            </Pressable>
+          </View>
+        </View>
       )}
 
       {formulaireOuvert && (
@@ -424,5 +453,29 @@ const styles = StyleSheet.create({
     color: "#64748b",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  demoHint: {
+    fontSize: 13,
+    color: "#64748b",
+    marginBottom: 12,
+  },
+  demoBtn: {
+    flex: 1,
+    backgroundColor: "#f1f5f9",
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    borderRadius: 8,
+    padding: 12,
+    alignItems: "center",
+  },
+  demoBtnLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1e293b",
+  },
+  demoBtnSub: {
+    fontSize: 12,
+    color: "#64748b",
+    marginTop: 2,
   },
 });

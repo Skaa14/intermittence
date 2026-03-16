@@ -6,6 +6,7 @@ interface ContratsContextType {
   ajouterContrat: (contrat: Omit<Contrat, "id">) => void;
   modifierContrat: (id: string, contrat: Omit<Contrat, "id">) => void;
   supprimerContrat: (id: string) => void;
+  reinitialiserContrats: (contrats: Omit<Contrat, "id">[]) => void;
 }
 
 const ContratsContext = createContext<ContratsContextType | null>(null);
@@ -48,9 +49,15 @@ export function ContratsProvider({ children }: { children: ReactNode }) {
     setContrats((prev) => prev.filter((c) => c.id !== id));
   };
 
+  const reinitialiserContrats = (nouveauxContrats: Omit<Contrat, "id">[]) => {
+    nextId.current = 1;
+    const avecIds = nouveauxContrats.map((c) => ({ ...c, id: String(nextId.current++) }));
+    setContrats(trierParDate(avecIds));
+  };
+
   return (
     <ContratsContext.Provider
-      value={{ contrats, ajouterContrat, modifierContrat, supprimerContrat }}
+      value={{ contrats, ajouterContrat, modifierContrat, supprimerContrat, reinitialiserContrats }}
     >
       {children}
     </ContratsContext.Provider>
