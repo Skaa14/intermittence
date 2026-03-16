@@ -7,7 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import { useMemo, useRef, useEffect } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, Stack } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import {
@@ -167,16 +167,15 @@ export default function DetailMoisScreen() {
     }
   }, [indexNum, mois.length]);
 
-  if (!profil) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.empty}>Configurez votre profil</Text>
-      </View>
-    );
-  }
-
   return (
-    <FlatList
+    <>
+      <Stack.Screen options={{ headerShown: true, title: "Détail du mois" }} />
+      {!profil ? (
+        <View style={styles.container}>
+          <Text style={styles.empty}>Configurez votre profil</Text>
+        </View>
+      ) : (
+        <FlatList
       ref={flatListRef}
       data={mois}
       horizontal
@@ -196,6 +195,8 @@ export default function DetailMoisScreen() {
       }}
       renderItem={({ item }) => <PageMois mois={item} />}
     />
+      )}
+    </>
   );
 }
 
