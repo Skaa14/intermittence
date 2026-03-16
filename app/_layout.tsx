@@ -1,8 +1,9 @@
 import { Stack } from "expo-router";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { ContratsProvider } from "../contexts/ContratsContext";
 import { ProfilProvider } from "../contexts/ProfilContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
+import { styles } from "./_layout.styles";
 
 function BannerModeTest() {
   const { nomProfil, reinitialiser } = useDonneesTest();
@@ -42,34 +43,3 @@ export default function RootLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  banner: {
-    backgroundColor: "#f59e0b",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    paddingTop: 48,
-  },
-  bannerText: {
-    color: "#1c1917",
-    fontWeight: "600",
-    fontSize: 13,
-    flex: 1,
-  },
-  bannerBtn: {
-    backgroundColor: "#1c1917",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  bannerBtnText: {
-    color: "#fef3c7",
-    fontWeight: "bold",
-    fontSize: 12,
-  },
-});

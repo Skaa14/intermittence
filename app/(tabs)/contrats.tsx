@@ -5,7 +5,6 @@ import {
   TextInput,
   Pressable,
   FlatList,
-  StyleSheet,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -16,11 +15,12 @@ import DateTimePicker, {
 import { useContrats } from "../../contexts/ContratsContext";
 import { Contrat } from "../../types/contrat";
 import { formatDate, formatDateISO, parseDate } from "../../utils/date";
+import { styles, webDateInputStyle } from "./contrats.styles";
+import { colors } from "../../theme/colors";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
 
-const COULEUR_ERREUR = "#ef4444";
 
 const isContratPasse = (contrat: Contrat): boolean => {
   const fin = parseDate(contrat.dateFin);
@@ -216,7 +216,7 @@ export default function ContratsScreen() {
                   }}
                   style={{
                     ...webDateInputStyle,
-                    ...(erreurs.dateDebut && { borderColor: COULEUR_ERREUR }),
+                    ...(erreurs.dateDebut && { borderColor: colors.error }),
                   }}
                 />
                 <input
@@ -230,7 +230,7 @@ export default function ContratsScreen() {
                   }}
                   style={{
                     ...webDateInputStyle,
-                    ...(erreurs.dateFin && { borderColor: COULEUR_ERREUR }),
+                    ...(erreurs.dateFin && { borderColor: colors.error }),
                   }}
                 />
               </>
@@ -385,213 +385,3 @@ export default function ContratsScreen() {
   );
 }
 
-const webDateInputStyle: React.CSSProperties = {
-  flex: 1,
-  border: "1px solid #cbd5e1",
-  borderRadius: 8,
-  padding: 12,
-  marginBottom: 8,
-  fontSize: 16,
-  backgroundColor: "#f8fafc",
-  fontFamily: "inherit",
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f8fafc",
-  },
-  resume: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 16,
-    backgroundColor: "#2563eb",
-  },
-  resumeItem: {
-    alignItems: "center",
-  },
-  resumeValue: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  resumeLabel: {
-    fontSize: 12,
-    color: "#bfdbfe",
-  },
-  formulaire: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#cbd5e1",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 8,
-    fontSize: 16,
-    backgroundColor: "#f8fafc",
-  },
-  row: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  inputHalf: {
-    flex: 1,
-  },
-  dateText: {
-    fontSize: 16,
-    color: "#1e293b",
-  },
-  datePlaceholder: {
-    fontSize: 16,
-    color: "#94a3b8",
-  },
-  btnAjouter: {
-    flex: 1,
-    backgroundColor: "#2563eb",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  btnAjouterText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  btnAnnuler: {
-    flex: 1,
-    backgroundColor: "#e2e8f0",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  btnAnnulerText: {
-    color: "#64748b",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  btnOuvrir: {
-    margin: 16,
-    backgroundColor: "#2563eb",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  btnOuvrirText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  liste: {
-    padding: 16,
-  },
-  vide: {
-    textAlign: "center",
-    color: "#94a3b8",
-    marginTop: 40,
-    fontSize: 16,
-  },
-  contratCard: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  contratHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  contratEmployeur: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1e293b",
-  },
-  supprimer: {
-    fontSize: 18,
-    color: "#ef4444",
-    padding: 4,
-  },
-  contratDates: {
-    fontSize: 14,
-    color: "#64748b",
-    marginTop: 4,
-  },
-  contratDetails: {
-    flexDirection: "row",
-    gap: 16,
-    marginTop: 8,
-  },
-  contratDetail: {
-    fontSize: 14,
-    color: "#2563eb",
-    fontWeight: "600",
-  },
-  btnTogglePasses: {
-    marginHorizontal: 16,
-    marginTop: 8,
-    padding: 10,
-    borderRadius: 8,
-    backgroundColor: "#f1f5f9",
-    alignItems: "center",
-  },
-  btnTogglePassesText: {
-    fontSize: 14,
-    color: "#64748b",
-    fontWeight: "500",
-  },
-  contratCardPasse: {
-    opacity: 0.6,
-    borderLeftWidth: 3,
-    borderLeftColor: "#94a3b8",
-  },
-  contratTitre: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    flex: 1,
-  },
-  contratTextPasse: {
-    color: "#94a3b8",
-  },
-  badgePasse: {
-    backgroundColor: "#e2e8f0",
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  badgePasseText: {
-    fontSize: 11,
-    color: "#64748b",
-    fontWeight: "600",
-  },
-  contratDetailPasse: {
-    color: "#94a3b8",
-  },
-  contratActions: {
-    flexDirection: "row",
-    gap: 8,
-    alignItems: "center",
-  },
-  modifier: {
-    fontSize: 18,
-    color: "#2563eb",
-    padding: 4,
-  },
-  inputErreur: {
-    borderColor: COULEUR_ERREUR,
-  },
-  erreurMois: {
-    color: COULEUR_ERREUR,
-    fontSize: 13,
-    marginBottom: 8,
-  },
-});

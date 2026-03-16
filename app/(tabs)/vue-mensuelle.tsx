@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
 } from "react-native";
@@ -13,6 +12,7 @@ import {
   calculerMoisIndemnisation,
   MoisIndemnisation,
 } from "../../utils/calculerMoisIndemnisation";
+import { styles, BADGE_STYLES } from "./vue-mensuelle.styles";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -37,14 +37,6 @@ function formatEuros(montant: number): string {
   return `${Math.round(montant)} €`;
 }
 
-const BADGE_STYLES: Record<
-  MoisIndemnisation["etat"],
-  { bg: string; text: string; label: string }
-> = {
-  passé: { bg: "#e2e8f0", text: "#475569", label: "Passé" },
-  "en cours": { bg: "#dbeafe", text: "#1d4ed8", label: "En cours" },
-  "à venir": { bg: "#dcfce7", text: "#15803d", label: "À venir" },
-};
 
 function BadgeEtat({ etat }: { etat: MoisIndemnisation["etat"] }) {
   const { bg, text, label } = BADGE_STYLES[etat];
@@ -126,83 +118,3 @@ export default function VueMensuelleScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f8fafc",
-  },
-  empty: {
-    fontSize: 16,
-    color: "#64748b",
-    textAlign: "center",
-  },
-  liste: {
-    padding: 16,
-    backgroundColor: "#f8fafc",
-    gap: 12,
-  },
-  carte: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  carteHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  carteTitre: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1e293b",
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: "500",
-  },
-  carteBody: {
-    gap: 6,
-  },
-  ligne: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  ligneTotal: {
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: "#e2e8f0",
-  },
-  libelleValeur: {
-    fontSize: 14,
-    color: "#64748b",
-  },
-  valeur: {
-    fontSize: 14,
-    color: "#1e293b",
-  },
-  libelleTotal: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1e293b",
-  },
-  valeurTotal: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#2563eb",
-  },
-});

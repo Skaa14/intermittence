@@ -28,13 +28,21 @@ Ce projet sert aussi de formation à React Native / Expo pour l'utilisateur.
 ```
 app/                    ← Dossier des routes (Expo Router)
 ├── _layout.tsx         ← Layout racine (Stack global)
+├── _layout.styles.ts   ← Styles du layout racine
 └── (tabs)/             ← Groupe d'onglets
     ├── _layout.tsx     ← Config des onglets (barre du bas)
     ├── index.tsx           ← Onglet Accueil (dashboard)
+    ├── index.styles.ts     ← Styles de l'accueil
     ├── contrats.tsx        ← Onglet Contrats (saisie)
-    └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
+    ├── contrats.styles.ts  ← Styles des contrats
+    ├── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
+    └── vue-mensuelle.styles.ts ← Styles de la vue mensuelle
 └── mois/
-    └── [index].tsx         ← Détail swipeable d'un mois d'indemnisation
+    ├── [index].tsx         ← Détail swipeable d'un mois d'indemnisation
+    └── [index].styles.ts   ← Styles du détail d'un mois
+theme/
+├── colors.ts           ← Tokens de couleurs partagés (source de vérité)
+└── webStyles.ts        ← Styles web partagés (React.CSSProperties)
 types/contrat.ts            ← Interface TypeScript du contrat
 types/profil.ts             ← Interface TypeScript du profil intermittent
 contexts/ContratsContext.tsx ← State partagé entre les écrans
@@ -60,3 +68,9 @@ assets/                 ← Images et ressources
 - **Toujours lancer les tests** (`npm test`) après une modification qui peut les impacter
 - **Toujours écrire des tests** pour chaque feature ou fix (Gherkin + step definitions dans `tests/`)
 - **Avant d'écrire des tests** : charger le skill `/test` pour connaître les conventions, patterns et mocks du projet
+
+## Conventions de style
+- **Zéro couleur hex en dur** dans les fichiers `.tsx` ou `.styles.ts` — toujours passer par `theme/colors.ts`
+- **Styles séparés** : chaque écran a son fichier `[nom].styles.ts` colocalisé, qui exporte `styles` (et éventuellement des constantes associées)
+- **Styles web** (`React.CSSProperties`) : utiliser `webDateInputBase` depuis `theme/webStyles.ts` comme base, étendre avec les propriétés spécifiques
+- Les fichiers `.tsx` n'importent que `{ styles }` depuis leur `.styles.ts` — pas de `StyleSheet` ni de couleurs directement dans le JSX

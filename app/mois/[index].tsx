@@ -1,7 +1,6 @@
 import {
   View,
   Text,
-  StyleSheet,
   FlatList,
   ScrollView,
   Dimensions,
@@ -14,6 +13,7 @@ import {
   calculerMoisIndemnisation,
   MoisIndemnisation,
 } from "../../utils/calculerMoisIndemnisation";
+import { styles } from "./[index].styles";
 const NOMS_MOIS = [
   "Janvier",
   "Février",
@@ -200,91 +200,3 @@ export default function DetailMoisScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f8fafc",
-  },
-  empty: {
-    fontSize: 16,
-    color: "#64748b",
-    textAlign: "center",
-  },
-  pageContent: {
-    padding: 20,
-    backgroundColor: "#f8fafc",
-  },
-  titreMois: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#1e293b",
-    marginBottom: 20,
-  },
-  section: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  titreSection: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#64748b",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 12,
-  },
-  vide: {
-    fontSize: 14,
-    color: "#94a3b8",
-    fontStyle: "italic",
-  },
-  contratItem: {
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
-  },
-  employeur: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#1e293b",
-    marginBottom: 4,
-  },
-  contratDetails: {
-    flexDirection: "row",
-    gap: 16,
-  },
-  detailVal: {
-    fontSize: 14,
-    color: "#475569",
-  },
-  ligne: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 6,
-  },
-  libelleValeur: {
-    fontSize: 14,
-    color: "#64748b",
-  },
-  valeur: {
-    fontSize: 14,
-    color: "#1e293b",
-  },
-  bold: {
-    fontWeight: "600",
-    color: "#1e293b",
-  },
-  boldValeur: {
-    fontWeight: "600",
-    color: "#2563eb",
-  },
-});
