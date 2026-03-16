@@ -33,6 +33,8 @@ app/                    ← Dossier des routes (Expo Router)
     ├── index.tsx           ← Onglet Accueil (dashboard)
     ├── contrats.tsx        ← Onglet Contrats (saisie)
     └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
+└── mois/
+    └── [index].tsx         ← Détail swipeable d'un mois d'indemnisation
 types/contrat.ts            ← Interface TypeScript du contrat
 types/profil.ts             ← Interface TypeScript du profil intermittent
 contexts/ContratsContext.tsx ← State partagé entre les écrans
