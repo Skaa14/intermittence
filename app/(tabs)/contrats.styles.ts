@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
+import { fonts } from "../../theme/fonts";
 import { webDateInputBase } from "../../theme/webStyles";
 
 export const addIconColor = colors.warning;
@@ -34,6 +35,7 @@ export const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
     fontSize: 16,
+    fontFamily: fonts.regular,
     backgroundColor: colors.bgBase,
   },
   row: {
@@ -46,10 +48,12 @@ export const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.textDark,
   },
   datePlaceholder: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.textFaint,
   },
   btnAjouter: {
@@ -60,8 +64,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnAjouterText: {
+    fontFamily: fonts.bold,
     color: colors.bgCard,
-    fontWeight: "bold",
     fontSize: 16,
   },
   btnAnnuler: {
@@ -72,8 +76,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnAnnulerText: {
+    fontFamily: fonts.medium,
     color: colors.textMuted,
-    fontWeight: "500",
     fontSize: 14,
   },
   btnOuvrir: {
@@ -87,6 +91,7 @@ export const styles = StyleSheet.create({
   },
   vide: {
     textAlign: "center",
+    fontFamily: fonts.regular,
     color: colors.textFaint,
     marginTop: 40,
     fontSize: 16,
@@ -111,7 +116,7 @@ export const styles = StyleSheet.create({
   },
   contratEmployeur: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textDark,
   },
   supprimer: {
@@ -121,6 +126,7 @@ export const styles = StyleSheet.create({
   },
   contratDates: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 4,
   },
@@ -131,8 +137,8 @@ export const styles = StyleSheet.create({
   },
   contratDetail: {
     fontSize: 14,
+    fontFamily: fonts.semiBold,
     color: colors.primary,
-    fontWeight: "600",
   },
   btnTogglePasses: {
     flex: 1,
@@ -145,8 +151,8 @@ export const styles = StyleSheet.create({
   },
   btnTogglePassesText: {
     fontSize: 14,
+    fontFamily: fonts.medium,
     color: colors.textMuted,
-    fontWeight: "500",
   },
   contratCardPasse: {
     opacity: 0.6,
@@ -170,8 +176,8 @@ export const styles = StyleSheet.create({
   },
   badgePasseText: {
     fontSize: 11,
+    fontFamily: fonts.semiBold,
     color: colors.textMuted,
-    fontWeight: "600",
   },
   contratDetailPasse: {
     color: colors.textFaint,
@@ -190,6 +196,7 @@ export const styles = StyleSheet.create({
     borderColor: colors.error,
   },
   erreurMois: {
+    fontFamily: fonts.regular,
     color: colors.error,
     fontSize: 13,
     marginBottom: 8,

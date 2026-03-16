@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../theme/colors";
+import { fonts } from "../theme/fonts";
 
 export const styles = StyleSheet.create({
   container: {
@@ -28,7 +29,7 @@ export const styles = StyleSheet.create({
   },
   bannerText: {
     color: colors.textDark,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     fontSize: 13,
     flex: 1,
   },
@@ -40,7 +41,7 @@ export const styles = StyleSheet.create({
   },
   bannerBtnText: {
     color: colors.bgCard,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     fontSize: 12,
   },
 });

@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
+import { fonts } from "../../theme/fonts";
 import { webDateInputBase } from "../../theme/webStyles";
 
 export const webDateInputStyle: React.CSSProperties = {
@@ -25,16 +26,18 @@ export const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginBottom: 4,
   },
   cardValue: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.textDark,
   },
   cardHint: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 8,
   },
@@ -58,16 +61,18 @@ export const styles = StyleSheet.create({
   },
   ajLabel: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.primaryLight,
     marginBottom: 4,
   },
   ajValue: {
     fontSize: 32,
-    fontWeight: "bold",
+    fontFamily: fonts.bold,
     color: colors.bgCard,
   },
   ajDetail: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.primaryLight,
     marginTop: 8,
   },
@@ -82,12 +87,13 @@ export const styles = StyleSheet.create({
   },
   configurerBtnText: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   label: {
     fontSize: 14,
+    fontFamily: fonts.semiBold,
     color: colors.textDark,
-    fontWeight: "600",
     marginTop: 12,
     marginBottom: 6,
   },
@@ -98,6 +104,7 @@ export const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
     fontSize: 16,
+    fontFamily: fonts.regular,
     backgroundColor: colors.bgBase,
   },
   row: {
@@ -119,18 +126,20 @@ export const styles = StyleSheet.create({
   },
   annexeBtnText: {
     fontSize: 13,
+    fontFamily: fonts.semiBold,
     color: colors.textMuted,
-    fontWeight: "600",
   },
   annexeBtnTextActive: {
     color: colors.bgCard,
   },
   dateText: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.textDark,
   },
   datePlaceholder: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.textFaint,
   },
   btnValider: {
@@ -141,8 +150,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnValiderText: {
+    fontFamily: fonts.bold,
     color: colors.bgCard,
-    fontWeight: "bold",
     fontSize: 16,
   },
   btnAnnuler: {
@@ -153,12 +162,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnAnnulerText: {
+    fontFamily: fonts.medium,
     color: colors.textMuted,
-    fontWeight: "bold",
     fontSize: 16,
   },
   demoHint: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginBottom: 12,
   },
@@ -173,11 +183,12 @@ export const styles = StyleSheet.create({
   },
   demoBtnLabel: {
     fontSize: 14,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textDark,
   },
   demoBtnSub: {
     fontSize: 12,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
   },

@@ -42,6 +42,7 @@ app/                    ← Dossier des routes (Expo Router)
     └── [index].styles.ts   ← Styles du détail d'un mois
 theme/
 ├── colors.ts           ← Tokens de couleurs partagés (source de vérité)
+├── fonts.ts            ← Tokens de polices partagés (source de vérité)
 └── webStyles.ts        ← Styles web partagés (React.CSSProperties)
 types/contrat.ts            ← Interface TypeScript du contrat
 types/profil.ts             ← Interface TypeScript du profil intermittent

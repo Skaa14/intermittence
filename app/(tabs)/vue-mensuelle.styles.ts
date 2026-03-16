@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
+import { fonts } from "../../theme/fonts";
 import { IndemnisationMensuelle } from "../../utils/calculerIndemnisationMensuelle";
 
 export const BADGE_STYLES: Record<
@@ -21,6 +22,7 @@ export const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: "center",
   },
@@ -49,7 +51,7 @@ export const styles = StyleSheet.create({
   },
   carteTitre: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     color: colors.textDark,
   },
   badge: {
@@ -59,7 +61,7 @@ export const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 12,
-    fontWeight: "500",
+    fontFamily: fonts.medium,
   },
   carteBody: {
     gap: 6,
@@ -76,20 +78,22 @@ export const styles = StyleSheet.create({
   },
   libelleValeur: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   valeur: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textDark,
   },
   libelleTotal: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     color: colors.textDark,
   },
   valeurTotal: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     color: colors.primary,
   },
 });

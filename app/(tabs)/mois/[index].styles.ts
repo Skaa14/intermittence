@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../../theme/colors";
+import { fonts } from "../../../theme/fonts";
 
 export const backIconColor = colors.textOnPrimary;
 
@@ -19,6 +20,7 @@ export const styles = StyleSheet.create({
   },
   empty: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     textAlign: "center",
   },
@@ -28,7 +30,7 @@ export const styles = StyleSheet.create({
   },
   titreMois: {
     fontSize: 22,
-    fontWeight: "700",
+    fontFamily: fonts.bold,
     color: colors.textDark,
     marginBottom: 20,
   },
@@ -47,7 +49,7 @@ export const styles = StyleSheet.create({
   },
   titreSection: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     color: colors.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -55,6 +57,7 @@ export const styles = StyleSheet.create({
   },
   vide: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textFaint,
     fontStyle: "italic",
   },
@@ -65,7 +68,7 @@ export const styles = StyleSheet.create({
   },
   employeur: {
     fontSize: 15,
-    fontWeight: "500",
+    fontFamily: fonts.medium,
     color: colors.textDark,
     marginBottom: 4,
   },
@@ -75,6 +78,7 @@ export const styles = StyleSheet.create({
   },
   detailVal: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMedium,
   },
   ligne: {
@@ -84,18 +88,20 @@ export const styles = StyleSheet.create({
   },
   libelleValeur: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
   },
   valeur: {
     fontSize: 14,
+    fontFamily: fonts.regular,
     color: colors.textDark,
   },
   bold: {
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     color: colors.textDark,
   },
   boldValeur: {
-    fontWeight: "600",
+    fontFamily: fonts.semiBold,
     color: colors.primary,
   },
   separateur: {
@@ -109,11 +115,13 @@ export const styles = StyleSheet.create({
   },
   texteFormule: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.textMuted,
     fontStyle: "italic",
   },
   texteFormulePlafond: {
     fontSize: 13,
+    fontFamily: fonts.regular,
     color: colors.warning,
     fontStyle: "italic",
   },
