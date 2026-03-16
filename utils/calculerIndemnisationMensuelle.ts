@@ -2,9 +2,26 @@ import { Contrat } from "../types/contrat";
 import { ProfilIntermittent } from "../types/profil";
 import { parseDate } from "./date";
 import { calculerAJ } from "./calculerAJ";
-import { SMIC_MENSUEL, SMIC_JOURNALIER } from "./reglementation";
+import {
+  SMIC_MENSUEL,
+  SMIC_JOURNALIER,
+  PMSS_MENSUEL,
+  DELAI_ATTENTE_JOURS,
+  COEF_JOURS_NON_INDEMNISABLES_A8,
+  COEF_JOURS_NON_INDEMNISABLES_A10,
+  COEF_PLAFOND_PMSS,
+  PLAFOND_FRANCHISE_CP_JOURS,
+  PERIODICITE_FRANCHISE_CP,
+  TAUX_FRANCHISE_CP,
+  SEUIL_FRANCHISE_CP_MENSUEL,
+  FRANCHISE_CP_MENSUELLE_BAS,
+  FRANCHISE_CP_MENSUELLE_HAUT,
+  MOIS_FRANCHISE_SALAIRE,
+  COEF_SJM_FRANCHISE_SALAIRE,
+  CONSTANTE_FRANCHISE_SALAIRE,
+} from "./reglementation";
 
-export interface MoisIndemnisation {
+export interface IndemnisationMensuelle {
   mois: Date;
   index: number;
   contratsDuMois: Contrat[];
@@ -17,7 +34,10 @@ export interface MoisIndemnisation {
   franchiseSalaire: number;
   joursIndemnises: number;
   aj: number;
+  areVerseeAvantPlafond: number;
   areVersee: number;
+  plafondAtteint: boolean;
+  plafondMontant: number;
   totalRecu: number;
   etat: "passé" | "en cours" | "à venir";
 }
@@ -37,10 +57,13 @@ function calculerFranchisesParMois(
 
   // Total arrondi au nombre entier obtenu (Math.floor) — guide France Travail p.13
   const totalFranchiseCP = Math.min(
-    30,
-    Math.floor((joursRef / 24) * 2.5)
+    PLAFOND_FRANCHISE_CP_JOURS,
+    Math.floor((joursRef / PERIODICITE_FRANCHISE_CP) * TAUX_FRANCHISE_CP)
   );
-  const tauxMensuelCP = totalFranchiseCP <= 24 ? 2 : 3;
+  const tauxMensuelCP =
+    totalFranchiseCP <= SEUIL_FRANCHISE_CP_MENSUEL
+      ? FRANCHISE_CP_MENSUELLE_BAS
+      : FRANCHISE_CP_MENSUELLE_HAUT;
   const franchiseCPParMois = Array.from({ length: 12 }, (_, i) => {
     const deja = i * tauxMensuelCP;
     return Math.min(tauxMensuelCP, Math.max(0, totalFranchiseCP - deja));
@@ -49,16 +72,18 @@ function calculerFranchisesParMois(
   const sjm = (profil.salaireReference * diviseur) / profil.heuresTravaillees;
   const franchiseSalaireRaw =
     (profil.salaireReference / SMIC_MENSUEL) *
-      (sjm / (3 * SMIC_JOURNALIER)) -
-    27;
+      (sjm / (COEF_SJM_FRANCHISE_SALAIRE * SMIC_JOURNALIER)) -
+    CONSTANTE_FRANCHISE_SALAIRE;
   // Total arrondi au nombre entier obtenu (Math.floor) — guide France Travail p.14
   const totalFranchiseSalaire = Math.max(0, Math.floor(franchiseSalaireRaw));
 
   // Mensuelle arrondie à l'entier supérieur (Math.ceil) — guide France Travail p.15
   const mensuelleBase =
-    totalFranchiseSalaire > 0 ? Math.ceil(totalFranchiseSalaire / 8) : 0;
+    totalFranchiseSalaire > 0
+      ? Math.ceil(totalFranchiseSalaire / MOIS_FRANCHISE_SALAIRE)
+      : 0;
   const franchiseSalaireParMois = Array.from({ length: 12 }, (_, i) => {
-    if (i >= 8 || totalFranchiseSalaire === 0) return 0;
+    if (i >= MOIS_FRANCHISE_SALAIRE || totalFranchiseSalaire === 0) return 0;
     const deja = i * mensuelleBase;
     if (deja >= totalFranchiseSalaire) return 0;
     return Math.min(mensuelleBase, totalFranchiseSalaire - deja);
@@ -67,10 +92,10 @@ function calculerFranchisesParMois(
   return { franchiseCPParMois, franchiseSalaireParMois };
 }
 
-export function calculerMoisIndemnisation(
+export function calculerIndemnisationMensuelle(
   profil: ProfilIntermittent,
   contrats: Contrat[]
-): MoisIndemnisation[] {
+): IndemnisationMensuelle[] {
   const dateAnniversaire = parseDate(profil.dateAnniversaire);
   if (!dateAnniversaire) return [];
 
@@ -79,11 +104,11 @@ export function calculerMoisIndemnisation(
     profil.salaireReference,
     profil.heuresTravaillees
   );
-  const DELAI_ATTENTE_PREMIER_MOIS = 7;
   const aujourdhui = new Date();
 
   const { franchiseCPParMois, franchiseSalaireParMois } =
     calculerFranchisesParMois(profil);
+  const plafondMontant = PMSS_MENSUEL * COEF_PLAFOND_PMSS;
 
   return Array.from({ length: 12 }, (_, i) => {
     const debutMois = new Date(
@@ -114,11 +139,11 @@ export function calculerMoisIndemnisation(
     const heuresDuMois = contratsDuMois.reduce((h, c) => h + c.heures, 0);
     const joursTravailles = Math.floor(
       profil.annexe === "8"
-        ? (heuresDuMois / 8) * 1.4
-        : (heuresDuMois / 10) * 1.3
+        ? (heuresDuMois / 8) * COEF_JOURS_NON_INDEMNISABLES_A8
+        : (heuresDuMois / 10) * COEF_JOURS_NON_INDEMNISABLES_A10
     );
 
-    const delaiAttente = i === 0 ? DELAI_ATTENTE_PREMIER_MOIS : 0;
+    const delaiAttente = i === 0 ? DELAI_ATTENTE_JOURS : 0;
     const franchiseCP = franchiseCPParMois[i];
     const franchiseSalaire = franchiseSalaireParMois[i];
     const joursIndemnises = Math.max(
@@ -129,7 +154,18 @@ export function calculerMoisIndemnisation(
         - franchiseCP
         - franchiseSalaire
     );
-    const areVersee = Math.round(aj * joursIndemnises);
+    const areVerseeAvantPlafond = Math.round(aj * joursIndemnises);
+    let areVersee: number;
+    if (salaireDuMois >= plafondMontant) {
+      areVersee = 0;
+    } else if (salaireDuMois + areVerseeAvantPlafond > plafondMontant) {
+      areVersee = Math.round(plafondMontant - salaireDuMois);
+    } else {
+      areVersee = areVerseeAvantPlafond;
+    }
+    const plafondAtteint =
+      salaireDuMois >= plafondMontant ||
+      salaireDuMois + areVerseeAvantPlafond > plafondMontant;
     const totalRecu = salaireDuMois + areVersee;
 
     const estMoisPassé =
@@ -154,7 +190,10 @@ export function calculerMoisIndemnisation(
       franchiseSalaire,
       joursIndemnises,
       aj,
+      areVerseeAvantPlafond,
       areVersee,
+      plafondAtteint,
+      plafondMontant,
       totalRecu,
       etat,
     };

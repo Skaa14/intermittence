@@ -1,2 +1,21 @@
 export const SMIC_MENSUEL = 1801.8;
 export const SMIC_JOURNALIER = 59.13;
+export const PMSS_MENSUEL = 3864;
+
+export const DELAI_ATTENTE_JOURS = 7;
+
+export const COEF_JOURS_NON_INDEMNISABLES_A8 = 1.4;
+export const COEF_JOURS_NON_INDEMNISABLES_A10 = 1.3;
+
+export const COEF_PLAFOND_PMSS = 1.18;
+
+export const PLAFOND_FRANCHISE_CP_JOURS = 30;
+export const PERIODICITE_FRANCHISE_CP = 24;
+export const TAUX_FRANCHISE_CP = 2.5;
+export const SEUIL_FRANCHISE_CP_MENSUEL = 24;
+export const FRANCHISE_CP_MENSUELLE_BAS = 2;
+export const FRANCHISE_CP_MENSUELLE_HAUT = 3;
+
+export const MOIS_FRANCHISE_SALAIRE = 8;
+export const COEF_SJM_FRANCHISE_SALAIRE = 3;
+export const CONSTANTE_FRANCHISE_SALAIRE = 27;

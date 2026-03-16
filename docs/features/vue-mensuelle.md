@@ -148,5 +148,4 @@ tests/
 
 ## À faire plus tard
 - Franchises (congés payés et salaire) — formules documentées dans `docs/metier/06-franchises-et-carence.md`
-- Plafond mensuel cumul ARE + rémunérations (118% PMSS)
 - Renommer le champ "Date anniversaire" du profil en "Date d'ouverture des droits" pour plus de clarté

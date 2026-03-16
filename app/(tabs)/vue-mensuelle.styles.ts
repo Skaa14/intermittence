@@ -1,9 +1,9 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
-import { MoisIndemnisation } from "../../utils/calculerMoisIndemnisation";
+import { IndemnisationMensuelle } from "../../utils/calculerIndemnisationMensuelle";
 
 export const BADGE_STYLES: Record<
-  MoisIndemnisation["etat"],
+  IndemnisationMensuelle["etat"],
   { bg: string; text: string; label: string }
 > = {
   passé: { bg: colors.borderLight, text: colors.textMedium, label: "Passé" },

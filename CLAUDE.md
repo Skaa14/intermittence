@@ -48,7 +48,7 @@ types/profil.ts             ← Interface TypeScript du profil intermittent
 contexts/ContratsContext.tsx ← State partagé entre les écrans
 contexts/ProfilContext.tsx   ← Profil intermittent (annexe, salaire référence, heures)
 utils/calculerAJ.ts         ← Calcul de l'indemnité journalière
-utils/calculerMoisIndemnisation.ts ← Calcul des 12 mois de la période d'indemnisation
+utils/calculerIndemnisationMensuelle.ts ← Calcul des 12 mois de la période d'indemnisation
 docs/                   ← Documentation du projet
 ├── tech/               ← Fiches pédagogiques React Native / Expo
 └── metier/             ← Fiches règles métier ARE intermittents + guide officiel PDF

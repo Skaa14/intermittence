@@ -285,6 +285,84 @@ defineFeature(feature, (test) => {
     }
   );
 
+  test("Exemple officiel 12 — Plafond mensuel réduit l'ARE", ({ given, and, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      pendingProfil = table[0];
+    });
+
+    and("ces contrats existent", (table: ContratRow[]) => {
+      pendingContrats = table;
+    });
+
+    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+      setupMoisScreen(index);
+    });
+
+    then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`are-versee-${mockIndex}`).props.children).toBe(valeur);
+    });
+
+    and(/^le total reçu affiché est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`total-recu-${mockIndex}`).props.children).toBe(valeur);
+    });
+  });
+
+  test("Salaire mensuel seul dépasse le plafond — ARE nulle", ({ given, and, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      pendingProfil = table[0];
+    });
+
+    and("ces contrats existent", (table: ContratRow[]) => {
+      pendingContrats = table;
+    });
+
+    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+      setupMoisScreen(index);
+    });
+
+    then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`are-versee-${mockIndex}`).props.children).toBe(valeur);
+    });
+
+    and(/^le total reçu affiché est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`total-recu-${mockIndex}`).props.children).toBe(valeur);
+    });
+  });
+
+  test("Jours indemnisés nuls mais salaire dépasse le plafond", ({ given, and, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      pendingProfil = table[0];
+    });
+
+    and("ces contrats existent", (table: ContratRow[]) => {
+      pendingContrats = table;
+    });
+
+    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+      setupMoisScreen(index);
+    });
+
+    then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
+      expect(
+        screen.getByTestId(`jours-indemnises-${mockIndex}`).props.children
+      ).toBe(`${valeur} j`);
+    });
+
+    and(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`are-versee-${mockIndex}`).props.children).toBe(valeur);
+    });
+
+    and(/^le total reçu affiché est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`total-recu-${mockIndex}`).props.children).toBe(valeur);
+    });
+  });
+
   test(
     "Franchises nulles quand les heures travaillées sont zéro",
     ({ given, and, then }) => {

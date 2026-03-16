@@ -112,6 +112,11 @@ export const styles = StyleSheet.create({
     color: colors.textMuted,
     fontStyle: "italic",
   },
+  texteFormulePlafond: {
+    fontSize: 13,
+    color: colors.warning,
+    fontStyle: "italic",
+  },
 });
 
 export const pageScrollStyle = (width: number, height: number) =>

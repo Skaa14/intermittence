@@ -67,3 +67,37 @@ Feature: Détail d'un mois
       | 10     | 1760   | 20000   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then la franchise congés payés affichée est "2"
+
+  Scenario: Exemple officiel 12 — Plafond mensuel réduit l'ARE
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 800    | 18000   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Studio    | 01/05/2026 | 31/05/2026 | 80     | 4000    |
+    And je suis sur le détail du mois d'index 1
+    Then l'ARE versée affichée est "560 €"
+    And le total reçu affiché est "4560 €"
+
+  Scenario: Salaire mensuel seul dépasse le plafond — ARE nulle
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 800    | 18000   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Studio    | 01/05/2026 | 31/05/2026 | 40     | 5000    |
+    And je suis sur le détail du mois d'index 1
+    Then l'ARE versée affichée est "0 €"
+    And le total reçu affiché est "5000 €"
+
+  Scenario: Jours indemnisés nuls mais salaire dépasse le plafond
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 0      | 13800   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Studio    | 01/04/2026 | 30/04/2026 | 200    | 5000    |
+    And je suis sur le détail du mois d'index 0
+    Then les jours indemnisés affichés sont "0"
+    And l'ARE versée affichée est "0 €"
+    And le total reçu affiché est "5000 €"

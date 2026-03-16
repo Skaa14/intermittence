@@ -12,9 +12,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../../contexts/ContratsContext";
 import { useProfil } from "../../../contexts/ProfilContext";
 import {
-  calculerMoisIndemnisation,
-  MoisIndemnisation,
-} from "../../../utils/calculerMoisIndemnisation";
+  calculerIndemnisationMensuelle,
+  IndemnisationMensuelle,
+} from "../../../utils/calculerIndemnisationMensuelle";
 import { styles, pageScrollStyle, backIconColor } from "./[index].styles";
 
 const NOMS_MOIS = [
@@ -66,7 +66,30 @@ function LigneDetail({
   );
 }
 
-type PageMoisProps = { mois: MoisIndemnisation; width: number; height: number };
+function FormulePlafond({ mois }: { mois: IndemnisationMensuelle }) {
+  return (
+    <>
+      <View style={styles.ligneFormule}>
+        <Text style={styles.texteFormulePlafond}>
+          {`Plafond ARE : ${formatEuros(mois.plafondMontant)}`}
+        </Text>
+      </View>
+      <View style={styles.ligneFormule}>
+        {mois.areVersee > 0 ? (
+          <Text style={styles.texteFormulePlafond}>
+            {`${formatEuros(mois.plafondMontant)} − ${formatEuros(mois.salaireDuMois)} = ${formatEuros(mois.areVersee)}`}
+          </Text>
+        ) : (
+          <Text style={styles.texteFormulePlafond}>
+            {`Salaires (${formatEuros(mois.salaireDuMois)}) > plafond → ARE nulle`}
+          </Text>
+        )}
+      </View>
+    </>
+  );
+}
+
+type PageMoisProps = { mois: IndemnisationMensuelle; width: number; height: number };
 
 function PageMois({ mois, width, height }: PageMoisProps) {
   return (
@@ -140,14 +163,17 @@ function PageMois({ mois, width, height }: PageMoisProps) {
           valeur={`${mois.joursIndemnises} j`}
           testID={`jours-indemnises-${mois.index}`}
         />
-        {mois.joursIndemnises > 0 && (
+        {(mois.joursIndemnises > 0 || mois.plafondAtteint) && (
           <>
             <View style={styles.separateur} />
-            <View style={styles.ligneFormule}>
-              <Text style={styles.texteFormule}>
-                {`${mois.joursIndemnises} j × ${mois.aj.toFixed(2).replace(".", ",")} €/j = ${mois.areVersee} €`}
-              </Text>
-            </View>
+            {mois.joursIndemnises > 0 && (
+              <View style={styles.ligneFormule}>
+                <Text style={styles.texteFormule}>
+                  {`${mois.joursIndemnises} j × ${mois.aj.toFixed(2).replace(".", ",")} €/j = ${mois.areVerseeAvantPlafond} €`}
+                </Text>
+              </View>
+            )}
+            {mois.plafondAtteint && <FormulePlafond mois={mois} />}
           </>
         )}
       </View>
@@ -200,7 +226,7 @@ export default function DetailMoisScreen() {
   }, [navigation, BackButton]);
 
   const mois = useMemo(
-    () => (profil ? calculerMoisIndemnisation(profil, contrats) : []),
+    () => (profil ? calculerIndemnisationMensuelle(profil, contrats) : []),
     [profil, contrats]
   );
 

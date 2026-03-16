@@ -9,9 +9,9 @@ import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import {
-  calculerMoisIndemnisation,
-  MoisIndemnisation,
-} from "../../utils/calculerMoisIndemnisation";
+  calculerIndemnisationMensuelle,
+  IndemnisationMensuelle,
+} from "../../utils/calculerIndemnisationMensuelle";
 import { styles, BADGE_STYLES } from "./vue-mensuelle.styles";
 
 const NOMS_MOIS = [
@@ -38,7 +38,7 @@ function formatEuros(montant: number): string {
 }
 
 
-function BadgeEtat({ etat }: { etat: MoisIndemnisation["etat"] }) {
+function BadgeEtat({ etat }: { etat: IndemnisationMensuelle["etat"] }) {
   const { bg, text, label } = BADGE_STYLES[etat];
   return (
     <View style={[styles.badge, { backgroundColor: bg }]}>
@@ -51,7 +51,7 @@ function CarteMois({
   mois,
   onPress,
 }: {
-  mois: MoisIndemnisation;
+  mois: IndemnisationMensuelle;
   onPress: () => void;
 }) {
   return (
@@ -88,7 +88,7 @@ export default function VueMensuelleScreen() {
   const router = useRouter();
 
   const mois = useMemo(
-    () => (profil ? calculerMoisIndemnisation(profil, contrats) : []),
+    () => (profil ? calculerIndemnisationMensuelle(profil, contrats) : []),
     [profil, contrats]
   );
 
