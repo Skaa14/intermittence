@@ -15,7 +15,7 @@ import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
 } from "../../../utils/calculerIndemnisationMensuelle";
-import { styles, pageScrollStyle, backIconColor } from "./[index].styles";
+import { styles, pageScrollStyle, backIconColor } from "./[moisIndex].styles";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -203,8 +203,8 @@ function PageMois({ mois, width, height }: PageMoisProps) {
 
 export default function DetailMoisScreen() {
   const { width: pageWidth, height: windowHeight } = useWindowDimensions();
-  const { index } = useLocalSearchParams<{ index: string }>();
-  const indexNum = Math.max(0, parseInt(index ?? "0", 10) || 0);
+  const { moisIndex } = useLocalSearchParams<{ moisIndex: string }>();
+  const indexNum = Math.max(0, parseInt(moisIndex ?? "0", 10) || 0);
   const { contrats } = useContrats();
   const { profil } = useProfil();
   const flatListRef = useRef<FlatList>(null);

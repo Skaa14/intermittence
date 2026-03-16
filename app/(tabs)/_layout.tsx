@@ -47,7 +47,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ title: "Simulateur ARE" }} />
       <Tabs.Screen name="contrats" options={{ title: "Contrats" }} />
       <Tabs.Screen name="vue-mensuelle" options={{ title: "Vue mensuelle" }} />
-      <Tabs.Screen name="mois/[index]" options={{ title: "Détail du mois", href: null }} />
+      <Tabs.Screen name="mois/[moisIndex]" options={{ title: "Détail du mois", href: null }} />
     </Tabs>
   );
 }

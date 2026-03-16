@@ -111,7 +111,7 @@ export default function VueMensuelleScreen() {
       renderItem={({ item }) => (
         <CarteMois
           mois={item}
-          onPress={() => router.push(`/mois/${item.index}`)}
+          onPress={() => router.push(`/mois/${item.index}` as any)}
         />
       )}
     />
