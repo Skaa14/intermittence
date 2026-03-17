@@ -22,3 +22,11 @@ export const SEUIL_NON_INDEMNISATION_A10 = 27;
 export const MOIS_FRANCHISE_SALAIRE = 8;
 export const COEF_SJM_FRANCHISE_SALAIRE = 3;
 export const CONSTANTE_FRANCHISE_SALAIRE = 27;
+
+export const SEUIL_COTISATION_NULLE = 31.96;
+export const SEUIL_COTISATION_CSG = 60;
+export const TAUX_RETRAITE_COMPLEMENTAIRE = 0.0093;
+export const TAUX_CSG_STANDARD = 0.062;
+export const TAUX_CSG_REDUIT = 0.038;
+export const TAUX_CRDS = 0.005;
+export const TAUX_ALSACE_MOSELLE = 0.015;

@@ -11,6 +11,8 @@ export type ProfilRow = {
   Heures: string;
   Salaire: string;
   "Date anniversaire": string;
+  CSG?: string;
+  "Alsace-Moselle"?: string;
 };
 
 export const renderAccueilScreen = () =>
@@ -50,5 +52,11 @@ export const configurerProfilViaFormulaire = (row: ProfilRow) => {
   selectDateAnniversaire(ddmmyyyyToIso(row["Date anniversaire"]));
   fireEvent.changeText(screen.getByTestId("input-salaire-reference"), row.Salaire);
   fireEvent.changeText(screen.getByTestId("input-heures-travaillees"), row.Heures);
+  if (row.CSG === "reduit") {
+    fireEvent.press(screen.getByTestId("btn-csg-reduit"));
+  }
+  if (row["Alsace-Moselle"] === "oui") {
+    fireEvent.press(screen.getByTestId("btn-alsace-moselle"));
+  }
   fireEvent.press(screen.getByText("Valider"));
 };

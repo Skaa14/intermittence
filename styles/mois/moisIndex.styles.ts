@@ -119,6 +119,12 @@ export const styles = StyleSheet.create({
     color: colors.textMuted,
     fontStyle: "italic",
   },
+  texteFormuleNet: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.successText,
+    fontStyle: "italic",
+  },
   texteFormulePlafond: {
     fontSize: 13,
     fontFamily: fonts.regular,

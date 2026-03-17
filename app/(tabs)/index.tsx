@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,9 +13,9 @@ import DateTimePicker, {
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useDonneesTest } from "../../contexts/DonneesTestContext";
-import { Annexe } from "../../types/profil";
+import { Annexe, TauxCSG } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
-import { calculerAJ } from "../../utils/calculerAJ";
+import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
 import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
@@ -35,6 +35,16 @@ export default function AccueilScreen() {
   const [heuresTravaillees, setHeuresTravaillees] = useState(
     profil ? profil.heuresTravaillees.toString() : ""
   );
+  const [tauxCSG, setTauxCSG] = useState<TauxCSG>(profil?.tauxCSG ?? "standard");
+  const [alsaceMoselle, setAlsaceMoselle] = useState(profil?.alsaceMoselle ?? false);
+
+  const { ajBrute, ajNette } = useMemo(() => {
+    if (!profil) return { ajBrute: 0, ajNette: 0 };
+    const brute = calculerAJ(profil.annexe, profil.salaireReference, profil.heuresTravaillees);
+    const sjm = calculerSJM(profil.annexe, profil.salaireReference, profil.heuresTravaillees);
+    const nette = calculerAJNette(brute, sjm, profil.tauxCSG, profil.alsaceMoselle);
+    return { ajBrute: brute, ajNette: nette };
+  }, [profil]);
 
   const totalHeures = contrats.reduce((sum, c) => sum + c.heures, 0);
   const totalSalaire = contrats.reduce((sum, c) => sum + c.salaireBrut, 0);
@@ -46,6 +56,8 @@ export default function AccueilScreen() {
       setDateAnniversaire(parseDate(profil.dateAnniversaire));
       setSalaireReference(profil.salaireReference.toString());
       setHeuresTravaillees(profil.heuresTravaillees.toString());
+      setTauxCSG(profil.tauxCSG);
+      setAlsaceMoselle(profil.alsaceMoselle);
     }
     setFormulaireOuvert(true);
   };
@@ -60,6 +72,8 @@ export default function AccueilScreen() {
       dateAnniversaire: formatDate(dateAnniversaire),
       salaireReference: salaire,
       heuresTravaillees: heures,
+      tauxCSG,
+      alsaceMoselle,
     });
     setFormulaireOuvert(false);
   };
@@ -100,14 +114,20 @@ export default function AccueilScreen() {
       {profil && !formulaireOuvert && (
         <Pressable testID="aj-card" style={styles.ajCard} onPress={ouvrirFormulaire}>
           <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
-          <Text testID="aj-value" style={styles.ajValue}>
-            {calculerAJ(
-              profil.annexe,
-              profil.salaireReference,
-              profil.heuresTravaillees
-            ).toFixed(2)}{" "}
-            €/jour
-          </Text>
+          <View style={styles.ajRow}>
+            <View style={styles.ajCol}>
+              <Text style={styles.ajColLabel}>Brut</Text>
+              <Text testID="aj-value" style={styles.ajValue}>
+                {ajBrute.toFixed(2)} €
+              </Text>
+            </View>
+            <View style={styles.ajCol}>
+              <Text style={styles.ajColLabel}>Net</Text>
+              <Text testID="aj-nette-value" style={styles.ajNetteValue}>
+                {ajNette.toFixed(2)} €
+              </Text>
+            </View>
+          </View>
           <Text style={styles.ajDetail}>
             Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
             {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
@@ -260,6 +280,60 @@ export default function AccueilScreen() {
             onChangeText={setHeuresTravaillees}
             keyboardType="numeric"
           />
+
+          <Text style={styles.label}>Taux CSG</Text>
+          <View style={styles.row}>
+            <Pressable
+              testID="btn-csg-standard"
+              style={[
+                styles.annexeBtn,
+                tauxCSG === "standard" && styles.annexeBtnActive,
+              ]}
+              onPress={() => setTauxCSG("standard")}
+            >
+              <Text
+                style={[
+                  styles.annexeBtnText,
+                  tauxCSG === "standard" && styles.annexeBtnTextActive,
+                ]}
+              >
+                Standard (6,2%)
+              </Text>
+            </Pressable>
+            <Pressable
+              testID="btn-csg-reduit"
+              style={[
+                styles.annexeBtn,
+                tauxCSG === "reduit" && styles.annexeBtnActive,
+              ]}
+              onPress={() => setTauxCSG("reduit")}
+            >
+              <Text
+                style={[
+                  styles.annexeBtnText,
+                  tauxCSG === "reduit" && styles.annexeBtnTextActive,
+                ]}
+              >
+                Réduit (3,8%)
+              </Text>
+            </Pressable>
+          </View>
+
+          <Pressable
+            testID="btn-alsace-moselle"
+            style={styles.checkboxRow}
+            onPress={() => setAlsaceMoselle(!alsaceMoselle)}
+          >
+            <View
+              style={[
+                styles.checkbox,
+                alsaceMoselle && styles.checkboxActive,
+              ]}
+            >
+              {alsaceMoselle && <Text style={styles.checkboxCheck}>✓</Text>}
+            </View>
+            <Text style={styles.checkboxLabel}>Régime Alsace-Moselle (+1,5%)</Text>
+          </Pressable>
 
           <View style={styles.row}>
             <Pressable

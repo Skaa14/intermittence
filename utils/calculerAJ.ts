@@ -1,4 +1,13 @@
-import { Annexe } from "../types/profil";
+import { Annexe, TauxCSG } from "../types/profil";
+import {
+  SEUIL_COTISATION_NULLE,
+  SEUIL_COTISATION_CSG,
+  TAUX_RETRAITE_COMPLEMENTAIRE,
+  TAUX_CSG_STANDARD,
+  TAUX_CSG_REDUIT,
+  TAUX_CRDS,
+  TAUX_ALSACE_MOSELLE,
+} from "./reglementation";
 
 const AJ_MIN = 31.96;
 
@@ -57,4 +66,42 @@ export function calculerAJ(
   const brut = A + B + C;
 
   return Math.min(Math.max(brut, p.plancher), p.plafond);
+}
+
+export function calculerSJM(
+  annexe: Annexe,
+  salaireReference: number,
+  heuresTravaillees: number
+): number {
+  const diviseur = annexe === "8" ? 8 : 10;
+  return (salaireReference * diviseur) / heuresTravaillees;
+}
+
+export function calculerAJNette(
+  ajBrute: number,
+  sjm: number,
+  tauxCSG: TauxCSG,
+  alsaceMoselle: boolean
+): number {
+  if (ajBrute <= SEUIL_COTISATION_NULLE) {
+    return ajBrute;
+  }
+
+  const retraite = tronquerCentime(sjm * TAUX_RETRAITE_COMPLEMENTAIRE);
+
+  if (ajBrute <= SEUIL_COTISATION_CSG) {
+    const alsace = alsaceMoselle
+      ? tronquerCentime(ajBrute * TAUX_ALSACE_MOSELLE)
+      : 0;
+    return tronquerCentime(ajBrute - retraite - alsace);
+  }
+
+  const tauxEffectif = tauxCSG === "reduit" ? TAUX_CSG_REDUIT : TAUX_CSG_STANDARD;
+  const csg = tronquerCentime(ajBrute * tauxEffectif);
+  const crds = tronquerCentime(ajBrute * TAUX_CRDS);
+  const alsace = alsaceMoselle
+    ? tronquerCentime(ajBrute * TAUX_ALSACE_MOSELLE)
+    : 0;
+
+  return tronquerCentime(ajBrute - retraite - csg - crds - alsace);
 }

@@ -63,9 +63,26 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fonts.regular,
     color: colors.primaryLight,
-    marginBottom: 4,
+    marginBottom: 8,
+  },
+  ajRow: {
+    flexDirection: "row",
+  },
+  ajCol: {
+    flex: 1,
+  },
+  ajColLabel: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.primaryLight,
+    marginBottom: 2,
   },
   ajValue: {
+    fontSize: 20,
+    fontFamily: fonts.regular,
+    color: colors.primaryLight,
+  },
+  ajNetteValue: {
     fontSize: 32,
     fontFamily: fonts.bold,
     color: colors.bgCard,
@@ -191,5 +208,34 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.textMuted,
     marginTop: 2,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    gap: 10,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: colors.border,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  checkboxCheck: {
+    color: colors.bgCard,
+    fontSize: 14,
+    fontFamily: fonts.bold,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    fontFamily: fonts.regular,
+    color: colors.textDark,
   },
 });

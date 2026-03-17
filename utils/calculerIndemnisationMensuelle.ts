@@ -1,7 +1,7 @@
 import { Contrat } from "../types/contrat";
 import { ProfilIntermittent } from "../types/profil";
 import { parseDate } from "./date";
-import { calculerAJ } from "./calculerAJ";
+import { calculerAJ, calculerAJNette, calculerSJM } from "./calculerAJ";
 import {
   SMIC_MENSUEL,
   SMIC_JOURNALIER,
@@ -36,6 +36,8 @@ export interface IndemnisationMensuelle {
   franchiseSalaire: number;
   joursIndemnises: number;
   aj: number;
+  ajNette: number;
+  areNetteEstimee: number;
   areVerseeAvantPlafond: number;
   areVersee: number;
   seuilNonIndemnisationAtteint: boolean;
@@ -107,6 +109,12 @@ export function calculerIndemnisationMensuelle(
     profil.salaireReference,
     profil.heuresTravaillees
   );
+  const sjm = calculerSJM(
+    profil.annexe,
+    profil.salaireReference,
+    profil.heuresTravaillees
+  );
+  const ajNette = calculerAJNette(aj, sjm, profil.tauxCSG, profil.alsaceMoselle);
   const aujourdhui = new Date();
 
   const { franchiseCPParMois, franchiseSalaireParMois } =
@@ -169,6 +177,7 @@ export function calculerIndemnisationMensuelle(
             - franchiseSalaire
         );
     const areVerseeAvantPlafond = Math.round(aj * joursIndemnises);
+    const areNetteEstimee = Math.round(ajNette * joursIndemnises);
     let areVersee: number;
     if (salaireDuMois >= plafondMontant) {
       areVersee = 0;
@@ -204,6 +213,8 @@ export function calculerIndemnisationMensuelle(
       franchiseSalaire,
       joursIndemnises,
       aj,
+      ajNette,
+      areNetteEstimee,
       areVerseeAvantPlafond,
       areVersee,
       seuilNonIndemnisationAtteint,

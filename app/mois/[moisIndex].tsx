@@ -175,11 +175,18 @@ function PageMois({ mois, width, height }: PageMoisProps) {
           <>
             <View style={styles.separateur} />
             {mois.joursIndemnises > 0 && (
-              <View style={styles.ligneFormule}>
-                <Text style={styles.texteFormule}>
-                  {`${mois.joursIndemnises} j × ${mois.aj.toFixed(2).replace(".", ",")} €/j = ${mois.areVerseeAvantPlafond} €`}
-                </Text>
-              </View>
+              <>
+                <View style={styles.ligneFormule}>
+                  <Text style={styles.texteFormule}>
+                    {`${mois.joursIndemnises} j × ${mois.aj.toFixed(2).replace(".", ",")} €/j = ${mois.areVerseeAvantPlafond} € brut`}
+                  </Text>
+                </View>
+                <View style={styles.ligneFormule}>
+                  <Text style={styles.texteFormuleNet} testID={`are-nette-${mois.index}`}>
+                    {`${mois.joursIndemnises} j × ${mois.ajNette.toFixed(2).replace(".", ",")} €/j = ${mois.areNetteEstimee} € net`}
+                  </Text>
+                </View>
+              </>
             )}
             {mois.plafondAtteint && <FormulePlafond mois={mois} />}
           </>

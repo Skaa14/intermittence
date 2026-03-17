@@ -57,6 +57,8 @@ export function creerProfilArtiste(): ProfilIntermittent {
     dateAnniversaire: formatDate(calculerAnniversaire()),
     salaireReference: 16200,
     heuresTravaillees: 545,
+    tauxCSG: "standard",
+    alsaceMoselle: false,
   };
 }
 
@@ -66,6 +68,8 @@ export function creerProfilTechnicien(): ProfilIntermittent {
     dateAnniversaire: formatDate(calculerAnniversaire()),
     salaireReference: 19800,
     heuresTravaillees: 580,
+    tauxCSG: "standard",
+    alsaceMoselle: false,
   };
 }
 
