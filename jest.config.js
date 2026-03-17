@@ -10,6 +10,7 @@ module.exports = {
     "^@expo/vector-icons(.*)$": "<rootDir>/tests/__mocks__/@expo/vector-icons.js",
     "^@react-native-async-storage/async-storage$":
       "@react-native-async-storage/async-storage/jest/async-storage-mock",
+    "^expo-router$": "<rootDir>/tests/__mocks__/expo-router.js",
   },
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   transformIgnorePatterns: [

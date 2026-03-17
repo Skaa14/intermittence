@@ -93,6 +93,19 @@ export const styles = StyleSheet.create({
     color: colors.primaryLight,
     marginTop: 8,
   },
+  btnDetailCalcul: {
+    marginTop: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    alignItems: "center",
+  },
+  btnDetailCalculText: {
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
+    color: colors.primaryLight,
+  },
   configurerBtn: {
     borderWidth: 1,
     borderColor: colors.border,

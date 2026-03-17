@@ -28,14 +28,14 @@ export const renderAccueilScreen = () =>
 
 export const ouvrirFormulaireProfil = () => {
   const btnConfigurer = screen.queryByTestId("btn-configurer-profil");
-  const ajCard = screen.queryByTestId("aj-card");
+  const btnModifier = screen.queryByTestId("btn-modifier-profil");
   if (btnConfigurer) {
     fireEvent.press(btnConfigurer);
-  } else if (ajCard) {
-    fireEvent.press(ajCard);
+  } else if (btnModifier) {
+    fireEvent.press(btnModifier);
   } else {
     throw new Error(
-      "Impossible d'ouvrir le formulaire profil : ni btn-configurer-profil ni aj-card trouvés"
+      "Impossible d'ouvrir le formulaire profil : ni btn-configurer-profil ni btn-modifier-profil trouvés"
     );
   }
 };

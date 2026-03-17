@@ -10,6 +10,7 @@ import {
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
+import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useDonneesTest } from "../../contexts/DonneesTestContext";
@@ -22,6 +23,7 @@ export default function AccueilScreen() {
   const { contrats } = useContrats();
   const { profil, mettreAJourProfil } = useProfil();
   const { chargerDonneesTest } = useDonneesTest();
+  const router = useRouter();
 
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
   const [annexe, setAnnexe] = useState<Annexe>(profil?.annexe ?? "8");
@@ -112,28 +114,37 @@ export default function AccueilScreen() {
       </View>
 
       {profil && !formulaireOuvert && (
-        <Pressable testID="aj-card" style={styles.ajCard} onPress={ouvrirFormulaire}>
-          <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
-          <View style={styles.ajRow}>
-            <View style={styles.ajCol}>
-              <Text style={styles.ajColLabel}>Brut</Text>
-              <Text testID="aj-value" style={styles.ajValue}>
-                {ajBrute.toFixed(2)} €
-              </Text>
+        <View testID="aj-card" style={styles.ajCard}>
+          <Pressable testID="btn-modifier-profil" onPress={ouvrirFormulaire}>
+            <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
+            <View style={styles.ajRow}>
+              <View style={styles.ajCol}>
+                <Text style={styles.ajColLabel}>Brut</Text>
+                <Text testID="aj-value" style={styles.ajValue}>
+                  {ajBrute.toFixed(2)} €
+                </Text>
+              </View>
+              <View style={styles.ajCol}>
+                <Text style={styles.ajColLabel}>Net</Text>
+                <Text testID="aj-nette-value" style={styles.ajNetteValue}>
+                  {ajNette.toFixed(2)} €
+                </Text>
+              </View>
             </View>
-            <View style={styles.ajCol}>
-              <Text style={styles.ajColLabel}>Net</Text>
-              <Text testID="aj-nette-value" style={styles.ajNetteValue}>
-                {ajNette.toFixed(2)} €
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.ajDetail}>
-            Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
-            {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
-            {profil.dateAnniversaire}
-          </Text>
-        </Pressable>
+            <Text style={styles.ajDetail}>
+              Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
+              {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
+              {profil.dateAnniversaire}
+            </Text>
+          </Pressable>
+          <Pressable
+            testID="btn-detail-calcul"
+            style={styles.btnDetailCalcul}
+            onPress={() => router.push("/detail-calcul-aj")}
+          >
+            <Text style={styles.btnDetailCalculText}>Voir le détail du calcul</Text>
+          </Pressable>
+        </View>
       )}
 
       {!profil && !formulaireOuvert && (

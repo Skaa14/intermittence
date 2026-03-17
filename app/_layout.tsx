@@ -52,6 +52,15 @@ function AppContent() {
             headerTintColor: colors.textOnPrimary,
           }}
         />
+        <Stack.Screen
+          name="detail-calcul-aj"
+          options={{
+            headerShown: true,
+            title: "Détail du calcul AJ",
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: colors.textOnPrimary,
+          }}
+        />
       </Stack>
     </View>
   );
