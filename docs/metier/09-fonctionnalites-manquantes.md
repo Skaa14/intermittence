@@ -20,29 +20,11 @@ Quand les jours de travail bruts (heures/8 annexe 8, heures/10 annexe 10) atteig
 
 ---
 
-## 3. AJ nette (cotisations sociales)
+## 3. ~~AJ nette (cotisations sociales)~~ ✅ Implémenté
 
-**Règle** (fiche `04-indemnite-journaliere.md`, section "AJ nette") :
+L'AJ nette est calculée avec les 3 tranches de cotisation (retraite complémentaire, CSG standard/réduit, CRDS) et le régime Alsace-Moselle. Le profil inclut le choix du taux CSG et une checkbox Alsace-Moselle.
 
-L'AJ brute subit des prélèvements selon trois tranches :
-
-| AJ brute | Cotisations |
-|---|---|
-| ≤ 31,96 € | Aucune |
-| > 31,96 € et ≤ 60 € | Retraite complémentaire : 0,93% du SJM |
-| > 60 € | Retraite complémentaire (0,93% du SJM) + CSG (6,2% ou 3,8%) + CRDS (0,5%) |
-
-Cas particulier : régime local Alsace-Moselle → cotisation supplémentaire de 1,50%.
-
-**Exemple** : AJ brute = 64,76 €, SJM = 180 €
-- Retraite complémentaire = 180 × 0,93% = 1,67 €
-- CSG = 64,76 × 6,2% = 4,02 €
-- CRDS = 64,76 × 0,5% = 0,32 €
-- AJ nette ≈ 64,76 − 1,67 − 4,02 − 0,32 ≈ 58,75 €
-
-**État actuel** : `calculerAJ.ts` renvoie uniquement l'AJ brute. Aucun calcul net n'existe.
-
-**Impact** : l'utilisateur voit un montant plus élevé que ce qu'il touchera réellement. Sur 12 mois, l'écart peut représenter plusieurs centaines d'euros.
+**Fichiers** : `utils/calculerAJ.ts` (calculerAJNette, calculerSJM), `utils/reglementation.ts` (constantes), `types/profil.ts` (tauxCSG, alsaceMoselle), `app/(tabs)/index.tsx` (formulaire + affichage), `app/mois/[moisIndex].tsx` (détail)
 
 ---
 
@@ -157,7 +139,7 @@ Certaines périodes hors contrat comptent pour les 507h :
 | ~~1~~ | ~~Persistance des données~~ ✅ | Implémenté |
 | ~~2~~ | ~~Seuil de non-indemnisation~~ ✅ | Implémenté |
 | 3 | Filtrage 507h sur période de référence | Fausse la barre de progression du dashboard |
-| 4 | AJ nette | Information concrète pour l'utilisateur |
+| ~~4~~ | ~~AJ nette~~ ✅ | Implémenté |
 | 5 | Cachets | Confort UX majeur pour les artistes |
 | 6 | Clause de rattrapage | Information utile, cas fréquent |
 | 7 | Heures d'enseignement | Correctif de calcul pour un sous-ensemble d'utilisateurs |
