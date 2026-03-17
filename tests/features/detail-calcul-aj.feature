@@ -62,3 +62,22 @@ Feature: Page de détail du calcul AJ
     Given un profil annexe 8 avec 600h et 18000 euros
     When la page de détail est affichée
     Then le SJM affiche la formule "18000 × 8 / 600"
+
+  Scenario: Les paramètres sont masqués par défaut
+    Given un profil annexe 8 avec 600h et 18000 euros
+    When la page de détail est affichée
+    Then les paramètres de la composante A ne sont pas visibles
+
+  Scenario: Affichage des paramètres au tap sur l'icône œil
+    Given un profil annexe 8 avec 600h et 18000 euros
+    When la page de détail est affichée
+    And je tape sur l'icône paramètres de la composante A
+    Then les paramètres de la composante A sont visibles
+    And le paramètre "18000" avec la description "Salaire de référence" est affiché
+
+  Scenario: Masquage des paramètres au second tap
+    Given un profil annexe 8 avec 600h et 18000 euros
+    When la page de détail est affichée
+    And je tape sur l'icône paramètres de la composante A
+    And je tape sur l'icône paramètres de la composante A
+    Then les paramètres de la composante A ne sont pas visibles

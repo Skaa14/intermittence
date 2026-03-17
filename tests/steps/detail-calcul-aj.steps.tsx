@@ -1,5 +1,5 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { render, screen, waitFor } from "@testing-library/react-native";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DetailCalculAJScreen from "../../app/detail-calcul-aj";
 import { ProfilProvider } from "../../contexts/ProfilContext";
@@ -268,6 +268,75 @@ defineFeature(feature, (test) => {
       expect(screen.getByTestId("detail-aj-sjm")).toHaveTextContent(
         new RegExp(escapeRegex(formule))
       );
+    });
+  });
+
+  test("Les paramètres sont masqués par défaut", ({ given, when, then }) => {
+    given(/^un profil annexe 8 avec (\d+)h et (\d+) euros$/, async (heures: string, salaire: string) => {
+      await sauvegarderProfil(creerProfil("8", heures, salaire));
+    });
+
+    when("la page de détail est affichée", async () => {
+      renderDetailScreen();
+      await attendreChargement();
+    });
+
+    then("les paramètres de la composante A ne sont pas visibles", () => {
+      expect(screen.queryByTestId("detail-aj-composante-a-parametres")).toBeNull();
+    });
+  });
+
+  test("Affichage des paramètres au tap sur l'icône œil", ({ given, when, then, and }) => {
+    given(/^un profil annexe 8 avec (\d+)h et (\d+) euros$/, async (heures: string, salaire: string) => {
+      await sauvegarderProfil(creerProfil("8", heures, salaire));
+    });
+
+    when("la page de détail est affichée", async () => {
+      renderDetailScreen();
+      await attendreChargement();
+    });
+
+    and("je tape sur l'icône paramètres de la composante A", () => {
+      act(() => {
+        fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
+      });
+    });
+
+    then("les paramètres de la composante A sont visibles", () => {
+      expect(screen.getByTestId("detail-aj-composante-a-parametres")).toBeTruthy();
+    });
+
+    and(/^le paramètre "(.*)" avec la description "(.*)" est affiché$/, (nom: string, description: string) => {
+      const bloc = screen.getByTestId("detail-aj-composante-a-parametres");
+      expect(bloc).toHaveTextContent(new RegExp(escapeRegex(nom)));
+      expect(bloc).toHaveTextContent(new RegExp(escapeRegex(description)));
+    });
+  });
+
+  test("Masquage des paramètres au second tap", ({ given, when, then, and }) => {
+    given(/^un profil annexe 8 avec (\d+)h et (\d+) euros$/, async (heures: string, salaire: string) => {
+      await sauvegarderProfil(creerProfil("8", heures, salaire));
+    });
+
+    when("la page de détail est affichée", async () => {
+      renderDetailScreen();
+      await attendreChargement();
+    });
+
+    and("je tape sur l'icône paramètres de la composante A", () => {
+      act(() => {
+        fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
+      });
+    });
+
+    and("je tape sur l'icône paramètres de la composante A", () => {
+      act(() => {
+        fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
+      });
+    });
+
+    then("les paramètres de la composante A ne sont pas visibles", () => {
+      expect(screen.queryByTestId("detail-aj-composante-a-parametres")).toBeNull();
     });
   });
 });

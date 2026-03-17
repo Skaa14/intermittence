@@ -1,27 +1,74 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Pressable, LayoutAnimation, UIManager, Platform } from "react-native";
 import { useProfil } from "../contexts/ProfilContext";
-import { calculerAJDetaille, DetailCotisation } from "../utils/calculerAJDetaille";
+import { calculerAJDetaille, DetailCotisation, ParametreInfo } from "../utils/calculerAJDetaille";
 import { styles } from "../styles/detail-calcul-aj.styles";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
-function EtapeView({ testID, label, formule, valeur }: { testID?: string; label: string; formule: string; valeur: string }) {
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+function ParametresBlock({ testID, parametres }: { testID?: string; parametres: ParametreInfo[] }) {
+  return (
+    <View testID={testID} style={styles.parametresBlock}>
+      {parametres.map((p, i) => (
+        <View key={i} style={styles.parametreLigne}>
+          <Text style={styles.parametreNom}>{p.nom}</Text>
+          <Text style={styles.parametreDescription}>{p.description}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function EtapeView({ testID, label, formule, valeur, parametres }: { testID?: string; label: string; formule: string; valeur: string; parametres?: ParametreInfo[] }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const toggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpanded(!expanded);
+  };
+
   return (
     <View testID={testID} style={styles.etape}>
       <Text style={styles.etapeLabel}>{label}</Text>
-      <Text style={styles.etapeFormule}>{formule}</Text>
+      <View style={styles.formuleLigne}>
+        <Text style={styles.etapeFormule}>{formule}</Text>
+        {parametres && parametres.length > 0 && (
+          <Pressable testID={testID ? `${testID}-info` : undefined} onPress={toggle} hitSlop={8} style={styles.infoButton}>
+            <Text style={[styles.infoIcon, expanded && styles.infoIconActive]}>👁</Text>
+          </Pressable>
+        )}
+      </View>
+      {expanded && parametres && <ParametresBlock testID={testID ? `${testID}-parametres` : undefined} parametres={parametres} />}
       <Text style={styles.etapeValeur}>{valeur}</Text>
     </View>
   );
 }
 
 function CotisationView({ testID, cotisation }: { testID?: string; cotisation: DetailCotisation }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const toggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setExpanded(!expanded);
+  };
+
   return (
     <View testID={testID} style={styles.cotisation}>
       <View style={styles.ligne}>
         <Text style={styles.cotisationLabel}>{cotisation.label}</Text>
         <Text style={styles.cotisationMontant}>− {cotisation.montant.toFixed(2)} €</Text>
       </View>
-      <Text style={styles.cotisationFormule}>{cotisation.formule}</Text>
+      <View style={styles.formuleLigne}>
+        <Text style={styles.cotisationFormule}>{cotisation.formule}</Text>
+        {cotisation.parametres && cotisation.parametres.length > 0 && (
+          <Pressable onPress={toggle} hitSlop={8} style={styles.infoButton}>
+            <Text style={[styles.infoIcon, expanded && styles.infoIconActive]}>👁</Text>
+          </Pressable>
+        )}
+      </View>
+      {expanded && cotisation.parametres && <ParametresBlock parametres={cotisation.parametres} />}
     </View>
   );
 }
@@ -74,18 +121,21 @@ export default function DetailCalculAJScreen() {
           label={brute.composanteA.label}
           formule={brute.composanteA.formule}
           valeur={`= ${brute.composanteA.valeur.toFixed(2)} €`}
+          parametres={brute.composanteA.parametres}
         />
         <EtapeView
           testID="detail-aj-composante-b"
           label={brute.composanteB.label}
           formule={brute.composanteB.formule}
           valeur={`= ${brute.composanteB.valeur.toFixed(2)} €`}
+          parametres={brute.composanteB.parametres}
         />
         <EtapeView
           testID="detail-aj-composante-c"
           label={brute.composanteC.label}
           formule={brute.composanteC.formule}
           valeur={`= ${brute.composanteC.valeur.toFixed(2)} €`}
+          parametres={brute.composanteC.parametres}
         />
 
         <View style={styles.separateur} />
@@ -121,6 +171,7 @@ export default function DetailCalculAJScreen() {
           label={nette.sjm.label}
           formule={nette.sjm.formule}
           valeur={`= ${nette.sjm.valeur.toFixed(2)} €`}
+          parametres={nette.sjm.parametres}
         />
 
         <View style={styles.separateur} />

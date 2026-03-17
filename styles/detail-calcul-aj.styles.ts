@@ -46,6 +46,7 @@ export const styles = StyleSheet.create({
     color: colors.textMuted,
     fontStyle: "italic",
     marginBottom: 2,
+    flex: 1,
   },
   etapeValeur: {
     fontSize: 16,
@@ -82,6 +83,7 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.textFaint,
     fontStyle: "italic",
+    flex: 1,
   },
   cotisationMontant: {
     fontSize: 14,
@@ -158,5 +160,47 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.primaryLight,
     marginTop: 4,
+  },
+  formuleLigne: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  infoButton: {
+    padding: 4,
+  },
+  infoIcon: {
+    fontSize: 14,
+    opacity: 0.4,
+  },
+  infoIconActive: {
+    opacity: 1,
+  },
+  parametresBlock: {
+    backgroundColor: colors.primaryBg,
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 6,
+    marginBottom: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+  },
+  parametreLigne: {
+    flexDirection: "row",
+    marginBottom: 4,
+    alignItems: "baseline",
+  },
+  parametreNom: {
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
+    color: colors.primary,
+    marginRight: 8,
+    minWidth: 50,
+  },
+  parametreDescription: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textMedium,
+    flex: 1,
   },
 });
