@@ -14,6 +14,7 @@ import { colors } from "../theme/colors";
 import { ContratsProvider } from "../contexts/ContratsContext";
 import { ProfilProvider } from "../contexts/ProfilContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
+import { ErrorBoundary } from "../components/ErrorBoundary";
 import { styles } from "./_layout.styles";
 
 SplashScreen.preventAutoHideAsync();
@@ -73,13 +74,15 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <ProfilProvider>
-      <ContratsProvider>
-        <DonneesTestProvider>
-          <AppContent />
-        </DonneesTestProvider>
-      </ContratsProvider>
-    </ProfilProvider>
+    <ErrorBoundary>
+      <ProfilProvider>
+        <ContratsProvider>
+          <DonneesTestProvider>
+            <AppContent />
+          </DonneesTestProvider>
+        </ContratsProvider>
+      </ProfilProvider>
+    </ErrorBoundary>
   );
 }
 
