@@ -5,6 +5,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
@@ -87,13 +88,13 @@ function FormulePlafond({ mois }: { mois: IndemnisationMensuelle }) {
   );
 }
 
-type PageMoisProps = { mois: IndemnisationMensuelle; width: number; height: number };
+type PageMoisProps = { mois: IndemnisationMensuelle; width: number; height: number; bottomInset: number };
 
-function PageMois({ mois, width, height }: PageMoisProps) {
+function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
   return (
     <ScrollView
       style={pageScrollStyle(width, height).page}
-      contentContainerStyle={styles.pageContent}
+      contentContainerStyle={[styles.pageContent, { paddingBottom: 20 + bottomInset }]}
       nestedScrollEnabled
       testID={`detail-mois-${mois.index}`}
     >
@@ -218,6 +219,7 @@ function PageMois({ mois, width, height }: PageMoisProps) {
 
 export default function DetailMoisScreen() {
   const { width: pageWidth, height: windowHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { moisIndex } = useLocalSearchParams<{ moisIndex: string }>();
   const indexNum = Math.max(0, parseInt(moisIndex ?? "0", 10) || 0);
   const { contrats } = useContrats();
@@ -266,7 +268,7 @@ export default function DetailMoisScreen() {
           animated: false,
         });
       }}
-      renderItem={({ item }) => <PageMois mois={item} width={pageWidth} height={listHeight || windowHeight} />}
+      renderItem={({ item }) => <PageMois mois={item} width={pageWidth} height={listHeight || windowHeight} bottomInset={insets.bottom} />}
     />
   );
 }

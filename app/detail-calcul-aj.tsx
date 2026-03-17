@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, Pressable, UIManager, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProfil } from "../contexts/ProfilContext";
 import { calculerAJDetaille, DetailCotisation, ParametreInfo } from "../utils/calculerAJDetaille";
 import { styles } from "../styles/detail-calcul-aj.styles";
@@ -66,6 +67,7 @@ function CotisationView({ testID, cotisation }: { testID?: string; cotisation: D
 
 export default function DetailCalculAJScreen() {
   const { profil } = useProfil();
+  const insets = useSafeAreaInsets();
 
   const detail = useMemo(() => {
     if (!profil) return null;
@@ -89,7 +91,7 @@ export default function DetailCalculAJScreen() {
   const { brute, nette } = detail;
 
   return (
-    <ScrollView testID="detail-aj-scroll" style={styles.container} contentContainerStyle={styles.scroll}>
+    <ScrollView testID="detail-aj-scroll" style={styles.container} contentContainerStyle={[styles.scroll, { paddingBottom: 20 + insets.bottom }]}>
       <View testID="detail-aj-resultat" style={styles.resultatSection}>
         <Text style={styles.resultatLabel}>Indemnité journalière estimée</Text>
         <View style={styles.resultatRow}>
