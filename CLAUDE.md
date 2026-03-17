@@ -26,20 +26,24 @@ Ce projet sert aussi de formation à React Native / Expo pour l'utilisateur.
 
 ## Architecture
 ```
-app/                    ← Dossier des routes (Expo Router)
+app/                    ← Dossier des routes (Expo Router) — PAS de fichiers non-route ici
 ├── _layout.tsx         ← Layout racine (Stack global)
-├── _layout.styles.ts   ← Styles du layout racine
-└── (tabs)/             ← Groupe d'onglets
-    ├── _layout.tsx     ← Config des onglets (barre du bas)
-    ├── index.tsx           ← Onglet Accueil (dashboard)
-    ├── index.styles.ts     ← Styles de l'accueil
-    ├── contrats.tsx        ← Onglet Contrats (saisie)
-    ├── contrats.styles.ts  ← Styles des contrats
-    ├── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
-    └── vue-mensuelle.styles.ts ← Styles de la vue mensuelle
+├── (tabs)/             ← Groupe d'onglets
+│   ├── _layout.tsx     ← Config des onglets (barre du bas)
+│   ├── index.tsx           ← Onglet Accueil (dashboard)
+│   ├── contrats.tsx        ← Onglet Contrats (saisie)
+│   └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
 └── mois/                   ← Écran de détail (Stack, hors tabs)
-    ├── [moisIndex].tsx     ← Détail swipeable d'un mois d'indemnisation
-    └── [moisIndex].styles.ts ← Styles du détail d'un mois
+    └── [moisIndex].tsx     ← Détail swipeable d'un mois d'indemnisation
+styles/                 ← Styles séparés (hors app/ pour éviter conflits Expo Router)
+├── root-layout.styles.ts  ← Styles du layout racine
+├── tabs/
+│   ├── layout.styles.ts       ← Styles du tab bar
+│   ├── index.styles.ts        ← Styles de l'accueil
+│   ├── contrats.styles.ts     ← Styles des contrats
+│   └── vue-mensuelle.styles.ts ← Styles de la vue mensuelle
+└── mois/
+    └── moisIndex.styles.ts    ← Styles du détail d'un mois
 theme/
 ├── colors.ts           ← Tokens de couleurs partagés (source de vérité)
 ├── fonts.ts            ← Tokens de polices partagés (source de vérité)
@@ -77,6 +81,6 @@ assets/                 ← Images et ressources
 
 ## Conventions de style
 - **Zéro couleur hex en dur** dans les fichiers `.tsx` ou `.styles.ts` — toujours passer par `theme/colors.ts`
-- **Styles séparés** : chaque écran a son fichier `[nom].styles.ts` colocalisé, qui exporte `styles` (et éventuellement des constantes associées)
+- **Styles séparés** : chaque écran a son fichier `.styles.ts` dans `styles/` (pas dans `app/` — Expo Router traite tout fichier `.ts` dans `app/` comme une route), qui exporte `styles` (et éventuellement des constantes associées)
 - **Styles web** (`React.CSSProperties`) : utiliser `webDateInputBase` depuis `theme/webStyles.ts` comme base, étendre avec les propriétés spécifiques
 - Les fichiers `.tsx` n'importent que `{ styles }` depuis leur `.styles.ts` — pas de `StyleSheet` ni de couleurs directement dans le JSX

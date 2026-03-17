@@ -13,7 +13,7 @@ import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
 } from "../../utils/calculerIndemnisationMensuelle";
-import { styles, pageScrollStyle } from "./[moisIndex].styles";
+import { styles, pageScrollStyle } from "../../styles/mois/moisIndex.styles";
 
 const NOMS_MOIS = [
   "Janvier",

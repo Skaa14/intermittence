@@ -16,7 +16,7 @@ import { useDonneesTest } from "../../contexts/DonneesTestContext";
 import { Annexe } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
 import { calculerAJ } from "../../utils/calculerAJ";
-import { styles, webDateInputStyle } from "./index.styles";
+import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
   const { contrats } = useContrats();

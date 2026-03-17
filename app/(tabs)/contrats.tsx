@@ -16,7 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../contexts/ContratsContext";
 import { Contrat } from "../../types/contrat";
 import { formatDate, formatDateISO, parseDate } from "../../utils/date";
-import { styles, webDateInputStyle, addIconColor, errorBorderColor } from "./contrats.styles";
+import { styles, webDateInputStyle, addIconColor, errorBorderColor } from "../../styles/tabs/contrats.styles";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";

@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { View, Pressable } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { colors } from "../../theme/colors";
-import { styles } from "./_layout.styles";
+import { styles } from "../../styles/tabs/layout.styles";
 
 const TAB_ICONS: Record<string, { active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }> = {
   index: { active: "home", inactive: "home-outline" },

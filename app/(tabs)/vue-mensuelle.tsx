@@ -12,7 +12,7 @@ import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
 } from "../../utils/calculerIndemnisationMensuelle";
-import { styles, BADGE_STYLES } from "./vue-mensuelle.styles";
+import { styles, BADGE_STYLES } from "../../styles/tabs/vue-mensuelle.styles";
 
 const NOMS_MOIS = [
   "Janvier",

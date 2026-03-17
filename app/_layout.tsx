@@ -15,7 +15,7 @@ import { ContratsProvider } from "../contexts/ContratsContext";
 import { ProfilProvider } from "../contexts/ProfilContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
-import { styles } from "./_layout.styles";
+import { styles } from "../styles/root-layout.styles";
 
 SplashScreen.preventAutoHideAsync();
 
