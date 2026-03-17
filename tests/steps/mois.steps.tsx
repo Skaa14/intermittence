@@ -1,6 +1,6 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, screen, act, within } from "@testing-library/react-native";
-import DetailMoisScreen from "../../app/(tabs)/mois/[moisIndex]";
+import DetailMoisScreen from "../../app/mois/[moisIndex]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
 import { ProfilIntermittent } from "../../types/profil";

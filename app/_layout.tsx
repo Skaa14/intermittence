@@ -10,6 +10,7 @@ import {
   PlusJakartaSans_600SemiBold,
   PlusJakartaSans_700Bold,
 } from "@expo-google-fonts/plus-jakarta-sans";
+import { colors } from "../theme/colors";
 import { ContratsProvider } from "../contexts/ContratsContext";
 import { ProfilProvider } from "../contexts/ProfilContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
@@ -41,6 +42,15 @@ function AppContent() {
       {modeTest && <BannerModeTest />}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen
+          name="mois/[moisIndex]"
+          options={{
+            headerShown: true,
+            title: "Détail du mois",
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: colors.textOnPrimary,
+          }}
+        />
       </Stack>
     </View>
   );

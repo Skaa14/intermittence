@@ -37,9 +37,9 @@ app/                    ← Dossier des routes (Expo Router)
     ├── contrats.styles.ts  ← Styles des contrats
     ├── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
     └── vue-mensuelle.styles.ts ← Styles de la vue mensuelle
-└── mois/
-    ├── [index].tsx         ← Détail swipeable d'un mois d'indemnisation
-    └── [index].styles.ts   ← Styles du détail d'un mois
+└── mois/                   ← Écran de détail (Stack, hors tabs)
+    ├── [moisIndex].tsx     ← Détail swipeable d'un mois d'indemnisation
+    └── [moisIndex].styles.ts ← Styles du détail d'un mois
 theme/
 ├── colors.ts           ← Tokens de couleurs partagés (source de vérité)
 ├── fonts.ts            ← Tokens de polices partagés (source de vérité)

@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../../../theme/colors";
-import { fonts } from "../../../theme/fonts";
+import { colors } from "../../theme/colors";
+import { fonts } from "../../theme/fonts";
 
 export const backIconColor = colors.textOnPrimary;
 

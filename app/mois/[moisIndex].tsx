@@ -3,19 +3,17 @@ import {
   Text,
   FlatList,
   ScrollView,
-  Pressable,
   useWindowDimensions,
 } from "react-native";
-import { useMemo, useRef, useEffect, useLayoutEffect, useState, useCallback } from "react";
-import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useContrats } from "../../../contexts/ContratsContext";
-import { useProfil } from "../../../contexts/ProfilContext";
+import { useMemo, useRef, useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useContrats } from "../../contexts/ContratsContext";
+import { useProfil } from "../../contexts/ProfilContext";
 import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
-} from "../../../utils/calculerIndemnisationMensuelle";
-import { styles, pageScrollStyle, backIconColor } from "./[moisIndex].styles";
+} from "../../utils/calculerIndemnisationMensuelle";
+import { styles, pageScrollStyle } from "./[moisIndex].styles";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -209,21 +207,6 @@ export default function DetailMoisScreen() {
   const { profil } = useProfil();
   const flatListRef = useRef<FlatList>(null);
   const [listHeight, setListHeight] = useState(0);
-  const router = useRouter();
-  const navigation = useNavigation();
-
-  const BackButton = useCallback(
-    () => (
-      <Pressable onPress={() => router.navigate("/(tabs)/vue-mensuelle")} style={styles.backButton}>
-        <Ionicons name="chevron-back" size={26} color={backIconColor} />
-      </Pressable>
-    ),
-    [router]
-  );
-
-  useLayoutEffect(() => {
-    navigation.setOptions({ headerLeft: BackButton });
-  }, [navigation, BackButton]);
 
   const mois = useMemo(
     () => (profil ? calculerIndemnisationMensuelle(profil, contrats) : []),
