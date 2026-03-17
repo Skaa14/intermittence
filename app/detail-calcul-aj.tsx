@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, Pressable, LayoutAnimation, UIManager, Platform } from "react-native";
+import { View, Text, ScrollView, Pressable, UIManager, Platform } from "react-native";
 import { useProfil } from "../contexts/ProfilContext";
 import { calculerAJDetaille, DetailCotisation, ParametreInfo } from "../utils/calculerAJDetaille";
 import { styles } from "../styles/detail-calcul-aj.styles";
-import { useMemo, useState } from "react";
+import { useAnimatedToggle } from "../hooks/useAnimatedToggle";
+import { useMemo } from "react";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -22,12 +23,7 @@ function ParametresBlock({ testID, parametres }: { testID?: string; parametres: 
 }
 
 function EtapeView({ testID, label, formule, valeur, parametres }: { testID?: string; label: string; formule: string; valeur: string; parametres?: ParametreInfo[] }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpanded(!expanded);
-  };
+  const [expanded, toggle] = useAnimatedToggle();
 
   return (
     <View testID={testID} style={styles.etape}>
@@ -47,12 +43,7 @@ function EtapeView({ testID, label, formule, valeur, parametres }: { testID?: st
 }
 
 function CotisationView({ testID, cotisation }: { testID?: string; cotisation: DetailCotisation }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setExpanded(!expanded);
-  };
+  const [expanded, toggle] = useAnimatedToggle();
 
   return (
     <View testID={testID} style={styles.cotisation}>

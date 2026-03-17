@@ -1,5 +1,5 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { render, screen, waitFor, fireEvent, act } from "@testing-library/react-native";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DetailCalculAJScreen from "../../app/detail-calcul-aj";
 import { ProfilProvider } from "../../contexts/ProfilContext";
@@ -297,9 +297,7 @@ defineFeature(feature, (test) => {
     });
 
     and("je tape sur l'icône paramètres de la composante A", () => {
-      act(() => {
-        fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
-      });
+      fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
     });
 
     then("les paramètres de la composante A sont visibles", () => {
@@ -324,15 +322,11 @@ defineFeature(feature, (test) => {
     });
 
     and("je tape sur l'icône paramètres de la composante A", () => {
-      act(() => {
-        fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
-      });
+      fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
     });
 
     and("je tape sur l'icône paramètres de la composante A", () => {
-      act(() => {
-        fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
-      });
+      fireEvent.press(screen.getByTestId("detail-aj-composante-a-info"));
     });
 
     then("les paramètres de la composante A ne sont pas visibles", () => {

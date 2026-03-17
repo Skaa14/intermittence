@@ -62,6 +62,10 @@ export function calculerAJDetaille(
   const sr = salaireReference;
   const nht = heuresTravaillees;
 
+  const pAjMin: ParametreInfo = { nom: `${AJ_MIN}`, description: "AJ minimale réglementaire" };
+  const pSR: ParametreInfo = { nom: `${sr}`, description: "Salaire de référence (SR) : total brut des cachets sur la période" };
+  const pNHT: ParametreInfo = { nom: `${nht}`, description: "Nombre d'heures travaillées (NHT) sur la période de référence" };
+
   const valA = tronquerCentime(
     (AJ_MIN *
       (p.coefSR1 * Math.min(sr, p.seuilSR) +
@@ -75,9 +79,9 @@ export function calculerAJDetaille(
       : `${AJ_MIN} × (${p.coefSR1} × ${p.seuilSR} + ${p.coefSR2} × (${sr} − ${p.seuilSR})) / 5000`,
     valeur: valA,
     parametres: [
-      { nom: `${AJ_MIN}`, description: "AJ minimale réglementaire" },
+      pAjMin,
       { nom: `${p.coefSR1}`, description: `Coefficient salaire (annexe ${annexe}, tranche 1)` },
-      { nom: `${sr}`, description: "Salaire de référence (SR) : total brut des cachets sur la période" },
+      pSR,
       ...(sr > p.seuilSR ? [
         { nom: `${p.seuilSR}`, description: `Seuil de salaire annexe ${annexe} (au-delà, le coefficient baisse)` },
         { nom: `${p.coefSR2}`, description: `Coefficient salaire (annexe ${annexe}, tranche 2)` },
@@ -99,9 +103,9 @@ export function calculerAJDetaille(
       : `${AJ_MIN} × (${p.coefNHT1} × ${p.seuilNHT} + ${p.coefNHT2} × (${nht} − ${p.seuilNHT})) / 507`,
     valeur: valB,
     parametres: [
-      { nom: `${AJ_MIN}`, description: "AJ minimale réglementaire" },
+      pAjMin,
       { nom: `${p.coefNHT1}`, description: `Coefficient heures (annexe ${annexe}, tranche 1)` },
-      { nom: `${nht}`, description: "Nombre d'heures travaillées (NHT) sur la période de référence" },
+      pNHT,
       ...(nht > p.seuilNHT ? [
         { nom: `${p.seuilNHT}`, description: `Seuil d'heures annexe ${annexe} (au-delà, le coefficient baisse)` },
         { nom: `${p.coefNHT2}`, description: `Coefficient heures (annexe ${annexe}, tranche 2)` },
@@ -116,7 +120,7 @@ export function calculerAJDetaille(
     formule: `${AJ_MIN} × ${p.coefC}`,
     valeur: valC,
     parametres: [
-      { nom: `${AJ_MIN}`, description: "AJ minimale réglementaire" },
+      pAjMin,
       { nom: `${p.coefC}`, description: `Coefficient fixe (annexe ${annexe})` },
     ],
   };
@@ -159,11 +163,13 @@ export function calculerAJDetaille(
     formule: `${sr} × ${diviseur} / ${nht}`,
     valeur: sjmVal,
     parametres: [
-      { nom: `${sr}`, description: "Salaire de référence (SR) : total brut des cachets sur la période" },
+      pSR,
       { nom: `${diviseur}`, description: `Coefficient horaire journalier (annexe ${annexe})` },
-      { nom: `${nht}`, description: "Nombre d'heures travaillées (NHT) sur la période de référence" },
+      pNHT,
     ],
   };
+
+  const pAjBrute: ParametreInfo = pAjBrute;
 
   let exonerationRaison: string | null = null;
   const cotisations: DetailCotisation[] = [];
@@ -203,7 +209,7 @@ export function calculerAJDetaille(
         formule: `${ajBrute.toFixed(2)} × ${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`,
         montant: alsace,
         parametres: [
-          { nom: `${ajBrute.toFixed(2)}`, description: "AJ brute calculée ci-dessus" },
+          pAjBrute,
           { nom: `${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`, description: "Cotisation spécifique Alsace-Moselle" },
         ],
       });
@@ -216,7 +222,7 @@ export function calculerAJDetaille(
       formule: `${ajBrute.toFixed(2)} × ${(tauxEffectif * 100).toFixed(1)}%`,
       montant: csg,
       parametres: [
-        { nom: `${ajBrute.toFixed(2)}`, description: "AJ brute calculée ci-dessus" },
+        pAjBrute,
         { nom: `${(tauxEffectif * 100).toFixed(1)}%`, description: `Taux CSG ${tauxCSG === "reduit" ? "réduit (revenu fiscal < seuil)" : "standard"}` },
       ],
     });
@@ -227,7 +233,7 @@ export function calculerAJDetaille(
       formule: `${ajBrute.toFixed(2)} × ${(TAUX_CRDS * 100).toFixed(1)}%`,
       montant: crds,
       parametres: [
-        { nom: `${ajBrute.toFixed(2)}`, description: "AJ brute calculée ci-dessus" },
+        pAjBrute,
         { nom: `${(TAUX_CRDS * 100).toFixed(1)}%`, description: "Taux de contribution au remboursement de la dette sociale" },
       ],
     });
@@ -239,7 +245,7 @@ export function calculerAJDetaille(
         formule: `${ajBrute.toFixed(2)} × ${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`,
         montant: alsace,
         parametres: [
-          { nom: `${ajBrute.toFixed(2)}`, description: "AJ brute calculée ci-dessus" },
+          pAjBrute,
           { nom: `${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`, description: "Cotisation spécifique Alsace-Moselle" },
         ],
       });
