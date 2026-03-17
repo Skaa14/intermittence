@@ -37,7 +37,7 @@ const PARAMS = {
 } as const;
 
 function tronquerCentime(valeur: number): number {
-  return Math.floor(valeur * 100) / 100;
+  return Math.floor(+(valeur * 100).toPrecision(12)) / 100;
 }
 
 export function calculerAJ(

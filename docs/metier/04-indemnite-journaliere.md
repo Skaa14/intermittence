@@ -31,6 +31,12 @@ C = AJ_min × 0.70
 
 Chaque composante A, B et C est **tronquée au centime** (partie entière inférieure) avant d'être sommée. C'est la convention utilisée par France Travail dans ses exemples de calcul (Guide Intermittent, exemple 6).
 
+Les cotisations sociales (retraite complémentaire, CSG, CRDS) sont également tronquées au centime avant déduction de l'AJ brute.
+
+### Limitation connue : précision de l'AJ nette
+
+Un écart de ~0.01 € peut exister entre l'AJ nette calculée par l'app et celle affichée par France Travail. La règle d'arrondi exacte utilisée par France Travail pour les cotisations n'est pas documentée dans le guide officiel. L'exemple 6 du guide confirme la troncature pour les composantes A, B, C, mais ne précise pas la méthode pour les cotisations. Des points de données supplémentaires (avec détail brut + cotisations) permettraient de résoudre cet écart.
+
 ## Plancher et plafond
 
 | Paramètre | Annexe 8 | Annexe 10 |
