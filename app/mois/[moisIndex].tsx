@@ -161,6 +161,16 @@ function PageMois({ mois, width, height }: PageMoisProps) {
           valeur={`${mois.joursIndemnises} j`}
           testID={`jours-indemnises-${mois.index}`}
         />
+        {mois.seuilNonIndemnisationAtteint && (
+          <View style={styles.ligneFormule}>
+            <Text
+              style={styles.texteFormulePlafond}
+              testID={`seuil-non-indemnisation-${mois.index}`}
+            >
+              Seuil de non-indemnisation atteint — aucune ARE due ce mois
+            </Text>
+          </View>
+        )}
         {(mois.joursIndemnises > 0 || mois.plafondAtteint) && (
           <>
             <View style={styles.separateur} />

@@ -19,6 +19,8 @@ import {
   MOIS_FRANCHISE_SALAIRE,
   COEF_SJM_FRANCHISE_SALAIRE,
   CONSTANTE_FRANCHISE_SALAIRE,
+  SEUIL_NON_INDEMNISATION_A8,
+  SEUIL_NON_INDEMNISATION_A10,
 } from "./reglementation";
 
 export interface IndemnisationMensuelle {
@@ -36,6 +38,7 @@ export interface IndemnisationMensuelle {
   aj: number;
   areVerseeAvantPlafond: number;
   areVersee: number;
+  seuilNonIndemnisationAtteint: boolean;
   plafondAtteint: boolean;
   plafondMontant: number;
   totalRecu: number;
@@ -137,6 +140,15 @@ export function calculerIndemnisationMensuelle(
       0
     );
     const heuresDuMois = contratsDuMois.reduce((h, c) => h + c.heures, 0);
+    const diviseur = profil.annexe === "8" ? 8 : 10;
+    const joursTravaillesBruts = heuresDuMois / diviseur;
+    const seuilNonIndemnisation =
+      profil.annexe === "8"
+        ? SEUIL_NON_INDEMNISATION_A8
+        : SEUIL_NON_INDEMNISATION_A10;
+    const seuilNonIndemnisationAtteint =
+      joursTravaillesBruts >= seuilNonIndemnisation;
+
     const joursTravailles = Math.floor(
       profil.annexe === "8"
         ? (heuresDuMois / 8) * COEF_JOURS_NON_INDEMNISABLES_A8
@@ -146,14 +158,16 @@ export function calculerIndemnisationMensuelle(
     const delaiAttente = i === 0 ? DELAI_ATTENTE_JOURS : 0;
     const franchiseCP = franchiseCPParMois[i];
     const franchiseSalaire = franchiseSalaireParMois[i];
-    const joursIndemnises = Math.max(
-      0,
-      joursCalendaires
-        - joursTravailles
-        - delaiAttente
-        - franchiseCP
-        - franchiseSalaire
-    );
+    const joursIndemnises = seuilNonIndemnisationAtteint
+      ? 0
+      : Math.max(
+          0,
+          joursCalendaires
+            - joursTravailles
+            - delaiAttente
+            - franchiseCP
+            - franchiseSalaire
+        );
     const areVerseeAvantPlafond = Math.round(aj * joursIndemnises);
     let areVersee: number;
     if (salaireDuMois >= plafondMontant) {
@@ -192,6 +206,7 @@ export function calculerIndemnisationMensuelle(
       aj,
       areVerseeAvantPlafond,
       areVersee,
+      seuilNonIndemnisationAtteint,
       plafondAtteint,
       plafondMontant,
       totalRecu,

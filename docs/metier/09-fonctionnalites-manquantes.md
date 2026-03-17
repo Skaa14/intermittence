@@ -12,22 +12,11 @@ Contrats et profil sont persistés via `AsyncStorage` avec hydratation au démar
 
 ---
 
-## 2. Seuil de non-indemnisation
+## 2. ~~Seuil de non-indemnisation~~ ✅ Implémenté
 
-**Règle** (fiche `06-franchises-et-carence.md`, section 7) :
+Quand les jours de travail bruts (heures/8 annexe 8, heures/10 annexe 10) atteignent ou dépassent le seuil (26 j annexe 8, 27 j annexe 10), `joursIndemnises` est forcé à 0 et un message explicatif s'affiche dans le détail du mois.
 
-| | Annexe 8 | Annexe 10 |
-|---|---|---|
-| Seuil | 26 jours de travail | 27 jours de travail |
-| Calcul jours | heures du mois / 8 | heures du mois / 10 |
-
-Quand le nombre de jours travaillés dans un mois atteint ou dépasse ce seuil, **aucune ARE n'est due** pour ce mois — pas même un montant réduit.
-
-**Exemple** : un technicien (annexe 8) qui travaille 210h dans un mois → 210/8 = 26,25 jours → seuil atteint → ARE = 0 €.
-
-**État actuel** : `calculerIndemnisationMensuelle.ts` calcule `joursIndemnises = joursCalendaires - joursTravailles - franchises...` sans vérifier le seuil. Un mois à 210h donnerait un `joursIndemnises` faible mais positif, alors qu'il devrait être 0.
-
-**Fichier concerné** : `utils/calculerIndemnisationMensuelle.ts`, lignes 140-156
+**Fichiers** : `utils/reglementation.ts` (constantes), `utils/calculerIndemnisationMensuelle.ts` (logique), `app/mois/[moisIndex].tsx` (affichage)
 
 ---
 
@@ -166,7 +155,7 @@ Certaines périodes hors contrat comptent pour les 507h :
 | Priorité | Feature | Justification |
 |---|---|---|
 | ~~1~~ | ~~Persistance des données~~ ✅ | Implémenté |
-| 2 | Seuil de non-indemnisation | Bug de calcul (ARE versée alors qu'elle ne devrait pas l'être) |
+| ~~2~~ | ~~Seuil de non-indemnisation~~ ✅ | Implémenté |
 | 3 | Filtrage 507h sur période de référence | Fausse la barre de progression du dashboard |
 | 4 | AJ nette | Information concrète pour l'utilisateur |
 | 5 | Cachets | Confort UX majeur pour les artistes |

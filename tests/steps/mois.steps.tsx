@@ -363,6 +363,98 @@ defineFeature(feature, (test) => {
     });
   });
 
+  test("Seuil de non-indemnisation atteint annexe 8", ({ given, and, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      pendingProfil = table[0];
+    });
+
+    and("ces contrats existent", (table: ContratRow[]) => {
+      pendingContrats = table;
+    });
+
+    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+      setupMoisScreen(index);
+    });
+
+    then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
+      expect(
+        screen.getByTestId(`jours-indemnises-${mockIndex}`).props.children
+      ).toBe(`${valeur} j`);
+    });
+
+    and(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`are-versee-${mockIndex}`).props.children).toBe(valeur);
+    });
+
+    and("le message seuil de non-indemnisation est affiché", () => {
+      expect(
+        screen.getByTestId(`seuil-non-indemnisation-${mockIndex}`)
+      ).toBeTruthy();
+    });
+  });
+
+  test("Seuil de non-indemnisation atteint annexe 10", ({ given, and, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      pendingProfil = table[0];
+    });
+
+    and("ces contrats existent", (table: ContratRow[]) => {
+      pendingContrats = table;
+    });
+
+    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+      setupMoisScreen(index);
+    });
+
+    then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
+      expect(
+        screen.getByTestId(`jours-indemnises-${mockIndex}`).props.children
+      ).toBe(`${valeur} j`);
+    });
+
+    and(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
+      expect(screen.getByTestId(`are-versee-${mockIndex}`).props.children).toBe(valeur);
+    });
+
+    and("le message seuil de non-indemnisation est affiché", () => {
+      expect(
+        screen.getByTestId(`seuil-non-indemnisation-${mockIndex}`)
+      ).toBeTruthy();
+    });
+  });
+
+  test("Seuil de non-indemnisation non atteint annexe 8", ({ given, and, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      pendingProfil = table[0];
+    });
+
+    and("ces contrats existent", (table: ContratRow[]) => {
+      pendingContrats = table;
+    });
+
+    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+      setupMoisScreen(index);
+    });
+
+    then("le message seuil de non-indemnisation n'est pas affiché", () => {
+      expect(
+        screen.queryByTestId(`seuil-non-indemnisation-${mockIndex}`)
+      ).toBeNull();
+    });
+
+    and(/^l'ARE versée affichée n'est pas "(.*)"$/, (valeur: string) => {
+      expect(
+        screen.getByTestId(`are-versee-${mockIndex}`).props.children
+      ).not.toBe(valeur);
+    });
+  });
+
   test(
     "Franchises nulles quand les heures travaillées sont zéro",
     ({ given, and, then }) => {

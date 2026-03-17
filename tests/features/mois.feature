@@ -101,3 +101,38 @@ Feature: Détail d'un mois
     Then les jours indemnisés affichés sont "0"
     And l'ARE versée affichée est "0 €"
     And le total reçu affiché est "5000 €"
+
+  Scenario: Seuil de non-indemnisation atteint annexe 8
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Studio    | 01/05/2026 | 31/05/2026 | 210    | 3000    |
+    And je suis sur le détail du mois d'index 1
+    Then les jours indemnisés affichés sont "0"
+    And l'ARE versée affichée est "0 €"
+    And le message seuil de non-indemnisation est affiché
+
+  Scenario: Seuil de non-indemnisation atteint annexe 10
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 10     | 507    | 13800   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Studio    | 01/05/2026 | 31/05/2026 | 280    | 4000    |
+    And je suis sur le détail du mois d'index 1
+    Then les jours indemnisés affichés sont "0"
+    And l'ARE versée affichée est "0 €"
+    And le message seuil de non-indemnisation est affiché
+
+  Scenario: Seuil de non-indemnisation non atteint annexe 8
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    And ces contrats existent
+      | Employeur | Début      | Fin        | Heures | Salaire |
+      | Studio    | 01/05/2026 | 31/05/2026 | 100    | 1500    |
+    And je suis sur le détail du mois d'index 1
+    Then le message seuil de non-indemnisation n'est pas affiché
+    And l'ARE versée affichée n'est pas "0 €"
