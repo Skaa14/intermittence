@@ -126,6 +126,21 @@ Feature: Détail d'un mois
     And l'ARE versée affichée est "0 €"
     And le message seuil de non-indemnisation est affiché
 
+  Scenario: Jours calendaires réduits le mois de la date d'anniversaire
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 21/08/2026        |
+    And je suis sur le détail du mois d'index 0
+    Then les jours calendaires affichés sont "11"
+    And les jours indemnisés affichés sont "2"
+
+  Scenario: Jours calendaires complets le mois suivant la date d'anniversaire
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 21/08/2026        |
+    And je suis sur le détail du mois d'index 1
+    Then les jours calendaires affichés sont "30"
+
   Scenario: Seuil de non-indemnisation non atteint annexe 8
     Given le profil est configuré
       | Annexe | Heures | Salaire | Date anniversaire |

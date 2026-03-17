@@ -132,7 +132,11 @@ export function calculerIndemnisationMensuelle(
       debutMois.getMonth() + 1,
       0
     );
-    const joursCalendaires = finMois.getDate();
+    const joursCalendairesMois = finMois.getDate();
+    const joursCalendaires =
+      i === 0
+        ? joursCalendairesMois - dateAnniversaire.getDate() + 1
+        : joursCalendairesMois;
 
     const contratsDuMois = contrats.filter((c) => {
       const debut = parseDate(c.dateDebut);

@@ -427,6 +427,54 @@ defineFeature(feature, (test) => {
     });
   });
 
+  test(
+    "Jours calendaires réduits le mois de la date d'anniversaire",
+    ({ given, and, then }) => {
+      fixerDateStep(given);
+
+      given("le profil est configuré", (table: ProfilRow[]) => {
+        pendingProfil = table[0];
+      });
+
+      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+        setupMoisScreen(index);
+      });
+
+      then(/^les jours calendaires affichés sont "(\d+)"$/, (valeur: string) => {
+        expect(
+          screen.getByTestId(`jours-calendaires-${mockIndex}`).props.children
+        ).toBe(`${valeur} j`);
+      });
+
+      and(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
+        expect(
+          screen.getByTestId(`jours-indemnises-${mockIndex}`).props.children
+        ).toBe(`${valeur} j`);
+      });
+    }
+  );
+
+  test(
+    "Jours calendaires complets le mois suivant la date d'anniversaire",
+    ({ given, and, then }) => {
+      fixerDateStep(given);
+
+      given("le profil est configuré", (table: ProfilRow[]) => {
+        pendingProfil = table[0];
+      });
+
+      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
+        setupMoisScreen(index);
+      });
+
+      then(/^les jours calendaires affichés sont "(\d+)"$/, (valeur: string) => {
+        expect(
+          screen.getByTestId(`jours-calendaires-${mockIndex}`).props.children
+        ).toBe(`${valeur} j`);
+      });
+    }
+  );
+
   test("Seuil de non-indemnisation non atteint annexe 8", ({ given, and, then }) => {
     fixerDateStep(given);
 
