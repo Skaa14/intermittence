@@ -16,6 +16,7 @@
     },
     "android": {
       "package": "com.lucasdormoy.intermittence",
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
