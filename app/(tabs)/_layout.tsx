@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Pressable } from "react-native";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../theme/colors";
 import { styles } from "../../styles/tabs/layout.styles";
 
@@ -12,10 +13,11 @@ const TAB_ICONS: Record<string, { active: keyof typeof Ionicons.glyphMap; inacti
 };
 
 function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
   const visibleRoutes = state.routes.filter((r) => TAB_ICONS[r.name]);
 
   return (
-    <View style={styles.tabBar}>
+    <View style={[styles.tabBar, { paddingBottom: insets.bottom }]}>
       {visibleRoutes.map((route) => {
         const isActive = state.routes[state.index].name === route.name;
         const icons = TAB_ICONS[route.name];
