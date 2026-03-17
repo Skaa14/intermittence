@@ -17,6 +17,7 @@ import { useDonneesTest } from "../../contexts/DonneesTestContext";
 import { Annexe, TauxCSG } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
 import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
+import { filtrerContratsPeriodeReference, trouverFCT, calculerDebutPeriodeReference } from "../../utils/filtrerContratsPeriodeReference";
 import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
@@ -48,8 +49,18 @@ export default function AccueilScreen() {
     return { ajBrute: brute, ajNette: nette };
   }, [profil]);
 
-  const totalHeures = contrats.reduce((sum, c) => sum + c.heures, 0);
-  const totalSalaire = contrats.reduce((sum, c) => sum + c.salaireBrut, 0);
+  const contratsFiltrés = useMemo(
+    () => filtrerContratsPeriodeReference(contrats),
+    [contrats]
+  );
+  const fct = useMemo(() => trouverFCT(contrats), [contrats]);
+  const debutPeriode = useMemo(
+    () => (fct ? calculerDebutPeriodeReference(fct) : undefined),
+    [fct]
+  );
+
+  const totalHeures = contratsFiltrés.reduce((sum, c) => sum + c.heures, 0);
+  const totalSalaire = contratsFiltrés.reduce((sum, c) => sum + c.salaireBrut, 0);
   const progression = Math.min((totalHeures / 507) * 100, 100);
 
   const ouvrirFormulaire = () => {
@@ -101,6 +112,11 @@ export default function AccueilScreen() {
             ? "Seuil atteint ! Tu peux ouvrir tes droits."
             : `Il te manque ${507 - totalHeures}h`}
         </Text>
+        {debutPeriode && fct && (
+          <Text testID="periode-reference" style={styles.cardPeriode}>
+            Période : {formatDate(debutPeriode)} → {formatDate(fct)} ({contratsFiltrés.length} contrat{contratsFiltrés.length > 1 ? "s" : ""})
+          </Text>
+        )}
       </View>
 
       <View style={styles.card}>

@@ -41,6 +41,12 @@ export const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 8,
   },
+  cardPeriode: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textFaint,
+    marginTop: 4,
+  },
   barreContainer: {
     height: 8,
     backgroundColor: colors.borderLight,
