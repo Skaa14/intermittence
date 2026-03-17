@@ -35,7 +35,7 @@ const verifierContratsVisibles = (table: ContratRow[]) => {
     const scope = within(carte);
     expect(scope.getByText(row.Employeur)).toBeTruthy();
     expect(scope.getByText(`${row["Début"]} → ${row.Fin}`)).toBeTruthy();
-    expect(scope.getByText(`${row.Heures}h`)).toBeTruthy();
+    expect(scope.getByText(`${row.Heures} h`)).toBeTruthy();
     expect(scope.getByText(`${row.Salaire}€ brut`)).toBeTruthy();
   });
 };

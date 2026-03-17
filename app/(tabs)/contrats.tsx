@@ -14,9 +14,11 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../contexts/ContratsContext";
-import { Contrat } from "../../types/contrat";
+import { useProfil } from "../../contexts/ProfilContext";
+import { Contrat, TypeHeures } from "../../types/contrat";
 import { formatDate, formatDateISO, parseDate } from "../../utils/date";
-import { styles, webDateInputStyle, addIconColor, errorBorderColor } from "../../styles/tabs/contrats.styles";
+import { formaterHeures } from "../../utils/formatHeures";
+import { styles, webDateInputStyle, addIconColor, errorBorderColor, placeholderColor } from "../../styles/tabs/contrats.styles";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
@@ -32,10 +34,13 @@ const isContratPasse = (contrat: Contrat): boolean => {
 
 export default function ContratsScreen() {
   const { contrats, ajouterContrat, modifierContrat, supprimerContrat } = useContrats();
+  const { profil } = useProfil();
+  const estAnnexe10 = profil?.annexe === "10";
 
   const [employeur, setEmployeur] = useState("");
   const [dateDebut, setDateDebut] = useState<Date | undefined>();
   const [dateFin, setDateFin] = useState<Date | undefined>();
+  const [typeHeures, setTypeHeures] = useState<TypeHeures>("heures");
   const [heures, setHeures] = useState("");
   const [salaireBrut, setSalaireBrut] = useState("");
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
@@ -114,6 +119,7 @@ export default function ContratsScreen() {
     setEmployeur("");
     setDateDebut(undefined);
     setDateFin(undefined);
+    setTypeHeures("heures");
     setHeures("");
     setSalaireBrut("");
     setContratEnEdition(null);
@@ -123,10 +129,12 @@ export default function ContratsScreen() {
   };
 
   const lancerEdition = (contrat: Contrat) => {
+    const type = contrat.type ?? "heures";
     setEmployeur(contrat.employeur);
     setDateDebut(parseDate(contrat.dateDebut));
     setDateFin(parseDate(contrat.dateFin));
-    setHeures(contrat.heures.toString());
+    setTypeHeures(type);
+    setHeures(type === "cachets" ? (contrat.heures / 12).toString() : contrat.heures.toString());
     setSalaireBrut(contrat.salaireBrut.toString());
     setContratEnEdition(contrat.id);
     setFormulaireOuvert(true);
@@ -153,12 +161,14 @@ export default function ContratsScreen() {
     }
     setErreurMois(null);
 
+    const valeurSaisie = parseFloat(heures);
     const donnees = {
       employeur,
       dateDebut: formatDate(dateDebut!),
       dateFin: formatDate(dateFin!),
-      heures: parseFloat(heures),
+      heures: typeHeures === "cachets" ? valeurSaisie * 12 : valeurSaisie,
       salaireBrut: parseFloat(salaireBrut),
+      type: typeHeures,
     };
 
     if (contratEnEdition) {
@@ -181,6 +191,7 @@ export default function ContratsScreen() {
             testID="input-employeur"
             style={[styles.input, erreurs.employeur && styles.inputErreur]}
             placeholder="Employeur"
+            placeholderTextColor={placeholderColor}
             value={employeur}
             onChangeText={(v) => { setEmployeur(v); setErreurs((e) => ({ ...e, employeur: false })); }}
           />
@@ -262,19 +273,79 @@ export default function ContratsScreen() {
               onChange={onChangeDateFin}
             />
           )}
+          {estAnnexe10 && (
+            <View testID="toggle-type-heures" style={styles.toggleRow}>
+              <Pressable
+                testID="toggle-heures"
+                style={[styles.toggleBtn, typeHeures === "heures" && styles.toggleBtnActif]}
+                onPress={() => { setTypeHeures("heures"); setHeures(""); }}
+              >
+                <Text style={[styles.toggleBtnText, typeHeures === "heures" && styles.toggleBtnTextActif]}>
+                  Heures
+                </Text>
+              </Pressable>
+              <Pressable
+                testID="toggle-cachets"
+                style={[styles.toggleBtn, typeHeures === "cachets" && styles.toggleBtnActif]}
+                onPress={() => { setTypeHeures("cachets"); setHeures("1"); }}
+              >
+                <Text style={[styles.toggleBtnText, typeHeures === "cachets" && styles.toggleBtnTextActif]}>
+                  Cachets
+                </Text>
+              </Pressable>
+            </View>
+          )}
           <View style={styles.row}>
-            <TextInput
-              testID="input-heures"
-              style={[styles.input, styles.inputHalf, erreurs.heures && styles.inputErreur]}
-              placeholder="Heures"
-              value={heures}
-              onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
-              keyboardType="numeric"
-            />
+            <View style={styles.inputHalf}>
+              {typeHeures === "cachets" ? (
+                <View style={styles.stepperRow}>
+                  <Pressable
+                    testID="btn-moins-cachets"
+                    style={[styles.stepperBtn, styles.stepperBtnLeft]}
+                    onPress={() => {
+                      const v = Math.max(1, (parseInt(heures, 10) || 1) - 1);
+                      setHeures(v.toString());
+                      setErreurs((e) => ({ ...e, heures: false }));
+                    }}
+                  >
+                    <Text style={styles.stepperBtnText}>−</Text>
+                  </Pressable>
+                  <TextInput
+                    testID="input-heures"
+                    style={[styles.input, styles.inputStepper, erreurs.heures && styles.inputErreur]}
+                    value={heures}
+                    onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
+                    keyboardType="numeric"
+                  />
+                  <Pressable
+                    testID="btn-plus-cachets"
+                    style={[styles.stepperBtn, styles.stepperBtnRight]}
+                    onPress={() => {
+                      const v = (parseInt(heures, 10) || 0) + 1;
+                      setHeures(v.toString());
+                      setErreurs((e) => ({ ...e, heures: false }));
+                    }}
+                  >
+                    <Text style={styles.stepperBtnText}>+</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <TextInput
+                  testID="input-heures"
+                  style={[styles.input, erreurs.heures && styles.inputErreur]}
+                  placeholder="Heures"
+                  placeholderTextColor={placeholderColor}
+                  value={heures}
+                  onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
+                  keyboardType="numeric"
+                />
+              )}
+            </View>
             <TextInput
               testID="input-salaire-brut"
               style={[styles.input, styles.inputHalf, erreurs.salaireBrut && styles.inputErreur]}
               placeholder="Salaire brut (€)"
+              placeholderTextColor={placeholderColor}
               value={salaireBrut}
               onChangeText={(v) => { setSalaireBrut(v); setErreurs((e) => ({ ...e, salaireBrut: false })); }}
               keyboardType="numeric"
@@ -356,8 +427,8 @@ export default function ContratsScreen() {
                 {item.dateDebut} → {item.dateFin}
               </Text>
               <View style={styles.contratDetails}>
-                <Text style={[styles.contratDetail, item.passe && styles.contratDetailPasse]}>
-                  {item.heures}h
+                <Text testID={`heures-${item.id}`} style={[styles.contratDetail, item.passe && styles.contratDetailPasse]}>
+                  {formaterHeures(item)}
                 </Text>
                 <Text style={[styles.contratDetail, item.passe && styles.contratDetailPasse]}>
                   {item.salaireBrut}€ brut

@@ -4,4 +4,5 @@ export type ContratRow = {
   Fin: string;
   Heures: string;
   Salaire: string;
+  Type?: string;
 };

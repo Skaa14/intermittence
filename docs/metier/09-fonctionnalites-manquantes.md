@@ -36,23 +36,11 @@ Le dashboard filtre les contrats sur les 12 mois précédant la FCT (date de fin
 
 ---
 
-## 5. Cachets (1 cachet = 12 heures)
+## 5. ~~Cachets (1 cachet = 12 heures)~~ ✅ Implémenté
 
-**Règle** (fiche `07-507-heures.md`, section "Cachets") :
+Le formulaire contrat propose un toggle Heures/Cachets. En mode cachets, la valeur saisie est convertie automatiquement en heures (× 12) pour les calculs. L'UI affiche en cachets dans la liste et le détail mois.
 
-> Un cachet = 12 heures, quelle que soit la qualification donnée par l'employeur.
-
-Les artistes (annexe 10) raisonnent généralement en cachets, pas en heures. Le formulaire contrat ne propose que la saisie en heures.
-
-**Plafonds mensuels** :
-
-| Annexe 8 | Annexe 10 |
-|---|---|
-| 208h (250h multi-employeurs) | 28 cachets (= 336h) |
-
-**Solution** : ajouter un champ `type: "heures" | "cachets"` dans l'interface `Contrat`. Si cachet sélectionné, convertir automatiquement en heures (× 12) pour les calculs tout en affichant en cachets dans l'UI.
-
-**Fichier concerné** : `types/contrat.ts`, `app/(tabs)/contrats.tsx`
+**Fichiers** : `types/contrat.ts` (type `TypeHeures`), `app/(tabs)/contrats.tsx` (toggle + conversion), `styles/tabs/contrats.styles.ts` (styles toggle), `app/mois/[moisIndex].tsx` (affichage détail)
 
 ---
 
@@ -134,7 +122,7 @@ Certaines périodes hors contrat comptent pour les 507h :
 | ~~2~~ | ~~Seuil de non-indemnisation~~ ✅ | Implémenté |
 | ~~3~~ | ~~Filtrage 507h sur période de référence~~ ✅ | Implémenté |
 | ~~4~~ | ~~AJ nette~~ ✅ | Implémenté |
-| 5 | Cachets | Confort UX majeur pour les artistes |
+| ~~5~~ | ~~Cachets~~ ✅ | Implémenté |
 | 6 | Clause de rattrapage | Information utile, cas fréquent |
 | 7 | Heures d'enseignement | Correctif de calcul pour un sous-ensemble d'utilisateurs |
 | 8 | Heures assimilées | Complétude métier |

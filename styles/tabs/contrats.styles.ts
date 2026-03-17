@@ -5,6 +5,7 @@ import { webDateInputBase } from "../../theme/webStyles";
 
 export const addIconColor = colors.warning;
 export const errorBorderColor = colors.error;
+export const placeholderColor = colors.textFaint;
 
 export const webDateInputStyle: React.CSSProperties = {
   ...webDateInputBase,
@@ -200,5 +201,66 @@ export const styles = StyleSheet.create({
     color: colors.error,
     fontSize: 13,
     marginBottom: 8,
+  },
+  toggleRow: {
+    flexDirection: "row",
+    marginBottom: 8,
+    borderRadius: 8,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  toggleBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: "center",
+    backgroundColor: colors.bgBase,
+  },
+  toggleBtnActif: {
+    backgroundColor: colors.primaryBg,
+  },
+  toggleBtnText: {
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    color: colors.textMuted,
+  },
+  toggleBtnTextActif: {
+    color: colors.primary,
+    fontFamily: fonts.bold,
+  },
+  stepperRow: {
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "stretch",
+  },
+  stepperBtn: {
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.primaryBg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 8,
+  },
+  stepperBtnLeft: {
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+    borderRightWidth: 0,
+  },
+  stepperBtnRight: {
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+    borderLeftWidth: 0,
+  },
+  stepperBtnText: {
+    fontSize: 20,
+    fontFamily: fonts.bold,
+    color: colors.primary,
+  },
+  inputStepper: {
+    flex: 1,
+    minWidth: 0,
+    borderRadius: 0,
+    textAlign: "center",
   },
 });

@@ -1,4 +1,4 @@
-import { Contrat } from "../types/contrat";
+import { Contrat, TypeHeures } from "../types/contrat";
 import { ProfilIntermittent } from "../types/profil";
 import { formatDate } from "./date";
 
@@ -18,11 +18,12 @@ function c(
   jourFin: number,
   employeur: string,
   heures: number,
-  salaireBrut: number
+  salaireBrut: number,
+  type?: TypeHeures
 ): ContratSansId {
   const debut = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourDebut);
   const fin = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourFin);
-  return { employeur, dateDebut: formatDate(debut), dateFin: formatDate(fin), heures, salaireBrut };
+  return { employeur, dateDebut: formatDate(debut), dateFin: formatDate(fin), heures, salaireBrut, ...(type && { type }) };
 }
 
 // M+6 = mois courant : génère 1 ou 2 contrats selon la position de aujourd'hui dans le mois
@@ -39,8 +40,8 @@ function contratsCurrentMonth(ann: Date): { artiste: ContratSansId[]; technicien
   const enCoursFin = Math.min(lastDay, todayDay + 5);
 
   const artiste: ContratSansId[] = [
-    ...(hasPast ? [c(ann, 6, 2, pastFin, "Théâtre du Nord", 64, 2240)] : []),
-    c(ann, 6, enCoursDebut, enCoursFin, "Théâtre du Nord", 64, 2240),
+    ...(hasPast ? [c(ann, 6, 2, pastFin, "Théâtre du Nord", 60, 2100, "cachets")] : []),
+    c(ann, 6, enCoursDebut, enCoursFin, "Théâtre du Nord", 60, 2100, "cachets"),
   ];
 
   const technicien: ContratSansId[] = [
@@ -79,15 +80,15 @@ export function creerProfilTechnicien(): ProfilIntermittent {
 export function creerContratsArtiste(): ContratSansId[] {
   const ann = calculerAnniversaire();
   return [
-    c(ann, 0, 1, 8, "Festival d'automne", 64, 1920),
+    c(ann, 0, 1, 8, "Festival d'automne", 60, 1920, "cachets"),
     c(ann, 0, 15, 22, "Cie Lumière", 64, 1920),
-    c(ann, 1, 6, 14, "Tournée nationale", 72, 2160),
+    c(ann, 1, 6, 14, "Tournée nationale", 72, 2160, "cachets"),
     c(ann, 3, 1, 9, "Opéra de Paris", 72, 2520),
-    c(ann, 3, 15, 22, "Opéra de Paris", 64, 2240),
-    c(ann, 5, 9, 15, "Centre chorégraphique", 56, 1960),
+    c(ann, 3, 15, 22, "Opéra de Paris", 60, 2240, "cachets"),
+    c(ann, 5, 9, 15, "Centre chorégraphique", 48, 1960, "cachets"),
     ...contratsCurrentMonth(ann).artiste,
     c(ann, 7, 14, 20, "Festival de printemps", 56, 1960),
-    c(ann, 9, 2, 8, "Tournée d'été", 56, 1960),
+    c(ann, 9, 2, 8, "Tournée d'été", 60, 1960, "cachets"),
   ];
 }
 

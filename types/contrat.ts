@@ -1,3 +1,5 @@
+export type TypeHeures = "heures" | "cachets";
+
 export interface Contrat {
   id: string;
   employeur: string;
@@ -5,4 +7,5 @@ export interface Contrat {
   dateFin: string;
   heures: number;
   salaireBrut: number;
+  type?: TypeHeures;
 }

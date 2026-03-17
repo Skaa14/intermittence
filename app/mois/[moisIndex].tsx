@@ -15,6 +15,7 @@ import {
   IndemnisationMensuelle,
 } from "../../utils/calculerIndemnisationMensuelle";
 import { styles, pageScrollStyle } from "../../styles/mois/moisIndex.styles";
+import { formaterHeures } from "../../utils/formatHeures";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -117,7 +118,7 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
               <Text style={styles.employeur}>{c.employeur}</Text>
               <View style={styles.contratDetails}>
                 <Text style={styles.detailVal}>{formatEuros(c.salaireBrut)}</Text>
-                <Text style={styles.detailVal}>{c.heures} h</Text>
+                <Text style={styles.detailVal}>{formaterHeures(c)}</Text>
               </View>
             </View>
           ))
