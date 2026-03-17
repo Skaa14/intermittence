@@ -28,17 +28,11 @@ L'AJ nette est calculée avec les 3 tranches de cotisation (retraite complément
 
 ---
 
-## 4. Filtrage des contrats sur la période de référence (507h)
+## 4. ~~Filtrage des contrats sur la période de référence (507h)~~ ✅ Implémenté
 
-**Règle** (fiche `07-507-heures.md`, section "Période de référence") :
+Le dashboard filtre les contrats sur les 12 mois précédant la FCT (date de fin du dernier contrat). La période de référence est affichée sous la barre de progression.
 
-Les 507 heures doivent être justifiées sur les **12 mois précédant la fin du dernier contrat** (FCT). Les contrats en dehors de cette fenêtre ne comptent pas.
-
-**État actuel** : le dashboard (`app/(tabs)/index.tsx`, ligne 39) additionne les heures de **tous** les contrats enregistrés, sans filtre de date. La fiche elle-même le note : *"Il faudra à terme filtrer les contrats sur la bonne période de 12 mois"* (`07-507-heures.md`, ligne 52).
-
-**Exemple** : un intermittent a 300h sur des contrats de 2024 et 250h en 2025. Le dashboard affiche 550h (seuil atteint), mais si la FCT est en décembre 2025, seules les 250h de la fenêtre janvier-décembre 2025 comptent → seuil non atteint.
-
-**Fichier concerné** : `app/(tabs)/index.tsx` (barre de progression 507h)
+**Fichiers** : `utils/filtrerContratsPeriodeReference.ts` (logique), `app/(tabs)/index.tsx` (intégration dashboard)
 
 ---
 
@@ -138,7 +132,7 @@ Certaines périodes hors contrat comptent pour les 507h :
 |---|---|---|
 | ~~1~~ | ~~Persistance des données~~ ✅ | Implémenté |
 | ~~2~~ | ~~Seuil de non-indemnisation~~ ✅ | Implémenté |
-| 3 | Filtrage 507h sur période de référence | Fausse la barre de progression du dashboard |
+| ~~3~~ | ~~Filtrage 507h sur période de référence~~ ✅ | Implémenté |
 | ~~4~~ | ~~AJ nette~~ ✅ | Implémenté |
 | 5 | Cachets | Confort UX majeur pour les artistes |
 | 6 | Clause de rattrapage | Information utile, cas fréquent |
