@@ -9,4 +9,4 @@
 - Les valeurs de test (noms d'employeurs, montants, dates, etc.) doivent venir du Gherkin, jamais en dur dans les step definitions. Utiliser des regex avec captures (`/^le contrat "(.*)" est visible$/`) pour que les steps soient paramétrées.
 - **Toujours des tests UI** : render le screen + fireEvent, jamais de tests renderHook. On teste le comportement tel que l'utilisateur le voit.
 - **Toujours des datatables** pour les données de contrats dans les scénarios Gherkin. Ne pas passer les champs en paramètres inline dans les steps.
-- **Toujours utiliser les testID** pour cibler les inputs dans les step definitions (ex: `screen.getByTestId("input-date-debut")`), jamais le texte du placeholder ou du label qui peut changer selon l'état du composant.
+- **Toujours préférer `getByTestId`** pour cibler les éléments dans les step definitions (ex: `screen.getByTestId("input-date-debut")`). `getByText` / `getByPlaceholderText` sont fragiles car le texte peut changer. N'utiliser les queries par texte que pour vérifier un contenu dynamique capturé depuis le Gherkin.

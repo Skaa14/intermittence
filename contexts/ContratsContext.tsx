@@ -1,8 +1,10 @@
-import { createContext, useContext, useState, useRef, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, useEffect, ReactNode } from "react";
 import { Contrat } from "../types/contrat";
+import { charger, sauvegarder } from "../utils/storage";
 
 interface ContratsContextType {
   contrats: Contrat[];
+  chargementTermine: boolean;
   ajouterContrat: (contrat: Omit<Contrat, "id">) => void;
   modifierContrat: (id: string, contrat: Omit<Contrat, "id">) => void;
   supprimerContrat: (id: string) => void;
@@ -25,39 +27,71 @@ function trierParDate(contrats: Contrat[]): Contrat[] {
   );
 }
 
+function maxId(contrats: Contrat[]): number {
+  if (contrats.length === 0) return 0;
+  return Math.max(...contrats.map((c) => Number(c.id) || 0));
+}
+
 export function ContratsProvider({ children }: { children: ReactNode }) {
   const [contrats, setContrats] = useState<Contrat[]>([]);
+  const [chargementTermine, setChargementTermine] = useState(false);
   const nextId = useRef(1);
+
+  useEffect(() => {
+    charger<Contrat[]>("contrats").then((donnees) => {
+      if (donnees && donnees.length > 0) {
+        setContrats(trierParDate(donnees));
+        nextId.current = maxId(donnees) + 1;
+      }
+      setChargementTermine(true);
+    }).catch(() => setChargementTermine(true));
+  }, []);
+
+  const persister = (nouveauxContrats: Contrat[]) => {
+    sauvegarder("contrats", nouveauxContrats);
+  };
 
   const ajouterContrat = (contratSansId: Omit<Contrat, "id">) => {
     const nouveau: Contrat = {
       ...contratSansId,
       id: String(nextId.current++),
     };
-    setContrats((prev) => trierParDate([...prev, nouveau]));
+    setContrats((prev) => {
+      const maj = trierParDate([...prev, nouveau]);
+      persister(maj);
+      return maj;
+    });
   };
 
   const modifierContrat = (id: string, contratSansId: Omit<Contrat, "id">) => {
-    setContrats((prev) =>
-      trierParDate(
+    setContrats((prev) => {
+      const maj = trierParDate(
         prev.map((c) => (c.id === id ? { ...contratSansId, id } : c))
-      )
-    );
+      );
+      persister(maj);
+      return maj;
+    });
   };
 
   const supprimerContrat = (id: string) => {
-    setContrats((prev) => prev.filter((c) => c.id !== id));
+    setContrats((prev) => {
+      const maj = prev.filter((c) => c.id !== id);
+      persister(maj);
+      return maj;
+    });
   };
 
   const reinitialiserContrats = (nouveauxContrats: Omit<Contrat, "id">[]) => {
     nextId.current = 1;
     const avecIds = nouveauxContrats.map((c) => ({ ...c, id: String(nextId.current++) }));
-    setContrats(trierParDate(avecIds));
+    const maj = trierParDate(avecIds);
+    setContrats(maj);
+    persister(maj);
   };
 
   return (
     <ContratsContext.Provider
-      value={{ contrats, ajouterContrat, modifierContrat, supprimerContrat, reinitialiserContrats }}
+      value={{ contrats, chargementTermine, ajouterContrat, modifierContrat, supprimerContrat, reinitialiserContrats }}
     >
       {children}
     </ContratsContext.Provider>

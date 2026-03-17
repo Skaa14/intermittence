@@ -94,7 +94,7 @@ export default function AccueilScreen() {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Contrats enregistrés</Text>
-        <Text style={styles.cardValue}>{contrats.length}</Text>
+        <Text testID="contrats-count" style={styles.cardValue}>{contrats.length}</Text>
       </View>
 
       {profil && !formulaireOuvert && (

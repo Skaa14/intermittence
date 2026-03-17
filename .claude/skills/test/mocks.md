@@ -83,3 +83,35 @@ const button = lastAlertButtons.find((b: any) => b.style === "destructive");
 expect(button).toBeDefined();
 act(() => { button?.onPress?.(); });
 ```
+
+## AsyncStorage
+
+Le mock est configuré globalement dans `jest.config.js` via `moduleNameMapper` :
+
+```js
+"^@react-native-async-storage/async-storage$":
+  "@react-native-async-storage/async-storage/jest/async-storage-mock",
+```
+
+Le storage est vidé automatiquement avant chaque test via `tests/setup.ts` (`setupFilesAfterEnv`).
+
+Pour tester la persistance (simuler un redémarrage) :
+
+```tsx
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// 1. Render et interagir avec l'app
+vue = renderAccueil();
+fireEvent.press(screen.getByTestId("btn-demo-technicien"));
+
+// 2. Unmount (simule fermeture)
+vue.unmount();
+
+// 3. Re-render (simule réouverture) — les données sont restaurées depuis le mock
+vue = renderAccueil();
+await waitFor(() => {
+  expect(screen.getByTestId("aj-value")).toBeTruthy();
+});
+```
+
+**Important** : utiliser `vue.unmount()` (pas `cleanup()`) pour éviter les erreurs "Can't access .root on unmounted test renderer".

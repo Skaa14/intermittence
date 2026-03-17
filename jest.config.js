@@ -8,7 +8,10 @@ module.exports = {
   ),
   moduleNameMapper: {
     "^@expo/vector-icons(.*)$": "<rootDir>/tests/__mocks__/@expo/vector-icons.js",
+    "^@react-native-async-storage/async-storage$":
+      "@react-native-async-storage/async-storage/jest/async-storage-mock",
   },
+  setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   transformIgnorePatterns: [
     "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|@cucumber|jest-cucumber|uuid))",
   ],
