@@ -1,16 +1,6 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
 import { fonts } from "../../theme/fonts";
-import { IndemnisationMensuelle } from "../../utils/calculerIndemnisationMensuelle";
-
-export const BADGE_STYLES: Record<
-  IndemnisationMensuelle["etat"],
-  { bg: string; text: string; label: string }
-> = {
-  passé: { bg: colors.borderLight, text: colors.textMedium, label: "Passé" },
-  "en cours": { bg: colors.primaryBg, text: colors.primaryDark, label: "En cours" },
-  "à venir": { bg: colors.successBg, text: colors.successText, label: "À venir" },
-};
 
 export const styles = StyleSheet.create({
   container: {
@@ -43,25 +33,11 @@ export const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  carteHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-  },
   carteTitre: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
     color: colors.textDark,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-  },
-  badgeText: {
-    fontSize: 12,
-    fontFamily: fonts.medium,
+    marginBottom: 12,
   },
   carteBody: {
     gap: 6,
@@ -69,12 +45,6 @@ export const styles = StyleSheet.create({
   ligne: {
     flexDirection: "row",
     justifyContent: "space-between",
-  },
-  ligneTotal: {
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
   },
   libelleValeur: {
     fontSize: 14,
@@ -85,15 +55,5 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.regular,
     color: colors.textDark,
-  },
-  libelleTotal: {
-    fontSize: 14,
-    fontFamily: fonts.semiBold,
-    color: colors.textDark,
-  },
-  valeurTotal: {
-    fontSize: 14,
-    fontFamily: fonts.semiBold,
-    color: colors.primary,
   },
 });

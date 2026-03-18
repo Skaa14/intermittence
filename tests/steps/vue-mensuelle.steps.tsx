@@ -114,40 +114,7 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test("Badges d'état des mois", ({ given, then, and }) => {
-    fixerDateStep(given);
-
-    given("le profil est configuré", (table: ProfilRow[]) => {
-      renderScreen();
-      configurerProfil(table[0]);
-    });
-
-    then(
-      /^la carte du mois (\d+) porte le badge "(.*)"$/,
-      (index: string, badge: string) => {
-        const carte = screen.getByTestId(`carte-mois-${index}`);
-        expect(within(carte).getByText(badge)).toBeTruthy();
-      }
-    );
-
-    and(
-      /^la carte du mois (\d+) porte le badge "(.*)"$/,
-      (index: string, badge: string) => {
-        const carte = screen.getByTestId(`carte-mois-${index}`);
-        expect(within(carte).getByText(badge)).toBeTruthy();
-      }
-    );
-
-    and(
-      /^la carte du mois (\d+) porte le badge "(.*)"$/,
-      (index: string, badge: string) => {
-        const carte = screen.getByTestId(`carte-mois-${index}`);
-        expect(within(carte).getByText(badge)).toBeTruthy();
-      }
-    );
-  });
-
-  test("Salaire brut affiché sur la carte d'un mois avec contrat", ({
+  test("Heures travaillées affichées sur la carte d'un mois avec contrat", ({
     given,
     and,
     then,
@@ -164,15 +131,42 @@ defineFeature(feature, (test) => {
     });
 
     then(
-      /^la carte du mois (\d+) affiche le salaire brut "(.*)"$/,
-      (index: string, salaire: string) => {
+      /^la carte du mois (\d+) affiche "(.*)"$/,
+      (index: string, texte: string) => {
         const carte = screen.getByTestId(`carte-mois-${index}`);
-        expect(within(carte).getByText(salaire)).toBeTruthy();
+        expect(within(carte).getByText(texte)).toBeTruthy();
+      }
+    );
+
+    and(
+      /^la carte du mois (\d+) affiche "(.*)" pour les jours de formation$/,
+      (index: string, texte: string) => {
+        const carte = screen.getByTestId(`carte-mois-${index}`);
+        expect(within(carte).getByText(texte)).toBeTruthy();
       }
     );
   });
 
-  test("Navigation vers le détail d'un mois", ({ given, and, when, then }) => {
+  test("Jours indemnisés affichés sur la carte", ({ given, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré", (table: ProfilRow[]) => {
+      renderScreen();
+      configurerProfil(table[0]);
+    });
+
+    then(
+      /^la carte du mois (\d+) affiche les jours indemnisés$/,
+      (index: string) => {
+        const carte = screen.getByTestId(`carte-mois-${index}`);
+        expect(within(carte).getByText("Jours indemnisés")).toBeTruthy();
+        const lignes = within(carte).getAllByText(/^\d+ j$/);
+        expect(lignes.length).toBeGreaterThanOrEqual(1);
+      }
+    );
+  });
+
+  test("Navigation vers le détail d'un mois", ({ given, when, then }) => {
     fixerDateStep(given);
 
     given("le profil est configuré", (table: ProfilRow[]) => {

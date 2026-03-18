@@ -13,22 +13,21 @@ Feature: Vue mensuelle
       | 8      | 507    | 13800   | 01/04/2026        |
     Then 12 cartes de mois sont affichées
 
-  Scenario: Badges d'état des mois
-    Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
-    Then la carte du mois 0 porte le badge "Passé"
-    And la carte du mois 2 porte le badge "En cours"
-    And la carte du mois 3 porte le badge "À venir"
-
-  Scenario: Salaire brut affiché sur la carte d'un mois avec contrat
+  Scenario: Heures travaillées affichées sur la carte d'un mois avec contrat
     Given le profil est configuré
       | Annexe | Heures | Salaire | Date anniversaire |
       | 8      | 507    | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Théâtre   | 01/04/2026 | 30/04/2026 | 40     | 1500    |
-    Then la carte du mois 0 affiche le salaire brut "1500 €"
+    Then la carte du mois 0 affiche "40 h"
+    And la carte du mois 0 affiche "0 j" pour les jours de formation
+
+  Scenario: Jours indemnisés affichés sur la carte
+    Given le profil est configuré
+      | Annexe | Heures | Salaire | Date anniversaire |
+      | 8      | 507    | 13800   | 01/04/2026        |
+    Then la carte du mois 1 affiche les jours indemnisés
 
   Scenario: Navigation vers le détail d'un mois
     Given le profil est configuré

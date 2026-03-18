@@ -13,7 +13,7 @@ import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
 } from "../../utils/calculerIndemnisationMensuelle";
-import { styles, BADGE_STYLES } from "../../styles/tabs/vue-mensuelle.styles";
+import { styles } from "../../styles/tabs/vue-mensuelle.styles";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -34,20 +34,6 @@ function formatMois(date: Date): string {
   return `${NOMS_MOIS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
-function formatEuros(montant: number): string {
-  return `${Math.round(montant)} €`;
-}
-
-
-function BadgeEtat({ etat }: { etat: IndemnisationMensuelle["etat"] }) {
-  const { bg, text, label } = BADGE_STYLES[etat];
-  return (
-    <View style={[styles.badge, { backgroundColor: bg }]}>
-      <Text style={[styles.badgeText, { color: text }]}>{label}</Text>
-    </View>
-  );
-}
-
 function CarteMois({
   mois,
   onPress,
@@ -61,22 +47,19 @@ function CarteMois({
       style={styles.carte}
       onPress={onPress}
     >
-      <View style={styles.carteHeader}>
-        <Text style={styles.carteTitre}>{formatMois(mois.mois)}</Text>
-        <BadgeEtat etat={mois.etat} />
-      </View>
+      <Text style={styles.carteTitre}>{formatMois(mois.mois)}</Text>
       <View style={styles.carteBody}>
         <View style={styles.ligne}>
-          <Text style={styles.libelleValeur}>ARE versée</Text>
-          <Text style={styles.valeur}>{formatEuros(mois.areVersee)}</Text>
+          <Text style={styles.libelleValeur}>Heures travaillées</Text>
+          <Text style={styles.valeur}>{mois.heuresDuMois} h</Text>
         </View>
         <View style={styles.ligne}>
-          <Text style={styles.libelleValeur}>Salaire brut</Text>
-          <Text style={styles.valeur}>{formatEuros(mois.salaireDuMois)}</Text>
+          <Text style={styles.libelleValeur}>Jours de formation</Text>
+          <Text style={styles.valeur}>{mois.joursFormation} j</Text>
         </View>
-        <View style={[styles.ligne, styles.ligneTotal]}>
-          <Text style={styles.libelleTotal}>Total reçu</Text>
-          <Text style={styles.valeurTotal}>{formatEuros(mois.totalRecu)}</Text>
+        <View style={styles.ligne}>
+          <Text style={styles.libelleValeur}>Jours indemnisés</Text>
+          <Text style={styles.valeur}>{mois.joursIndemnises} j</Text>
         </View>
       </View>
     </TouchableOpacity>
