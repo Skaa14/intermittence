@@ -10,9 +10,10 @@ import { FormationsProvider } from "../../contexts/FormationsContext";
 import { simulateDayPress } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
 import { ContratRow } from "./types";
+import { flushAsync } from "./act";
 
-export const renderScreen = () =>
-  render(
+export const renderScreen = async () => {
+  const result = render(
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
@@ -21,6 +22,9 @@ export const renderScreen = () =>
       </ContratsProvider>
     </ProfilProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 export const ouvrirFormulaire = () => {
   fireEvent.press(screen.getByTestId("btn-ouvrir-formulaire"));

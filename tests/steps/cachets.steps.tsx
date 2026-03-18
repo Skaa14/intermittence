@@ -58,8 +58,8 @@ defineFeature(feature, (test) => {
       mockAnnexe = "10";
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -77,8 +77,8 @@ defineFeature(feature, (test) => {
       mockAnnexe = "8";
     });
 
-    and("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    and("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -92,8 +92,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -111,8 +111,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -134,8 +134,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     when("j'ajoute un contrat en cachets", (table: ContratRow[]) => {
@@ -155,8 +155,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     when("j'ajoute un contrat en cachets", (table: ContratRow[]) => {
@@ -176,8 +176,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     when("j'ajoute un contrat en heures", (table: ContratRow[]) => {
@@ -197,8 +197,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -230,8 +230,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -253,8 +253,8 @@ defineFeature(feature, (test) => {
 
     given("le profil est en annexe 10", () => {});
 
-    given("un contrat en cachets existe", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat en cachets existe", async (table: ContratRow[]) => {
+      await renderScreen();
       ajouterContratViaFormulaire(table[0]);
     });
 

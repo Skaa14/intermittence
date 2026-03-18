@@ -6,6 +6,7 @@ import { FormationsProvider } from "../../contexts/FormationsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { selectDatePicker } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
+import { flushAsync } from "./act";
 
 export type ProfilRow = {
   Annexe: string;
@@ -16,8 +17,8 @@ export type ProfilRow = {
   "Alsace-Moselle"?: string;
 };
 
-export const renderAccueilScreen = () =>
-  render(
+export const renderAccueilScreen = async () => {
+  const result = render(
     <ContratsProvider>
       <ProfilProvider>
         <FormationsProvider>
@@ -28,6 +29,9 @@ export const renderAccueilScreen = () =>
       </ProfilProvider>
     </ContratsProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 export const ouvrirFormulaireProfil = () => {
   const btnConfigurer = screen.queryByTestId("btn-configurer-profil");

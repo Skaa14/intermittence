@@ -32,8 +32,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -55,8 +55,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -78,8 +78,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 

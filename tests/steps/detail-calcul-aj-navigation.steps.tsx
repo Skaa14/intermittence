@@ -26,8 +26,8 @@ defineFeature(feature, (test) => {
   });
 
   const givenAccueil = (given: Function) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
   };
 

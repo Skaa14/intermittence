@@ -20,8 +20,8 @@ defineFeature(feature, (test) => {
   });
 
   test("Pas de profil au démarrage", ({ given, then }) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then("le bouton de configuration du profil est visible", () => {
@@ -30,8 +30,8 @@ defineFeature(feature, (test) => {
   });
 
   test("Configuration du profil", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     when("je configure mon profil", (table: ProfilRow[]) => {
@@ -44,8 +44,8 @@ defineFeature(feature, (test) => {
   });
 
   test("Modification du profil existant", ({ given, when, then, and }) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     and("je configure mon profil", (table: ProfilRow[]) => {

@@ -54,8 +54,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("un contrat existant :", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat existant :", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -78,8 +78,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("un contrat existant :", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat existant :", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -105,8 +105,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    and("un contrat existant :", (table: ContratRow[]) => {
-      renderScreen();
+    and("un contrat existant :", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 

@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import DetailCalculAJScreen from "../../app/detail-calcul-aj";
 import { ProfilProvider } from "../../contexts/ProfilContext";
 import { Annexe, ProfilIntermittent, TauxCSG } from "../../types/profil";
+import { flushAsync } from "../helpers/act";
 
 const feature = loadFeature("tests/features/detail-calcul-aj.feature");
 
@@ -11,12 +12,15 @@ const sauvegarderProfil = async (profil: ProfilIntermittent) => {
   await AsyncStorage.setItem("intermittence:profil", JSON.stringify(profil));
 };
 
-const renderDetailScreen = () =>
-  render(
+const renderDetailScreen = async () => {
+  const result = render(
     <ProfilProvider>
       <DetailCalculAJScreen />
     </ProfilProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 const attendreChargement = async () => {
   await waitFor(() => {
@@ -44,8 +48,8 @@ const escapeRegex = (str: string) =>
 
 defineFeature(feature, (test) => {
   test("Affichage sans profil configuré", ({ given, then }) => {
-    given("la page de détail est affichée sans profil", () => {
-      renderDetailScreen();
+    given("la page de détail est affichée sans profil", async () => {
+      await renderDetailScreen();
     });
 
     then(/^le message "(.*)" est affiché$/, (message: string) => {
@@ -59,7 +63,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -106,7 +110,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -135,7 +139,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -156,7 +160,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -177,7 +181,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -204,7 +208,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -223,7 +227,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -238,7 +242,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -260,7 +264,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -277,7 +281,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -292,7 +296,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 
@@ -317,7 +321,7 @@ defineFeature(feature, (test) => {
     });
 
     when("la page de détail est affichée", async () => {
-      renderDetailScreen();
+      await renderDetailScreen();
       await attendreChargement();
     });
 

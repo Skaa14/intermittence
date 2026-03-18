@@ -6,8 +6,8 @@ const feature = loadFeature("tests/features/donnees-test.feature");
 
 defineFeature(feature, (test) => {
   test("Les boutons de démo sont visibles", ({ given, then }) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then("les boutons de données de test sont visibles", () => {
@@ -17,8 +17,8 @@ defineFeature(feature, (test) => {
   });
 
   test("Chargement du profil artiste", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     when(/^je charge les données de test "(.*)"$/, (type: string) => {
@@ -31,8 +31,8 @@ defineFeature(feature, (test) => {
   });
 
   test("Chargement du profil technicien", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     when(/^je charge les données de test "(.*)"$/, (type: string) => {

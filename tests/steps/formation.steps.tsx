@@ -10,6 +10,7 @@ import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { Formation, OptionFormation } from "../../types/formation";
 import { fixerDate } from "../helpers/form";
+import { flushAsync } from "../helpers/act";
 import { ContratRow } from "../helpers/types";
 
 let mockIndex = "0";
@@ -59,8 +60,8 @@ function SetupMois() {
   return <DetailMoisScreen />;
 }
 
-const renderAccueil = () =>
-  render(
+const renderAccueil = async () => {
+  const result = render(
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
@@ -71,9 +72,12 @@ const renderAccueil = () =>
       </ContratsProvider>
     </ProfilProvider>
   );
+  await flushAsync();
+  return result;
+};
 
-const renderMois = () =>
-  render(
+const renderMois = async () => {
+  const result = render(
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
@@ -82,6 +86,9 @@ const renderMois = () =>
       </ContratsProvider>
     </ProfilProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 let pendingProfil: ProfilRow | null = null;
 let pendingContrats: ContratRow[] = [];
@@ -157,8 +164,8 @@ defineFeature(feature, (test) => {
     jest.useRealTimers();
   });
 
-  const renderEtInjecterAccueil = () => {
-    renderAccueil();
+  const renderEtInjecterAccueil = async () => {
+    await renderAccueil();
     injecterDonnees();
   };
 
@@ -168,8 +175,8 @@ defineFeature(feature, (test) => {
     contratsStep(and);
     formationsStep(and);
 
-    then(/^le compteur affiche "(.*)"$/, (texte: string) => {
-      renderEtInjecterAccueil();
+    then(/^le compteur affiche "(.*)"$/, async (texte: string) => {
+      await renderEtInjecterAccueil();
       expect(screen.getByText(texte)).toBeTruthy();
     });
 
@@ -184,8 +191,8 @@ defineFeature(feature, (test) => {
     contratsStep(and);
     formationsStep(and);
 
-    then(/^le compteur affiche "(.*)"$/, (texte: string) => {
-      renderEtInjecterAccueil();
+    then(/^le compteur affiche "(.*)"$/, async (texte: string) => {
+      await renderEtInjecterAccueil();
       expect(screen.getByText(texte)).toBeTruthy();
     });
 
@@ -200,8 +207,8 @@ defineFeature(feature, (test) => {
     contratsStep(and);
     formationsStep(and);
 
-    then(/^le compteur affiche "(.*)"$/, (texte: string) => {
-      renderEtInjecterAccueil();
+    then(/^le compteur affiche "(.*)"$/, async (texte: string) => {
+      await renderEtInjecterAccueil();
       expect(screen.getByText(texte)).toBeTruthy();
     });
 
@@ -215,9 +222,9 @@ defineFeature(feature, (test) => {
     configurerProfilStep(given);
     formationsStep(and);
 
-    when(/^je navigue vers le détail du mois (\d+)$/, (index: string) => {
+    when(/^je navigue vers le détail du mois (\d+)$/, async (index: string) => {
       mockIndex = index;
-      renderMois();
+      await renderMois();
       injecterDonnees();
     });
 

@@ -37,8 +37,8 @@ defineFeature(feature, (test) => {
       await injecterContrats(table);
     });
 
-    when("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    when("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then(
@@ -65,8 +65,8 @@ defineFeature(feature, (test) => {
       await injecterContrats(table);
     });
 
-    when("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    when("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then(
@@ -91,8 +91,8 @@ defineFeature(feature, (test) => {
       // AsyncStorage est déjà vide (setup.ts)
     });
 
-    when("l'écran d'accueil est affiché", () => {
-      renderAccueilScreen();
+    when("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then(

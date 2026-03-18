@@ -1,5 +1,5 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { render, screen, act, within } from "@testing-library/react-native";
+import { render, screen, within, act } from "@testing-library/react-native";
 import DetailMoisScreen from "../../app/mois/[moisIndex]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
@@ -8,6 +8,7 @@ import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
 import { fixerDate } from "../helpers/form";
+import { flushAsync } from "../helpers/act";
 
 let mockIndex = "0";
 
@@ -37,8 +38,8 @@ function Setup() {
   return <DetailMoisScreen />;
 }
 
-const renderScreen = () =>
-  render(
+const renderScreen = async () => {
+  const result = render(
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
@@ -47,6 +48,9 @@ const renderScreen = () =>
       </ContratsProvider>
     </ProfilProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 const fixerDateStep = (
   given: (pattern: RegExp, fn: (date: string) => void) => void
@@ -76,9 +80,9 @@ const franchiseSalaireStep = (
   });
 };
 
-const setupMoisScreen = (index: string) => {
+const setupMoisScreen = async (index: string) => {
   mockIndex = index;
-  renderScreen();
+  await renderScreen();
   act(() => {
     if (pendingProfil) {
       capturedMettreAJourProfil!({
@@ -122,8 +126,8 @@ defineFeature(feature, (test) => {
       pendingProfil = table[0];
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^les jours calendaires affichés sont "(\d+)"$/, (valeur: string) => {
@@ -164,8 +168,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(
@@ -192,8 +196,8 @@ defineFeature(feature, (test) => {
 
     given("le profil n'est pas configuré", () => {});
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^le message "(.*)" est affiché$/, (message: string) => {
@@ -208,8 +212,8 @@ defineFeature(feature, (test) => {
       pendingProfil = table[0];
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
@@ -240,8 +244,8 @@ defineFeature(feature, (test) => {
         pendingProfil = table[0];
       });
 
-      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-        setupMoisScreen(index);
+      and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+        await setupMoisScreen(index);
       });
 
       then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
@@ -263,8 +267,8 @@ defineFeature(feature, (test) => {
         pendingProfil = table[0];
       });
 
-      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-        setupMoisScreen(index);
+      and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+        await setupMoisScreen(index);
       });
 
       franchiseCPStep(then);
@@ -280,8 +284,8 @@ defineFeature(feature, (test) => {
         pendingProfil = table[0];
       });
 
-      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-        setupMoisScreen(index);
+      and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+        await setupMoisScreen(index);
       });
 
       franchiseSalaireStep(then);
@@ -299,8 +303,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
@@ -323,8 +327,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^l'ARE versée affichée est "(.*)"$/, (valeur: string) => {
@@ -347,8 +351,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
@@ -377,8 +381,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
@@ -409,8 +413,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {
@@ -439,8 +443,8 @@ defineFeature(feature, (test) => {
         pendingProfil = table[0];
       });
 
-      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-        setupMoisScreen(index);
+      and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+        await setupMoisScreen(index);
       });
 
       then(/^les jours calendaires affichés sont "(\d+)"$/, (valeur: string) => {
@@ -466,8 +470,8 @@ defineFeature(feature, (test) => {
         pendingProfil = table[0];
       });
 
-      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-        setupMoisScreen(index);
+      and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+        await setupMoisScreen(index);
       });
 
       then(/^les jours calendaires affichés sont "(\d+)"$/, (valeur: string) => {
@@ -489,8 +493,8 @@ defineFeature(feature, (test) => {
       pendingContrats = table;
     });
 
-    and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-      setupMoisScreen(index);
+    and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+      await setupMoisScreen(index);
     });
 
     then("le message seuil de non-indemnisation n'est pas affiché", () => {
@@ -515,8 +519,8 @@ defineFeature(feature, (test) => {
         pendingProfil = table[0];
       });
 
-      and(/^je suis sur le détail du mois d'index (\d+)$/, (index: string) => {
-        setupMoisScreen(index);
+      and(/^je suis sur le détail du mois d'index (\d+)$/, async (index: string) => {
+        await setupMoisScreen(index);
       });
 
       then(/^les jours indemnisés affichés sont "(\d+)"$/, (valeur: string) => {

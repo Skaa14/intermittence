@@ -39,8 +39,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     then(/^le message "(.*)" est visible$/, (message: string) => {
@@ -53,8 +53,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     when("j'ajoute ce contrat", (table: ContratRow[]) => {
@@ -71,8 +71,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     and("j'ajoute ce contrat", (table: ContratRow[]) => {

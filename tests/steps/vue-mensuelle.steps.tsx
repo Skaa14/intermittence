@@ -8,6 +8,7 @@ import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
 import { fixerDate } from "../helpers/form";
+import { flushAsync } from "../helpers/act";
 
 const mockPush = jest.fn();
 
@@ -33,8 +34,8 @@ function Setup() {
   return <VueMensuelleScreen />;
 }
 
-const renderScreen = () =>
-  render(
+const renderScreen = async () => {
+  const result = render(
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
@@ -43,6 +44,9 @@ const renderScreen = () =>
       </ContratsProvider>
     </ProfilProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 const fixerDateStep = (given: (pattern: RegExp, fn: (date: string) => void) => void) => {
   given(/^nous sommes le "(.*)"$/, (date: string) => {
@@ -91,8 +95,8 @@ defineFeature(feature, (test) => {
   test("Profil non configuré - invitation à configurer", ({ given, then }) => {
     fixerDateStep(given);
 
-    given("le profil n'est pas configuré", () => {
-      renderScreen();
+    given("le profil n'est pas configuré", async () => {
+      await renderScreen();
     });
 
     then("le message d'invitation à configurer le profil est visible", () => {
@@ -103,8 +107,8 @@ defineFeature(feature, (test) => {
   test("12 cartes affichées avec profil configuré", ({ given, then }) => {
     fixerDateStep(given);
 
-    given("le profil est configuré", (table: ProfilRow[]) => {
-      renderScreen();
+    given("le profil est configuré", async (table: ProfilRow[]) => {
+      await renderScreen();
       configurerProfil(table[0]);
     });
 
@@ -121,8 +125,8 @@ defineFeature(feature, (test) => {
   }) => {
     fixerDateStep(given);
 
-    given("le profil est configuré", (table: ProfilRow[]) => {
-      renderScreen();
+    given("le profil est configuré", async (table: ProfilRow[]) => {
+      await renderScreen();
       configurerProfil(table[0]);
     });
 
@@ -150,8 +154,8 @@ defineFeature(feature, (test) => {
   test("Jours indemnisés affichés sur la carte", ({ given, then }) => {
     fixerDateStep(given);
 
-    given("le profil est configuré", (table: ProfilRow[]) => {
-      renderScreen();
+    given("le profil est configuré", async (table: ProfilRow[]) => {
+      await renderScreen();
       configurerProfil(table[0]);
     });
 
@@ -169,8 +173,8 @@ defineFeature(feature, (test) => {
   test("Navigation vers le détail d'un mois", ({ given, when, then }) => {
     fixerDateStep(given);
 
-    given("le profil est configuré", (table: ProfilRow[]) => {
-      renderScreen();
+    given("le profil est configuré", async (table: ProfilRow[]) => {
+      await renderScreen();
       configurerProfil(table[0]);
     });
 

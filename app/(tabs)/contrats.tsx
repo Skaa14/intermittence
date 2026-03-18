@@ -29,22 +29,32 @@ import {
   formationIconColor,
 } from "../../styles/tabs/contrats.styles";
 
-type ContratAvecStatut = Contrat & { passe: boolean };
+type AvecStatut<T> = T & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
 type ChampFormation = "intitule" | "dateDebut" | "dateFin" | "heures";
 type TypeSaisie = "contrat" | "formation";
 
 type ElementListe =
-  | { kind: "contrat"; data: ContratAvecStatut }
-  | { kind: "formation"; data: Formation };
+  | { kind: "contrat"; data: AvecStatut<Contrat> }
+  | { kind: "formation"; data: AvecStatut<Formation> };
 
-const isContratPasse = (contrat: Contrat): boolean => {
-  const fin = parseDate(contrat.dateFin);
+const isDateFinPassee = (dateFin: string): boolean => {
+  const fin = parseDate(dateFin);
   if (!fin) return false;
   const aujourdhui = new Date();
   aujourdhui.setHours(0, 0, 0, 0);
   return fin.getTime() < aujourdhui.getTime();
 };
+
+function partitionnerParDate<T extends { dateFin: string }>(items: T[]) {
+  const actifs: (T & { passe: false })[] = [];
+  const passes: (T & { passe: true })[] = [];
+  for (const item of items) {
+    if (isDateFinPassee(item.dateFin)) passes.push({ ...item, passe: true as const });
+    else actifs.push({ ...item, passe: false as const });
+  }
+  return { actifs, passes };
+}
 
 export default function ContratsScreen() {
   const { contrats, ajouterContrat, modifierContrat, supprimerContrat } = useContrats();
@@ -69,23 +79,26 @@ export default function ContratsScreen() {
   const [erreurs, setErreurs] = useState<Partial<Record<ChampContrat | ChampFormation, boolean>>>({});
   const [erreurMois, setErreurMois] = useState<string | null>(null);
 
-  const { contratsActifs, contratsPasses } = useMemo(() => {
-    const actifs: ContratAvecStatut[] = [];
-    const passes: ContratAvecStatut[] = [];
-    for (const c of contrats) {
-      if (isContratPasse(c)) passes.push({ ...c, passe: true });
-      else actifs.push({ ...c, passe: false });
-    }
-    return { contratsActifs: actifs, contratsPasses: passes };
-  }, [contrats]);
+  const { actifs: contratsActifs, passes: contratsPasses } = useMemo(
+    () => partitionnerParDate(contrats), [contrats]
+  );
+
+  const { actifs: formationsActives, passes: formationsPassees } = useMemo(
+    () => partitionnerParDate(formations), [formations]
+  );
+
+  const nbPasses = contratsPasses.length + formationsPassees.length;
 
   const elements: ElementListe[] = useMemo(() => {
     const items: ElementListe[] = [];
     const contratsAffiches = afficherPasses
       ? [...contratsActifs, ...contratsPasses]
       : contratsActifs;
+    const formationsAffichees = afficherPasses
+      ? [...formationsActives, ...formationsPassees]
+      : formationsActives;
     for (const c of contratsAffiches) items.push({ kind: "contrat", data: c });
-    for (const f of formations) items.push({ kind: "formation", data: f });
+    for (const f of formationsAffichees) items.push({ kind: "formation", data: f });
     items.sort((a, b) => {
       const da = parseDate(a.data.dateDebut);
       const db = parseDate(b.data.dateDebut);
@@ -93,7 +106,7 @@ export default function ContratsScreen() {
       return da.getTime() - db.getTime();
     });
     return items;
-  }, [contratsActifs, contratsPasses, formations, afficherPasses]);
+  }, [contratsActifs, contratsPasses, formationsActives, formationsPassees, afficherPasses]);
 
   const reinitialiserFormulaire = () => {
     setEmployeur("");
@@ -483,14 +496,19 @@ export default function ContratsScreen() {
 
     const f = item.data;
     return (
-      <View testID={`formation-${f.id}`} style={[styles.contratCard, styles.formationCard]}>
+      <View testID={`formation-${f.id}`} style={[styles.contratCard, f.passe ? styles.contratCardPasse : styles.formationCard]}>
         <View style={styles.contratHeader}>
           <View style={styles.contratTitre}>
-            <Ionicons name="school" size={16} color={formationIconColor} />
-            <Text style={styles.contratEmployeur}>{f.intitule}</Text>
-            <View style={styles.badgeFormation}>
-              <Text style={styles.badgeFormationText}>Formation</Text>
+            <Ionicons name="school" size={16} color={f.passe ? placeholderColor : formationIconColor} />
+            <Text style={[styles.contratEmployeur, f.passe && styles.contratTextPasse]}>{f.intitule}</Text>
+            <View style={f.passe ? styles.badgeFormationPasse : styles.badgeFormation}>
+              <Text style={f.passe ? styles.badgeFormationPasseText : styles.badgeFormationText}>Formation</Text>
             </View>
+            {f.passe && (
+              <View style={styles.badgePasse}>
+                <Text style={styles.badgePasseText}>Passé</Text>
+              </View>
+            )}
           </View>
           <View style={styles.contratActions}>
             <Pressable onPress={() => lancerEditionFormation(f)}>
@@ -501,12 +519,12 @@ export default function ContratsScreen() {
             </Pressable>
           </View>
         </View>
-        <Text style={styles.contratDates}>
+        <Text style={[styles.contratDates, f.passe && styles.contratTextPasse]}>
           {f.dateDebut} → {f.dateFin}
         </Text>
         <View style={styles.contratDetails}>
-          <Text style={styles.contratDetail}>{f.heures}h</Text>
-          <Text style={styles.formationOption}>
+          <Text style={[styles.contratDetail, f.passe && styles.contratDetailPasse]}>{f.heures}h</Text>
+          <Text style={[styles.formationOption, f.passe && styles.contratDetailPasse]}>
             {f.option === "compterHeures" ? "Heures comptées" : "ARE maintenue"}
           </Text>
         </View>
@@ -583,7 +601,7 @@ export default function ContratsScreen() {
         >
           <Ionicons name="add-circle" size={44} color={addIconColor} />
         </Pressable>
-        {contratsPasses.length > 0 && (
+        {nbPasses > 0 && (
           <Pressable
             testID="btn-toggle-passes"
             style={styles.btnTogglePasses}
@@ -591,8 +609,8 @@ export default function ContratsScreen() {
           >
             <Text style={styles.btnTogglePassesText}>
               {afficherPasses
-                ? `Masquer passés (${contratsPasses.length})`
-                : `Passés (${contratsPasses.length})`}
+                ? `Masquer passés (${nbPasses})`
+                : `Passés (${nbPasses})`}
             </Text>
           </Pressable>
         )}

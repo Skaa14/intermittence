@@ -48,8 +48,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("l'écran contrats est affiché", () => {
-      renderScreen();
+    given("l'écran contrats est affiché", async () => {
+      await renderScreen();
     });
 
     when('j\'appuie sur "Nouveau contrat"', () => {
@@ -68,8 +68,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -91,8 +91,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -122,8 +122,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -149,8 +149,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -187,8 +187,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
+    given("le formulaire de saisie est ouvert", async () => {
+      await renderScreen();
       ouvrirFormulaire();
     });
 
@@ -219,8 +219,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("un contrat existe dans la liste", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat existe dans la liste", async (table: ContratRow[]) => {
+      await renderScreen();
       ajouterContratViaFormulaire(table[0]);
     });
 
@@ -250,8 +250,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("un contrat existe dans la liste", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat existe dans la liste", async (table: ContratRow[]) => {
+      await renderScreen();
       ajouterContratViaFormulaire(table[0]);
     });
 
@@ -283,8 +283,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("un contrat existe dans la liste sur le web", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat existe dans la liste sur le web", async (table: ContratRow[]) => {
+      await renderScreen();
       ajouterContratViaFormulaire(table[0]);
       Platform.OS = "web" as any;
     });
@@ -314,8 +314,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("un contrat existe dans la liste sur le web", (table: ContratRow[]) => {
-      renderScreen();
+    given("un contrat existe dans la liste sur le web", async (table: ContratRow[]) => {
+      await renderScreen();
       ajouterContratViaFormulaire(table[0]);
       Platform.OS = "web" as any;
     });

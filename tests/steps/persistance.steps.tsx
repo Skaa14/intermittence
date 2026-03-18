@@ -8,6 +8,7 @@ import { FormationsProvider } from "../../contexts/FormationsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { ProfilRow, configurerProfilViaFormulaire } from "../helpers/accueil";
 import { resetPickerCallbacks } from "../helpers/mocks";
+import { flushAsync } from "../helpers/act";
 
 jest.mock("@react-native-community/datetimepicker", () =>
   require("../helpers/mocks").mockDateTimePickerFactory()
@@ -15,8 +16,8 @@ jest.mock("@react-native-community/datetimepicker", () =>
 
 const feature = loadFeature("tests/features/persistance.feature");
 
-const renderAccueil = () =>
-  render(
+const renderAccueil = async () => {
+  const result = render(
     <ContratsProvider>
       <ProfilProvider>
         <FormationsProvider>
@@ -27,6 +28,9 @@ const renderAccueil = () =>
       </ProfilProvider>
     </ContratsProvider>
   );
+  await flushAsync();
+  return result;
+};
 
 defineFeature(feature, (test) => {
   let vue: RenderResult;
@@ -44,15 +48,15 @@ defineFeature(feature, (test) => {
   }) => {
     given(
       /^je charge les données de test "(.*)" sur l'écran d'accueil$/,
-      (type: string) => {
-        vue = renderAccueil();
+      async (type: string) => {
+        vue = await renderAccueil();
         fireEvent.press(screen.getByTestId(`btn-demo-${type}`));
       }
     );
 
     when("l'application redémarre", async () => {
       vue.unmount();
-      vue = renderAccueil();
+      vue = await renderAccueil();
       await waitFor(() => {
         expect(screen.getByTestId("aj-value")).toBeTruthy();
       });
@@ -75,15 +79,15 @@ defineFeature(feature, (test) => {
   }) => {
     given(
       "je configure un profil sur l'écran d'accueil",
-      (table: ProfilRow[]) => {
-        vue = renderAccueil();
+      async (table: ProfilRow[]) => {
+        vue = await renderAccueil();
         configurerProfilViaFormulaire(table[0]);
       }
     );
 
     when("l'application redémarre", async () => {
       vue.unmount();
-      vue = renderAccueil();
+      vue = await renderAccueil();
       await waitFor(() => {
         expect(screen.getByTestId("aj-value")).toBeTruthy();
       });
@@ -102,8 +106,8 @@ defineFeature(feature, (test) => {
   }) => {
     given(
       /^je charge les données de test "(.*)" sur l'écran d'accueil$/,
-      (type: string) => {
-        vue = renderAccueil();
+      async (type: string) => {
+        vue = await renderAccueil();
         fireEvent.press(screen.getByTestId(`btn-demo-${type}`));
       }
     );
@@ -111,7 +115,7 @@ defineFeature(feature, (test) => {
     when("le storage est vidé et l'application redémarre", async () => {
       vue.unmount();
       await AsyncStorage.clear();
-      vue = renderAccueil();
+      vue = await renderAccueil();
       await waitFor(() => {
         expect(screen.getByTestId("btn-configurer-profil")).toBeTruthy();
       });

@@ -32,8 +32,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("ces contrats existent", (table: ContratRow[]) => {
-      renderScreen();
+    given("ces contrats existent", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -54,8 +54,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("ces contrats existent", (table: ContratRow[]) => {
-      renderScreen();
+    given("ces contrats existent", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -69,8 +69,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("ces contrats existent", (table: ContratRow[]) => {
-      renderScreen();
+    given("ces contrats existent", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -98,8 +98,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("ces contrats existent", (table: ContratRow[]) => {
-      renderScreen();
+    given("ces contrats existent", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -124,8 +124,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("ces contrats existent", (table: ContratRow[]) => {
-      renderScreen();
+    given("ces contrats existent", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 
@@ -142,8 +142,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("aucun contrat n'existe", () => {
-      renderScreen();
+    given("aucun contrat n'existe", async () => {
+      await renderScreen();
     });
 
     then(/^le message "(.*)" est visible$/, (message: string) => {
@@ -159,8 +159,8 @@ defineFeature(feature, (test) => {
       fixerDate(date);
     });
 
-    given("ces contrats existent", (table: ContratRow[]) => {
-      renderScreen();
+    given("ces contrats existent", async (table: ContratRow[]) => {
+      await renderScreen();
       table.forEach((row) => ajouterContratViaFormulaire(row));
     });
 

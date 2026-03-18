@@ -296,6 +296,17 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     color: colors.primary,
   },
+  badgeFormationPasse: {
+    backgroundColor: colors.borderLight,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgeFormationPasseText: {
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    color: colors.textFaint,
+  },
   formationOption: {
     fontSize: 14,
     fontFamily: fonts.medium,
