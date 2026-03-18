@@ -5,6 +5,7 @@ import DetailMoisScreen from "../../app/mois/[moisIndex]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
 import { FormationsProvider, useFormations } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
@@ -65,9 +66,11 @@ const renderAccueil = async () => {
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
-          <DonneesTestProvider>
-            <SetupAccueil />
-          </DonneesTestProvider>
+          <EnseignementsProvider>
+            <DonneesTestProvider>
+              <SetupAccueil />
+            </DonneesTestProvider>
+          </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>
@@ -81,7 +84,9 @@ const renderMois = async () => {
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
-          <SetupMois />
+          <EnseignementsProvider>
+            <SetupMois />
+          </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>

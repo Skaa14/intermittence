@@ -14,12 +14,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useFormations } from "../../contexts/FormationsContext";
+import { useEnseignements } from "../../contexts/EnseignementsContext";
 import { Contrat, TypeHeures } from "../../types/contrat";
 import { Formation, OptionFormation } from "../../types/formation";
+import { Enseignement } from "../../types/enseignement";
 import { formatDate, parseDate } from "../../utils/date";
 import { formatRangeCourt } from "../../utils/formatDateCourt";
 import { formaterHeures } from "../../utils/formatHeures";
-import { PLAFOND_HEURES_FORMATION } from "../../utils/reglementation";
+import { PLAFOND_HEURES_FORMATION, PLAFOND_HEURES_ENSEIGNEMENT } from "../../utils/reglementation";
 import DateRangePicker from "../../components/DateRangePicker";
 import {
   styles,
@@ -27,16 +29,19 @@ import {
   placeholderColor,
   contratIconColor,
   formationIconColor,
+  enseignementIconColor,
 } from "../../styles/tabs/contrats.styles";
 
 type AvecStatut<T> = T & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
 type ChampFormation = "intitule" | "dateDebut" | "dateFin" | "heures";
-type TypeSaisie = "contrat" | "formation";
+type ChampEnseignement = "etablissement" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
+type TypeSaisie = "contrat" | "formation" | "enseignement";
 
 type ElementListe =
   | { kind: "contrat"; data: AvecStatut<Contrat> }
-  | { kind: "formation"; data: AvecStatut<Formation> };
+  | { kind: "formation"; data: AvecStatut<Formation> }
+  | { kind: "enseignement"; data: AvecStatut<Enseignement> };
 
 const isDateFinPassee = (dateFin: string): boolean => {
   const fin = parseDate(dateFin);
@@ -60,11 +65,13 @@ export default function ContratsScreen() {
   const { contrats, ajouterContrat, modifierContrat, supprimerContrat } = useContrats();
   const { profil } = useProfil();
   const { formations, ajouterFormation, modifierFormation, supprimerFormation } = useFormations();
+  const { enseignements, ajouterEnseignement, modifierEnseignement, supprimerEnseignement } = useEnseignements();
   const estAnnexe10 = profil?.annexe === "10";
 
   const [typeSaisie, setTypeSaisie] = useState<TypeSaisie>("contrat");
   const [employeur, setEmployeur] = useState("");
   const [intitule, setIntitule] = useState("");
+  const [etablissement, setEtablissement] = useState("");
   const [dateDebut, setDateDebut] = useState<Date | undefined>();
   const [dateFin, setDateFin] = useState<Date | undefined>();
   const [typeHeures, setTypeHeures] = useState<TypeHeures>("heures");
@@ -76,7 +83,8 @@ export default function ContratsScreen() {
   const [afficherPasses, setAfficherPasses] = useState(false);
   const [contratEnEdition, setContratEnEdition] = useState<string | null>(null);
   const [formationEnEdition, setFormationEnEdition] = useState<string | null>(null);
-  const [erreurs, setErreurs] = useState<Partial<Record<ChampContrat | ChampFormation, boolean>>>({});
+  const [enseignementEnEdition, setEnseignementEnEdition] = useState<string | null>(null);
+  const [erreurs, setErreurs] = useState<Partial<Record<ChampContrat | ChampFormation | ChampEnseignement, boolean>>>({});
   const [erreurMois, setErreurMois] = useState<string | null>(null);
 
   const { actifs: contratsActifs, passes: contratsPasses } = useMemo(
@@ -87,7 +95,11 @@ export default function ContratsScreen() {
     () => partitionnerParDate(formations), [formations]
   );
 
-  const nbPasses = contratsPasses.length + formationsPassees.length;
+  const { actifs: enseignementsActifs, passes: enseignementsPasses } = useMemo(
+    () => partitionnerParDate(enseignements), [enseignements]
+  );
+
+  const nbPasses = contratsPasses.length + formationsPassees.length + enseignementsPasses.length;
 
   const elements: ElementListe[] = useMemo(() => {
     const items: ElementListe[] = [];
@@ -97,8 +109,12 @@ export default function ContratsScreen() {
     const formationsAffichees = afficherPasses
       ? [...formationsActives, ...formationsPassees]
       : formationsActives;
+    const enseignementsAffiches = afficherPasses
+      ? [...enseignementsActifs, ...enseignementsPasses]
+      : enseignementsActifs;
     for (const c of contratsAffiches) items.push({ kind: "contrat", data: c });
     for (const f of formationsAffichees) items.push({ kind: "formation", data: f });
+    for (const e of enseignementsAffiches) items.push({ kind: "enseignement", data: e });
     items.sort((a, b) => {
       const da = parseDate(a.data.dateDebut);
       const db = parseDate(b.data.dateDebut);
@@ -106,11 +122,12 @@ export default function ContratsScreen() {
       return da.getTime() - db.getTime();
     });
     return items;
-  }, [contratsActifs, contratsPasses, formationsActives, formationsPassees, afficherPasses]);
+  }, [contratsActifs, contratsPasses, formationsActives, formationsPassees, enseignementsActifs, enseignementsPasses, afficherPasses]);
 
   const reinitialiserFormulaire = () => {
     setEmployeur("");
     setIntitule("");
+    setEtablissement("");
     setDateDebut(undefined);
     setDateFin(undefined);
     setTypeHeures("heures");
@@ -119,6 +136,7 @@ export default function ContratsScreen() {
     setOptionFormation("compterHeures");
     setContratEnEdition(null);
     setFormationEnEdition(null);
+    setEnseignementEnEdition(null);
     setFormulaireOuvert(false);
     setShowDatePicker(false);
     setErreurs({});
@@ -171,6 +189,45 @@ export default function ContratsScreen() {
             text: "Supprimer",
             style: "destructive",
             onPress: () => supprimerContrat(contrat.id),
+          },
+        ],
+      );
+    }
+  };
+
+  const lancerEditionEnseignement = (enseignement: Enseignement) => {
+    setTypeSaisie("enseignement");
+    setEtablissement(enseignement.etablissement);
+    setDateDebut(parseDate(enseignement.dateDebut));
+    setDateFin(parseDate(enseignement.dateFin));
+    setHeures(enseignement.heures.toString());
+    setSalaireBrut(enseignement.salaireBrut.toString());
+    setEnseignementEnEdition(enseignement.id);
+    setContratEnEdition(null);
+    setFormationEnEdition(null);
+    setFormulaireOuvert(true);
+  };
+
+  const confirmerSuppressionEnseignement = (enseignement: Enseignement) => {
+    if (Platform.OS === "web") {
+      if (
+        typeof window !== "undefined" &&
+        window.confirm(
+          `Supprimer l'enseignement ${enseignement.etablissement} — ${enseignement.dateDebut} → ${enseignement.dateFin} ?`
+        )
+      ) {
+        supprimerEnseignement(enseignement.id);
+      }
+    } else {
+      Alert.alert(
+        "Supprimer cet enseignement ?",
+        `${enseignement.etablissement} — ${enseignement.dateDebut} → ${enseignement.dateFin}`,
+        [
+          { text: "Annuler", style: "cancel" },
+          {
+            text: "Supprimer",
+            style: "destructive",
+            onPress: () => supprimerEnseignement(enseignement.id),
           },
         ],
       );
@@ -271,8 +328,38 @@ export default function ContratsScreen() {
     reinitialiserFormulaire();
   };
 
+  const handleValiderEnseignement = () => {
+    const nouvellesErreurs: Record<string, boolean> = {
+      etablissement: !etablissement,
+      dateDebut: !dateDebut,
+      dateFin: !dateFin,
+      heures: !heures,
+      salaireBrut: !salaireBrut,
+    };
+    setErreurs(nouvellesErreurs);
+
+    if (Object.values(nouvellesErreurs).some(Boolean)) return;
+
+    const donnees = {
+      etablissement,
+      dateDebut: formatDate(dateDebut!),
+      dateFin: formatDate(dateFin!),
+      heures: parseFloat(heures),
+      salaireBrut: parseFloat(salaireBrut),
+    };
+
+    if (enseignementEnEdition) {
+      modifierEnseignement(enseignementEnEdition, donnees);
+    } else {
+      ajouterEnseignement(donnees);
+    }
+
+    reinitialiserFormulaire();
+  };
+
   const handleValider = () => {
     if (typeSaisie === "formation") handleValiderFormation();
+    else if (typeSaisie === "enseignement") handleValiderEnseignement();
     else handleValiderContrat();
   };
 
@@ -453,6 +540,46 @@ export default function ContratsScreen() {
     </>
   );
 
+  const renderFormulaireEnseignement = () => (
+    <>
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Établissement</Text>
+        <TextInput
+          testID="input-etablissement"
+          style={[styles.input, erreurs.etablissement && styles.inputErreur]}
+          value={etablissement}
+          onChangeText={(v) => { setEtablissement(v); setErreurs((e) => ({ ...e, etablissement: false })); }}
+        />
+      </View>
+      {renderDateField()}
+      <View style={styles.row}>
+        <View style={[styles.fieldGroup, styles.inputHalf]}>
+          <Text style={styles.label}>Heures</Text>
+          <TextInput
+            testID="input-heures-enseignement"
+            style={[styles.input, erreurs.heures && styles.inputErreur]}
+            value={heures}
+            onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
+            keyboardType="numeric"
+          />
+        </View>
+        <View style={[styles.fieldGroup, styles.inputHalf]}>
+          <Text style={styles.label}>Salaire brut (€)</Text>
+          <TextInput
+            testID="input-salaire-brut-enseignement"
+            style={[styles.input, erreurs.salaireBrut && styles.inputErreur]}
+            value={salaireBrut}
+            onChangeText={(v) => { setSalaireBrut(v); setErreurs((e) => ({ ...e, salaireBrut: false })); }}
+            keyboardType="numeric"
+          />
+        </View>
+      </View>
+      <Text style={styles.optionHint}>
+        Les heures comptent pour les 507h (plafond {PLAFOND_HEURES_ENSEIGNEMENT}h) mais sont exclues du calcul de l'AJ (SR et NHT).
+      </Text>
+    </>
+  );
+
   const renderElement = ({ item }: { item: ElementListe }) => {
     if (item.kind === "contrat") {
       const c = item.data;
@@ -494,39 +621,76 @@ export default function ContratsScreen() {
       );
     }
 
-    const f = item.data;
+    if (item.kind === "formation") {
+      const f = item.data;
+      return (
+        <View testID={`formation-${f.id}`} style={[styles.contratCard, f.passe ? styles.contratCardPasse : styles.formationCard]}>
+          <View style={styles.contratHeader}>
+            <View style={styles.contratTitre}>
+              <Ionicons name="school" size={16} color={f.passe ? placeholderColor : formationIconColor} />
+              <Text style={[styles.contratEmployeur, f.passe && styles.contratTextPasse]}>{f.intitule}</Text>
+              <View style={f.passe ? styles.badgeFormationPasse : styles.badgeFormation}>
+                <Text style={f.passe ? styles.badgeFormationPasseText : styles.badgeFormationText}>Formation</Text>
+              </View>
+              {f.passe && (
+                <View style={styles.badgePasse}>
+                  <Text style={styles.badgePasseText}>Passé</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.contratActions}>
+              <Pressable onPress={() => lancerEditionFormation(f)}>
+                <Text style={styles.modifier}>✎</Text>
+              </Pressable>
+              <Pressable onPress={() => confirmerSuppressionFormation(f)}>
+                <Text style={styles.supprimer}>✕</Text>
+              </Pressable>
+            </View>
+          </View>
+          <Text style={[styles.contratDates, f.passe && styles.contratTextPasse]}>
+            {f.dateDebut} → {f.dateFin}
+          </Text>
+          <View style={styles.contratDetails}>
+            <Text style={[styles.contratDetail, f.passe && styles.contratDetailPasse]}>{f.heures}h</Text>
+            <Text style={[styles.formationOption, f.passe && styles.contratDetailPasse]}>
+              {f.option === "compterHeures" ? "Heures comptées" : "ARE maintenue"}
+            </Text>
+          </View>
+        </View>
+      );
+    }
+
+    const e = item.data as AvecStatut<Enseignement>;
     return (
-      <View testID={`formation-${f.id}`} style={[styles.contratCard, f.passe ? styles.contratCardPasse : styles.formationCard]}>
+      <View testID={`enseignement-${e.id}`} style={[styles.contratCard, e.passe ? styles.contratCardPasse : styles.enseignementCard]}>
         <View style={styles.contratHeader}>
           <View style={styles.contratTitre}>
-            <Ionicons name="school" size={16} color={f.passe ? placeholderColor : formationIconColor} />
-            <Text style={[styles.contratEmployeur, f.passe && styles.contratTextPasse]}>{f.intitule}</Text>
-            <View style={f.passe ? styles.badgeFormationPasse : styles.badgeFormation}>
-              <Text style={f.passe ? styles.badgeFormationPasseText : styles.badgeFormationText}>Formation</Text>
+            <Ionicons name="school-outline" size={16} color={e.passe ? placeholderColor : enseignementIconColor} />
+            <Text style={[styles.contratEmployeur, e.passe && styles.contratTextPasse]}>{e.etablissement}</Text>
+            <View style={e.passe ? styles.badgeEnseignementPasse : styles.badgeEnseignement}>
+              <Text style={e.passe ? styles.badgeEnseignementPasseText : styles.badgeEnseignementText}>Enseignement</Text>
             </View>
-            {f.passe && (
+            {e.passe && (
               <View style={styles.badgePasse}>
                 <Text style={styles.badgePasseText}>Passé</Text>
               </View>
             )}
           </View>
           <View style={styles.contratActions}>
-            <Pressable onPress={() => lancerEditionFormation(f)}>
+            <Pressable onPress={() => lancerEditionEnseignement(e)}>
               <Text style={styles.modifier}>✎</Text>
             </Pressable>
-            <Pressable onPress={() => confirmerSuppressionFormation(f)}>
+            <Pressable onPress={() => confirmerSuppressionEnseignement(e)}>
               <Text style={styles.supprimer}>✕</Text>
             </Pressable>
           </View>
         </View>
-        <Text style={[styles.contratDates, f.passe && styles.contratTextPasse]}>
-          {f.dateDebut} → {f.dateFin}
+        <Text style={[styles.contratDates, e.passe && styles.contratTextPasse]}>
+          {e.dateDebut} → {e.dateFin}
         </Text>
         <View style={styles.contratDetails}>
-          <Text style={[styles.contratDetail, f.passe && styles.contratDetailPasse]}>{f.heures}h</Text>
-          <Text style={[styles.formationOption, f.passe && styles.contratDetailPasse]}>
-            {f.option === "compterHeures" ? "Heures comptées" : "ARE maintenue"}
-          </Text>
+          <Text style={[styles.contratDetail, e.passe && styles.contratDetailPasse]}>{e.heures}h</Text>
+          <Text style={[styles.contratDetail, e.passe && styles.contratDetailPasse]}>{e.salaireBrut}€ brut</Text>
         </View>
       </View>
     );
@@ -550,7 +714,7 @@ export default function ContratsScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView style={styles.formulaire} contentContainerStyle={styles.formulaireContent}>
-          {!contratEnEdition && !formationEnEdition && (
+          {!contratEnEdition && !formationEnEdition && !enseignementEnEdition && (
             <View testID="toggle-type-saisie" style={[styles.toggleRow, styles.toggleTypeSaisie]}>
               <Pressable
                 testID="toggle-saisie-contrat"
@@ -570,9 +734,22 @@ export default function ContratsScreen() {
                   Formation
                 </Text>
               </Pressable>
+              <Pressable
+                testID="toggle-saisie-enseignement"
+                style={[styles.toggleBtn, typeSaisie === "enseignement" && styles.toggleBtnActif]}
+                onPress={() => setTypeSaisie("enseignement")}
+              >
+                <Text style={[styles.toggleBtnText, typeSaisie === "enseignement" && styles.toggleBtnTextActif]}>
+                  Enseignement
+                </Text>
+              </Pressable>
             </View>
           )}
-          {typeSaisie === "contrat" ? renderFormulaireContrat() : renderFormulaireFormation()}
+          {typeSaisie === "contrat"
+            ? renderFormulaireContrat()
+            : typeSaisie === "formation"
+              ? renderFormulaireFormation()
+              : renderFormulaireEnseignement()}
         </ScrollView>
         <View style={styles.formulaireActions}>
           <Pressable
@@ -583,7 +760,7 @@ export default function ContratsScreen() {
           </Pressable>
           <Pressable style={styles.btnAjouter} onPress={handleValider}>
             <Text style={styles.btnAjouterText}>
-              {contratEnEdition || formationEnEdition ? "Modifier" : "Ajouter"}
+              {contratEnEdition || formationEnEdition || enseignementEnEdition ? "Modifier" : "Ajouter"}
             </Text>
           </Pressable>
         </View>
@@ -622,9 +799,9 @@ export default function ContratsScreen() {
         contentContainerStyle={styles.liste}
         ListEmptyComponent={
           <Text style={styles.vide}>
-            {contrats.length === 0 && formations.length === 0
+            {contrats.length === 0 && formations.length === 0 && enseignements.length === 0
               ? "Aucun contrat ni formation. Ajoute ton premier contrat !"
-              : "Aucun contrat en cours. Utilise le bouton ci-dessus pour afficher les contrats passés."}
+              : "Aucun élément en cours. Utilise le bouton ci-dessus pour afficher les passés."}
           </Text>
         }
         renderItem={renderElement}

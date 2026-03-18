@@ -12,7 +12,7 @@ Feature: Formation professionnelle
       | Cie Lumière  | 01/04/2026 | 15/04/2026 | 400    | 12000   |
     And ces formations existent
       | Intitulé          | Début      | Fin        | Heures | Option         |
-      | Technique vocale  | 01/05/2026 | 20/05/2026 | 90     | compterHeures  |
+      | Technique vocale  | 01/02/2026 | 20/02/2026 | 90     | compterHeures  |
     Then le compteur affiche "490h / 507h"
     And le texte "dont 90h de formation" est visible
 
@@ -25,7 +25,7 @@ Feature: Formation professionnelle
       | Live Nation  | 01/04/2026 | 15/04/2026 | 400    | 12000   |
     And ces formations existent
       | Intitulé               | Début      | Fin        | Heures | Option    |
-      | Habilitation électrique | 01/05/2026 | 20/05/2026 | 70     | garderARE |
+      | Habilitation électrique | 01/02/2026 | 20/02/2026 | 70     | garderARE |
     Then le compteur affiche "400h / 507h"
     And le texte "dont" n'est pas visible
 
@@ -38,7 +38,7 @@ Feature: Formation professionnelle
       | Cie Lumière  | 01/04/2026 | 15/04/2026 | 200    | 6000    |
     And ces formations existent
       | Intitulé          | Début      | Fin        | Heures | Option        |
-      | Formation longue  | 01/05/2026 | 30/05/2026 | 500    | compterHeures |
+      | Formation longue  | 01/02/2026 | 28/02/2026 | 500    | compterHeures |
     Then le compteur affiche "538h / 507h"
     And le texte "dont 338h de formation" est visible
 

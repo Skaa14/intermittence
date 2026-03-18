@@ -11,6 +11,7 @@ import { useLocalSearchParams } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useFormations } from "../../contexts/FormationsContext";
+import { useEnseignements } from "../../contexts/EnseignementsContext";
 import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
@@ -143,6 +144,22 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
         </View>
       )}
 
+      {mois.enseignementsDuMois.length > 0 && (
+        <View style={styles.section}>
+          <Text style={styles.titreSection}>Enseignement</Text>
+          {mois.enseignementsDuMois.map((e) => (
+            <View key={e.id} style={styles.contratItem}>
+              <Text style={styles.employeur}>{e.etablissement}</Text>
+              <Text style={styles.detailVal}>{e.dateDebut} → {e.dateFin}</Text>
+              <View style={styles.contratDetails}>
+                <Text style={styles.detailVal}>{e.heures}h</Text>
+                <Text style={styles.detailVal}>{formatEuros(e.salaireBrut)}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
       <View style={styles.section}>
         <Text style={styles.titreSection}>Décomposition</Text>
         <LigneDetail
@@ -160,6 +177,13 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
             label="Jours de formation"
             valeur={`-${mois.joursFormation} j`}
             testID={`jours-formation-${mois.index}`}
+          />
+        )}
+        {mois.joursEnseignement > 0 && (
+          <LigneDetail
+            label="Jours d'enseignement"
+            valeur={`-${mois.joursEnseignement} j`}
+            testID={`jours-enseignement-${mois.index}`}
           />
         )}
         {mois.delaiAttente > 0 && (
@@ -251,12 +275,13 @@ export default function DetailMoisScreen() {
   const { contrats } = useContrats();
   const { profil } = useProfil();
   const { formations } = useFormations();
+  const { enseignements } = useEnseignements();
   const flatListRef = useRef<FlatList>(null);
   const [listHeight, setListHeight] = useState(0);
 
   const mois = useMemo(
-    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations) : []),
-    [profil, contrats, formations]
+    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations, enseignements) : []),
+    [profil, contrats, formations, enseignements]
   );
 
   useEffect(() => {

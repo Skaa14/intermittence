@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { useContrats } from "./ContratsContext";
 import { useProfil } from "./ProfilContext";
 import { useFormations } from "./FormationsContext";
+import { useEnseignements } from "./EnseignementsContext";
 import { charger, sauvegarder, supprimer } from "../utils/storage";
 import {
   creerProfilArtiste,
@@ -10,6 +11,8 @@ import {
   creerContratsTechnicien,
   creerFormationsArtiste,
   creerFormationsTechnicien,
+  creerEnseignementsArtiste,
+  creerEnseignementsTechnicien,
 } from "../utils/donneesTest";
 
 interface DonneesTestContextType {
@@ -26,6 +29,7 @@ export function DonneesTestProvider({ children }: { children: ReactNode }) {
   const { reinitialiserContrats } = useContrats();
   const { mettreAJourProfil, reinitialiserProfil } = useProfil();
   const { reinitialiserFormations } = useFormations();
+  const { reinitialiserEnseignements } = useEnseignements();
   const [modeTest, setModeTest] = useState(false);
   const [nomProfil, setNomProfil] = useState<string | null>(null);
   const [chargementTermine, setChargementTermine] = useState(false);
@@ -46,12 +50,14 @@ export function DonneesTestProvider({ children }: { children: ReactNode }) {
       mettreAJourProfil(creerProfilArtiste());
       reinitialiserContrats(creerContratsArtiste());
       reinitialiserFormations(creerFormationsArtiste());
+      reinitialiserEnseignements(creerEnseignementsArtiste());
       setNomProfil("Artiste — Annexe 10");
       sauvegarder("nomProfil", "Artiste — Annexe 10");
     } else {
       mettreAJourProfil(creerProfilTechnicien());
       reinitialiserContrats(creerContratsTechnicien());
       reinitialiserFormations(creerFormationsTechnicien());
+      reinitialiserEnseignements(creerEnseignementsTechnicien());
       setNomProfil("Technicien — Annexe 8");
       sauvegarder("nomProfil", "Technicien — Annexe 8");
     }
@@ -63,6 +69,7 @@ export function DonneesTestProvider({ children }: { children: ReactNode }) {
     reinitialiserProfil();
     reinitialiserContrats([]);
     reinitialiserFormations([]);
+    reinitialiserEnseignements([]);
     setModeTest(false);
     setNomProfil(null);
     supprimer("modeTest");

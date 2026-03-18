@@ -32,3 +32,5 @@ export const TAUX_CRDS = 0.005;
 export const TAUX_ALSACE_MOSELLE = 0.015;
 
 export const PLAFOND_HEURES_FORMATION = 338;
+
+export const PLAFOND_HEURES_ENSEIGNEMENT = 70;

@@ -3,6 +3,7 @@ import AccueilScreen from "../../app/(tabs)/index";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { selectDatePicker } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
@@ -22,9 +23,11 @@ export const renderAccueilScreen = async () => {
     <ContratsProvider>
       <ProfilProvider>
         <FormationsProvider>
-          <DonneesTestProvider>
-            <AccueilScreen />
-          </DonneesTestProvider>
+          <EnseignementsProvider>
+            <DonneesTestProvider>
+              <AccueilScreen />
+            </DonneesTestProvider>
+          </EnseignementsProvider>
         </FormationsProvider>
       </ProfilProvider>
     </ContratsProvider>

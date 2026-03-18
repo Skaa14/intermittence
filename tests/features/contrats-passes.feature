@@ -40,7 +40,7 @@ Feature: Masquage des contrats passés
     Given ces contrats existent
       | Employeur       | Début      | Fin        | Heures | Salaire |
       | Ancien Théâtre  | 01/01/2026 | 31/01/2026 | 40     | 1500    |
-    Then le message "Aucun contrat en cours. Utilise le bouton ci-dessus pour afficher les contrats passés." est visible
+    Then le message "Aucun élément en cours. Utilise le bouton ci-dessus pour afficher les passés." est visible
 
   Scenario: Message vide quand aucun contrat n'existe
     Given aucun contrat n'existe

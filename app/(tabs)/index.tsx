@@ -14,20 +14,23 @@ import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useFormations } from "../../contexts/FormationsContext";
+import { useEnseignements } from "../../contexts/EnseignementsContext";
 import { useDonneesTest } from "../../contexts/DonneesTestContext";
 import { Annexe, TauxCSG } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
 import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
-import { filtrerContratsPeriodeReference, trouverFCT, calculerDebutPeriodeReference } from "../../utils/filtrerContratsPeriodeReference";
+import { filtrerContratsPeriodeReference, trouverFCT, calculerDebutPeriodeReference, filtrerParPeriodeReference } from "../../utils/filtrerContratsPeriodeReference";
 import { calculerHeuresFormationPlafonnees } from "../../utils/calculerHeuresFormation";
+import { calculerHeuresEnseignementPlafonnees } from "../../utils/calculerHeuresEnseignement";
 import { trouverDatesOuvertureEligibles, simulerOuverture } from "../../utils/simulerOuvertureDroits";
-import { PLAFOND_HEURES_FORMATION } from "../../utils/reglementation";
+import { PLAFOND_HEURES_FORMATION, PLAFOND_HEURES_ENSEIGNEMENT } from "../../utils/reglementation";
 import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
   const { contrats } = useContrats();
   const { profil, mettreAJourProfil } = useProfil();
   const { formations } = useFormations();
+  const { enseignements } = useEnseignements();
   const { chargerDonneesTest } = useDonneesTest();
   const router = useRouter();
 
@@ -66,20 +69,23 @@ export default function AccueilScreen() {
   );
 
   const datesEligibles = useMemo(
-    () => trouverDatesOuvertureEligibles(contrats, formations),
-    [contrats, formations]
+    () => trouverDatesOuvertureEligibles(contrats, formations, enseignements),
+    [contrats, formations, enseignements]
   );
 
   const simulation = useMemo(() => {
     if (!contratFctId || !profil) return undefined;
     const eligible = datesEligibles.find((d) => d.contrat.id === contratFctId);
     if (!eligible) return undefined;
-    return simulerOuverture(contrats, formations, eligible.dateFCT, profil);
+    return simulerOuverture(contrats, formations, eligible.dateFCT, profil, enseignements);
   }, [contratFctId, profil, contrats, formations, datesEligibles]);
 
   const totalHeuresContrats = contratsFiltrés.reduce((sum, c) => sum + c.heures, 0);
-  const heuresFormation = calculerHeuresFormationPlafonnees(formations);
-  const totalHeures = totalHeuresContrats + heuresFormation;
+  const formationsFiltrees = fct ? filtrerParPeriodeReference(formations, fct) : formations;
+  const enseignementsFiltres = fct ? filtrerParPeriodeReference(enseignements, fct) : enseignements;
+  const heuresFormation = calculerHeuresFormationPlafonnees(formationsFiltrees);
+  const heuresEnseignement = calculerHeuresEnseignementPlafonnees(enseignementsFiltres);
+  const totalHeures = totalHeuresContrats + heuresFormation + heuresEnseignement;
   const totalSalaire = contratsFiltrés.reduce((sum, c) => sum + c.salaireBrut, 0);
   const progression = Math.min((totalHeures / 507) * 100, 100);
 
@@ -132,9 +138,14 @@ export default function AccueilScreen() {
             ? "Seuil atteint ! Tu peux ouvrir tes droits."
             : `Il te manque ${507 - totalHeures}h`}
         </Text>
-        {heuresFormation > 0 && (
+        {(heuresFormation > 0 || heuresEnseignement > 0) && (
           <Text style={styles.cardHint}>
-            dont {heuresFormation}h de formation (plafond {PLAFOND_HEURES_FORMATION}h)
+            {[
+              "dont",
+              heuresEnseignement > 0 ? `${heuresEnseignement}h d'enseignement (plafond ${PLAFOND_HEURES_ENSEIGNEMENT}h)` : "",
+              heuresEnseignement > 0 && heuresFormation > 0 ? "—" : "",
+              heuresFormation > 0 ? `${heuresFormation}h de formation (plafond ${PLAFOND_HEURES_FORMATION}h)` : "",
+            ].filter(Boolean).join(" ")}
           </Text>
         )}
         {debutPeriode && fct && (
@@ -203,7 +214,7 @@ export default function AccueilScreen() {
                       </View>
                     </View>
                     <Text style={styles.simulationDetail}>
-                      {simulation.heuresTravaillees}h travaillées — {simulation.salaireReference.toFixed(0)} € de salaire référence
+                      {simulation.heuresEligiblesAJ}h travaillées — {simulation.salaireReference.toFixed(0)} € de salaire référence
                     </Text>
                   </View>
                 )}

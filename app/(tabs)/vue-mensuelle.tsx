@@ -9,6 +9,7 @@ import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useFormations } from "../../contexts/FormationsContext";
+import { useEnseignements } from "../../contexts/EnseignementsContext";
 import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
@@ -57,6 +58,12 @@ function CarteMois({
           <Text style={styles.libelleValeur}>Jours de formation</Text>
           <Text style={styles.valeur}>{mois.joursFormation} j</Text>
         </View>
+        {mois.joursEnseignement > 0 && (
+          <View style={styles.ligne}>
+            <Text style={styles.libelleValeur}>Jours d'enseignement</Text>
+            <Text style={styles.valeur}>{mois.joursEnseignement} j</Text>
+          </View>
+        )}
         <View style={styles.ligne}>
           <Text style={styles.libelleValeur}>Jours indemnisés</Text>
           <Text style={styles.valeur}>{mois.joursIndemnises} j</Text>
@@ -70,11 +77,12 @@ export default function VueMensuelleScreen() {
   const { contrats } = useContrats();
   const { profil } = useProfil();
   const { formations } = useFormations();
+  const { enseignements } = useEnseignements();
   const router = useRouter();
 
   const mois = useMemo(
-    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations) : []),
-    [profil, contrats, formations]
+    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations, enseignements) : []),
+    [profil, contrats, formations, enseignements]
   );
 
   if (!profil) {

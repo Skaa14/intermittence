@@ -35,6 +35,10 @@ export const colors = {
   warningDark: "#001C2F",
   warningLight: "#FFF2DC",
 
+  // Enseignement
+  enseignement: "#5B6ABF",
+  enseignementBg: "#EAECF7",
+
   // Divers
   shadow: "#001C2F",
   textOnPrimary: "#FFFFFF",

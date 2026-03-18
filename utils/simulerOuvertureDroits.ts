@@ -1,9 +1,11 @@
 import { Contrat } from "../types/contrat";
 import { Formation } from "../types/formation";
+import { Enseignement } from "../types/enseignement";
 import { ProfilIntermittent } from "../types/profil";
 import { parseDate } from "./date";
-import { filtrerContratsParFCT } from "./filtrerContratsPeriodeReference";
+import { filtrerContratsParFCT, filtrerParPeriodeReference } from "./filtrerContratsPeriodeReference";
 import { calculerHeuresFormationPlafonnees } from "./calculerHeuresFormation";
+import { calculerHeuresEnseignementPlafonnees } from "./calculerHeuresEnseignement";
 import { calculerAJ, calculerSJM, calculerAJNette } from "./calculerAJ";
 
 export interface DateOuvertureEligible {
@@ -16,17 +18,17 @@ export interface SimulationOuverture {
   dateAnniversaire: Date;
   dateFinIndemnisation: Date;
   salaireReference: number;
-  heuresTravaillees: number;
+  heuresEligiblesAJ: number;
+  heuresEnseignement: number;
   ajBrute: number;
   ajNette: number;
 }
 
 export function trouverDatesOuvertureEligibles(
   contrats: Contrat[],
-  formations: Formation[]
+  formations: Formation[],
+  enseignements: Enseignement[] = []
 ): DateOuvertureEligible[] {
-  const heuresFormation = calculerHeuresFormationPlafonnees(formations);
-
   const datesVues = new Set<string>();
   const eligibles: DateOuvertureEligible[] = [];
 
@@ -47,7 +49,9 @@ export function trouverDatesOuvertureEligibles(
 
     const contratsFiltres = filtrerContratsParFCT(contrats, fct);
     const heuresContrats = contratsFiltres.reduce((sum, c) => sum + c.heures, 0);
-    const total = heuresContrats + heuresFormation;
+    const heuresFormation = calculerHeuresFormationPlafonnees(filtrerParPeriodeReference(formations, fct));
+    const heuresEnseignement = calculerHeuresEnseignementPlafonnees(filtrerParPeriodeReference(enseignements, fct));
+    const total = heuresContrats + heuresFormation + heuresEnseignement;
 
     if (total >= 507) {
       eligibles.push({ contrat, dateFCT: fct, heuresCumulees: total });
@@ -61,16 +65,19 @@ export function simulerOuverture(
   contrats: Contrat[],
   formations: Formation[],
   dateFCT: Date,
-  profil: ProfilIntermittent
+  profil: ProfilIntermittent,
+  enseignements: Enseignement[] = []
 ): SimulationOuverture {
   const contratsFiltres = filtrerContratsParFCT(contrats, dateFCT);
-  const heuresFormation = calculerHeuresFormationPlafonnees(formations);
+  const heuresFormation = calculerHeuresFormationPlafonnees(filtrerParPeriodeReference(formations, dateFCT));
+  const heuresEnseignement = calculerHeuresEnseignementPlafonnees(filtrerParPeriodeReference(enseignements, dateFCT));
 
   const salaireReference = contratsFiltres.reduce((sum, c) => sum + c.salaireBrut, 0);
-  const heuresTravaillees = contratsFiltres.reduce((sum, c) => sum + c.heures, 0) + heuresFormation;
+  const heuresContrats = contratsFiltres.reduce((sum, c) => sum + c.heures, 0);
+  const heuresEligiblesAJ = heuresContrats + heuresFormation;
 
-  const ajBrute = calculerAJ(profil.annexe, salaireReference, heuresTravaillees);
-  const sjm = calculerSJM(profil.annexe, salaireReference, heuresTravaillees);
+  const ajBrute = calculerAJ(profil.annexe, salaireReference, heuresEligiblesAJ);
+  const sjm = calculerSJM(profil.annexe, salaireReference, heuresEligiblesAJ);
   const ajNette = calculerAJNette(ajBrute, sjm, profil.tauxCSG, profil.alsaceMoselle);
 
   const dateAnniversaire = new Date(dateFCT.getFullYear(), dateFCT.getMonth(), dateFCT.getDate() + 1);
@@ -80,7 +87,8 @@ export function simulerOuverture(
     dateAnniversaire,
     dateFinIndemnisation,
     salaireReference,
-    heuresTravaillees,
+    heuresEligiblesAJ,
+    heuresEnseignement,
     ajBrute,
     ajNette,
   };

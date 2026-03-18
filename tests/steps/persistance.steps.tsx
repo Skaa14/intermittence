@@ -5,6 +5,7 @@ import AccueilScreen from "../../app/(tabs)/index";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { ProfilRow, configurerProfilViaFormulaire } from "../helpers/accueil";
 import { resetPickerCallbacks } from "../helpers/mocks";
@@ -21,9 +22,11 @@ const renderAccueil = async () => {
     <ContratsProvider>
       <ProfilProvider>
         <FormationsProvider>
-          <DonneesTestProvider>
-            <AccueilScreen />
-          </DonneesTestProvider>
+          <EnseignementsProvider>
+            <DonneesTestProvider>
+              <AccueilScreen />
+            </DonneesTestProvider>
+          </EnseignementsProvider>
         </FormationsProvider>
       </ProfilProvider>
     </ContratsProvider>

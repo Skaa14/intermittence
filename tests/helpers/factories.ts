@@ -1,5 +1,6 @@
 import { Contrat } from "../../types/contrat";
 import { Formation } from "../../types/formation";
+import { Enseignement } from "../../types/enseignement";
 import { ProfilIntermittent } from "../../types/profil";
 
 export function contrat(overrides: Partial<Contrat> = {}): Contrat {
@@ -22,6 +23,18 @@ export function formation(overrides: Partial<Formation> = {}): Formation {
     dateFin: "15/03/2026",
     heures: 70,
     option: "compterHeures",
+    ...overrides,
+  };
+}
+
+export function enseignement(overrides: Partial<Enseignement> = {}): Enseignement {
+  return {
+    id: "1",
+    etablissement: "Conservatoire test",
+    dateDebut: "01/03/2026",
+    dateFin: "15/03/2026",
+    heures: 40,
+    salaireBrut: 1800,
     ...overrides,
   };
 }

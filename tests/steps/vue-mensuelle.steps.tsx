@@ -4,6 +4,7 @@ import VueMensuelleScreen from "../../app/(tabs)/vue-mensuelle";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
@@ -39,7 +40,9 @@ const renderScreen = async () => {
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
-          <Setup />
+          <EnseignementsProvider>
+            <Setup />
+          </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>

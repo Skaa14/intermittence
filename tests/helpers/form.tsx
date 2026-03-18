@@ -7,6 +7,7 @@ import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { simulateDayPress } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
 import { ContratRow } from "./types";
@@ -17,7 +18,9 @@ export const renderScreen = async () => {
     <ProfilProvider>
       <ContratsProvider>
         <FormationsProvider>
-          <ContratsScreen />
+          <EnseignementsProvider>
+            <ContratsScreen />
+          </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>

@@ -6,6 +6,7 @@ export const addIconColor = colors.warning;
 export const placeholderColor = colors.textFaint;
 export const contratIconColor = colors.textMuted;
 export const formationIconColor = colors.primary;
+export const enseignementIconColor = colors.enseignement;
 
 export const styles = StyleSheet.create({
   container: {
@@ -318,5 +319,31 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 8,
     lineHeight: 18,
+  },
+  enseignementCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: colors.enseignement,
+  },
+  badgeEnseignement: {
+    backgroundColor: colors.enseignementBg,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgeEnseignementText: {
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    color: colors.enseignement,
+  },
+  badgeEnseignementPasse: {
+    backgroundColor: colors.borderLight,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgeEnseignementPasseText: {
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    color: colors.textFaint,
   },
 });

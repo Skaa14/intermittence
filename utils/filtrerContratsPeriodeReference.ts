@@ -1,6 +1,18 @@
 import { Contrat } from "../types/contrat";
 import { parseDate } from "./date";
 
+export function filtrerParPeriodeReference<T extends { dateFin: string }>(
+  items: T[],
+  fct: Date
+): T[] {
+  const debutFenetre = calculerDebutPeriodeReference(fct);
+  return items.filter((item) => {
+    const fin = parseDate(item.dateFin);
+    if (!fin) return false;
+    return fin >= debutFenetre && fin <= fct;
+  });
+}
+
 export function trouverFCT(contrats: Contrat[]): Date | undefined {
   let fct: Date | undefined;
   for (const c of contrats) {

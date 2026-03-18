@@ -1,4 +1,4 @@
-import { contrat, formation, profil } from "../helpers/factories";
+import { contrat, formation, enseignement, profil } from "../helpers/factories";
 import { calculerAJ, calculerSJM, calculerAJNette } from "../../utils/calculerAJ";
 import {
   trouverDatesOuvertureEligibles,
@@ -91,7 +91,7 @@ describe("simulerOuverture", () => {
     const result = simulerOuverture(contrats, [], fct, p);
 
     expect(result.salaireReference).toBe(18000);
-    expect(result.heuresTravaillees).toBe(600);
+    expect(result.heuresEligiblesAJ).toBe(600);
 
     const ajBruteAttendue = calculerAJ("8", 18000, 600);
     const sjm = calculerSJM("8", 18000, 600);
@@ -125,11 +125,31 @@ describe("simulerOuverture", () => {
 
     const result = simulerOuverture(contrats, formations, fct, p);
 
-    expect(result.heuresTravaillees).toBe(550);
+    expect(result.heuresEligiblesAJ).toBe(550);
     expect(result.salaireReference).toBe(12000);
 
     const ajBruteAttendue = calculerAJ("10", 12000, 550);
     expect(result.ajBrute).toBe(ajBruteAttendue);
+  });
+
+  it("exclut les heures d'enseignement du calcul de l'AJ", () => {
+    const contrats = [
+      contrat({ id: "1", heures: 400, salaireBrut: 12000, dateDebut: "01/03/2026", dateFin: "31/03/2026" }),
+    ];
+    const enseignements = [
+      enseignement({ heures: 60, salaireBrut: 2000, dateDebut: "01/03/2026", dateFin: "15/03/2026" }),
+    ];
+    const p = profil({ annexe: "8" });
+    const fct = new Date(2026, 2, 31);
+
+    const result = simulerOuverture(contrats, [], fct, p, enseignements);
+
+    expect(result.heuresEligiblesAJ).toBe(400);
+    expect(result.heuresEnseignement).toBe(60);
+    expect(result.salaireReference).toBe(12000);
+
+    const ajSansEnseignement = calculerAJ("8", 12000, 400);
+    expect(result.ajBrute).toBe(ajSansEnseignement);
   });
 
   it("utilise les paramètres du profil pour le calcul net (CSG réduit, Alsace-Moselle)", () => {

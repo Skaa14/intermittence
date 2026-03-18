@@ -1,10 +1,12 @@
 import { Contrat, TypeHeures } from "../types/contrat";
 import { Formation, OptionFormation } from "../types/formation";
+import { Enseignement } from "../types/enseignement";
 import { ProfilIntermittent } from "../types/profil";
 import { formatDate } from "./date";
 
 type ContratSansId = Omit<Contrat, "id">;
 type FormationSansId = Omit<Formation, "id">;
+type EnseignementSansId = Omit<Enseignement, "id">;
 
 // Anniversaire = aujourd'hui - 6 mois (même jour du mois)
 function calculerAnniversaire(): Date {
@@ -88,6 +90,34 @@ function f(
   const debut = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourDebut);
   const fin = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourFin);
   return { intitule, dateDebut: formatDate(debut), dateFin: formatDate(fin), heures, option };
+}
+
+function ens(
+  ann: Date,
+  moisOffset: number,
+  jourDebut: number,
+  jourFin: number,
+  etablissement: string,
+  heures: number,
+  salaireBrut: number
+): EnseignementSansId {
+  const debut = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourDebut);
+  const fin = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourFin);
+  return { etablissement, dateDebut: formatDate(debut), dateFin: formatDate(fin), heures, salaireBrut };
+}
+
+export function creerEnseignementsArtiste(): EnseignementSansId[] {
+  const ann = calculerAnniversaire();
+  return [
+    ens(ann, 4, 5, 16, "Conservatoire de Lyon", 40, 1800),
+  ];
+}
+
+export function creerEnseignementsTechnicien(): EnseignementSansId[] {
+  const ann = calculerAnniversaire();
+  return [
+    ens(ann, 3, 2, 12, "ENSATT — Lyon", 50, 2200),
+  ];
 }
 
 export function creerFormationsArtiste(): FormationSansId[] {

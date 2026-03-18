@@ -1,9 +1,11 @@
 import { Contrat } from "../types/contrat";
 import { Formation } from "../types/formation";
+import { Enseignement } from "../types/enseignement";
 import { ProfilIntermittent } from "../types/profil";
 import { parseDate } from "./date";
 import { calculerAJ, calculerAJNette, calculerSJM } from "./calculerAJ";
 import { calculerJoursFormationDansMois } from "./calculerHeuresFormation";
+import { calculerJoursEnseignementDansMois } from "./calculerHeuresEnseignement";
 import {
   SMIC_MENSUEL,
   SMIC_JOURNALIER,
@@ -30,10 +32,12 @@ export interface IndemnisationMensuelle {
   index: number;
   contratsDuMois: Contrat[];
   formationsDuMois: Formation[];
+  enseignementsDuMois: Enseignement[];
   salaireDuMois: number;
   heuresDuMois: number;
   joursTravailles: number;
   joursFormation: number;
+  joursEnseignement: number;
   joursCalendaires: number;
   delaiAttente: number;
   franchiseCP: number;
@@ -104,7 +108,8 @@ function calculerFranchisesParMois(
 export function calculerIndemnisationMensuelle(
   profil: ProfilIntermittent,
   contrats: Contrat[],
-  formations: Formation[] = []
+  formations: Formation[] = [],
+  enseignements: Enseignement[] = []
 ): IndemnisationMensuelle[] {
   const dateAnniversaire = parseDate(profil.dateAnniversaire);
   if (!dateAnniversaire) return [];
@@ -159,6 +164,13 @@ export function calculerIndemnisationMensuelle(
       return debut <= finMois && fin >= debutMois;
     });
 
+    const enseignementsDuMois = enseignements.filter((e) => {
+      const debut = parseDate(e.dateDebut);
+      const fin = parseDate(e.dateFin);
+      if (!debut || !fin) return false;
+      return debut <= finMois && fin >= debutMois;
+    });
+
     const salaireDuMois = contratsDuMois.reduce(
       (s, c) => s + c.salaireBrut,
       0
@@ -170,11 +182,17 @@ export function calculerIndemnisationMensuelle(
       profil.annexe === "8"
         ? SEUIL_NON_INDEMNISATION_A8
         : SEUIL_NON_INDEMNISATION_A10;
+    const debutEffectif = i === 0
+      ? new Date(debutMois.getFullYear(), debutMois.getMonth(), dateAnniversaire.getDate())
+      : debutMois;
     const joursFormation = calculerJoursFormationDansMois(
       formations,
-      i === 0
-        ? new Date(debutMois.getFullYear(), debutMois.getMonth(), dateAnniversaire.getDate())
-        : debutMois,
+      debutEffectif,
+      finMois
+    );
+    const joursEnseignement = calculerJoursEnseignementDansMois(
+      enseignements,
+      debutEffectif,
       finMois
     );
 
@@ -197,6 +215,7 @@ export function calculerIndemnisationMensuelle(
           joursCalendaires
             - joursTravailles
             - joursFormation
+            - joursEnseignement
             - delaiAttente
             - franchiseCP
             - franchiseSalaire
@@ -230,10 +249,12 @@ export function calculerIndemnisationMensuelle(
       index: i,
       contratsDuMois,
       formationsDuMois,
+      enseignementsDuMois,
       salaireDuMois,
       heuresDuMois,
       joursTravailles,
       joursFormation,
+      joursEnseignement,
       joursCalendaires,
       delaiAttente,
       franchiseCP,
