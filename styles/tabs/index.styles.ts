@@ -257,4 +257,90 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.textDark,
   },
+  simulationSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
+  },
+  simulationTitle: {
+    fontSize: 15,
+    fontFamily: fonts.semiBold,
+    color: colors.textDark,
+    marginBottom: 8,
+  },
+  simulationHint: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textFaint,
+    marginBottom: 12,
+  },
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 12,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.bgBase,
+  },
+  chipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  chipText: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+  },
+  chipTextActive: {
+    color: colors.bgCard,
+    fontFamily: fonts.semiBold,
+  },
+  simulationResultats: {
+    backgroundColor: colors.successBg,
+    borderRadius: 10,
+    padding: 16,
+  },
+  simulationPeriode: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.successText,
+    marginBottom: 12,
+  },
+  simulationAjRow: {
+    flexDirection: "row",
+    marginBottom: 12,
+  },
+  simulationAjCol: {
+    flex: 1,
+  },
+  simulationAjLabel: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.successText,
+    marginBottom: 2,
+  },
+  simulationAjValue: {
+    fontSize: 22,
+    fontFamily: fonts.bold,
+    color: colors.successText,
+  },
+  simulationDetail: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.successText,
+  },
+  simulationProfilHint: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginTop: 12,
+    fontStyle: "italic",
+  },
 });

@@ -15,10 +15,7 @@ export function calculerDebutPeriodeReference(fct: Date): Date {
   return new Date(fct.getFullYear() - 1, fct.getMonth(), fct.getDate() + 1);
 }
 
-export function filtrerContratsPeriodeReference(contrats: Contrat[]): Contrat[] {
-  const fct = trouverFCT(contrats);
-  if (!fct) return [];
-
+export function filtrerContratsParFCT(contrats: Contrat[], fct: Date): Contrat[] {
   const debutFenetre = calculerDebutPeriodeReference(fct);
 
   return contrats.filter((c) => {
@@ -26,4 +23,11 @@ export function filtrerContratsPeriodeReference(contrats: Contrat[]): Contrat[] 
     if (!fin) return false;
     return fin >= debutFenetre && fin <= fct;
   });
+}
+
+export function filtrerContratsPeriodeReference(contrats: Contrat[]): Contrat[] {
+  const fct = trouverFCT(contrats);
+  if (!fct) return [];
+
+  return filtrerContratsParFCT(contrats, fct);
 }

@@ -20,6 +20,7 @@ import { formatDate, parseDate } from "../../utils/date";
 import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
 import { filtrerContratsPeriodeReference, trouverFCT, calculerDebutPeriodeReference } from "../../utils/filtrerContratsPeriodeReference";
 import { calculerHeuresFormationPlafonnees } from "../../utils/calculerHeuresFormation";
+import { trouverDatesOuvertureEligibles, simulerOuverture } from "../../utils/simulerOuvertureDroits";
 import { PLAFOND_HEURES_FORMATION } from "../../utils/reglementation";
 import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
@@ -44,6 +45,7 @@ export default function AccueilScreen() {
   );
   const [tauxCSG, setTauxCSG] = useState<TauxCSG>(profil?.tauxCSG ?? "standard");
   const [alsaceMoselle, setAlsaceMoselle] = useState(profil?.alsaceMoselle ?? false);
+  const [contratFctId, setContratFctId] = useState<string | null>(null);
 
   const { ajBrute, ajNette } = useMemo(() => {
     if (!profil) return { ajBrute: 0, ajNette: 0 };
@@ -62,6 +64,18 @@ export default function AccueilScreen() {
     () => (fct ? calculerDebutPeriodeReference(fct) : undefined),
     [fct]
   );
+
+  const datesEligibles = useMemo(
+    () => trouverDatesOuvertureEligibles(contrats, formations),
+    [contrats, formations]
+  );
+
+  const simulation = useMemo(() => {
+    if (!contratFctId || !profil) return undefined;
+    const eligible = datesEligibles.find((d) => d.contrat.id === contratFctId);
+    if (!eligible) return undefined;
+    return simulerOuverture(contrats, formations, eligible.dateFCT, profil);
+  }, [contratFctId, profil, contrats, formations, datesEligibles]);
 
   const totalHeuresContrats = contratsFiltrés.reduce((sum, c) => sum + c.heures, 0);
   const heuresFormation = calculerHeuresFormationPlafonnees(formations);
@@ -127,6 +141,75 @@ export default function AccueilScreen() {
           <Text testID="periode-reference" style={styles.cardPeriode}>
             Période : {formatDate(debutPeriode)} → {formatDate(fct)} ({contratsFiltrés.length} contrat{contratsFiltrés.length > 1 ? "s" : ""})
           </Text>
+        )}
+        {totalHeures >= 507 && (
+          <View testID="simulation-section" style={styles.simulationSection}>
+            <Text style={styles.simulationTitle}>Simuler l'ouverture de droits</Text>
+            <Text style={styles.simulationHint}>
+              Simulation basée sur tes contrats et formations renseignés
+            </Text>
+            {!profil ? (
+              <Text testID="simulation-profil-requis" style={styles.simulationProfilHint}>
+                Configure ton profil pour simuler l'ouverture de droits
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.simulationHint}>
+                  Choisis la date de fin de contrat pour l'ouverture :
+                </Text>
+                <View style={styles.chipRow}>
+                  {datesEligibles.map((d) => (
+                    <Pressable
+                      key={d.contrat.id}
+                      testID={`chip-fct-${d.contrat.id}`}
+                      style={[
+                        styles.chip,
+                        contratFctId === d.contrat.id && styles.chipActive,
+                      ]}
+                      onPress={() =>
+                        setContratFctId(
+                          contratFctId === d.contrat.id ? null : d.contrat.id
+                        )
+                      }
+                    >
+                      <Text
+                        style={[
+                          styles.chipText,
+                          contratFctId === d.contrat.id && styles.chipTextActive,
+                        ]}
+                      >
+                        {d.contrat.employeur} — {d.contrat.dateFin}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+                {simulation && (
+                  <View testID="simulation-resultats" style={styles.simulationResultats}>
+                    <Text style={styles.simulationPeriode}>
+                      Période couverte : {formatDate(simulation.dateAnniversaire)} → {formatDate(simulation.dateFinIndemnisation)}
+                    </Text>
+                    <View style={styles.simulationAjRow}>
+                      <View style={styles.simulationAjCol}>
+                        <Text style={styles.simulationAjLabel}>AJ brute</Text>
+                        <Text testID="simulation-aj-brute" style={styles.simulationAjValue}>
+                          {simulation.ajBrute.toFixed(2)} €
+                        </Text>
+                      </View>
+                      <View style={styles.simulationAjCol}>
+                        <Text style={styles.simulationAjLabel}>AJ nette</Text>
+                        <Text testID="simulation-aj-nette" style={styles.simulationAjValue}>
+                          {simulation.ajNette.toFixed(2)} €
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={styles.simulationDetail}>
+                      {simulation.heuresTravaillees}h travaillées — {simulation.salaireReference.toFixed(0)} € de salaire référence
+                    </Text>
+                  </View>
+                )}
+              </>
+            )}
+          </View>
         )}
       </View>
 
