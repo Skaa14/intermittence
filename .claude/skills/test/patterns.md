@@ -5,7 +5,7 @@
 - **Jest** via `jest-expo` preset
 - **React Native Testing Library** (`@testing-library/react-native`)
 - **jest-cucumber** pour le BDD (Gherkin → step definitions)
-- Config : `jest.config.js` (testMatch sur `tests/steps/**/*.steps.tsx`)
+- Config : `jest.config.js` (testMatch sur `tests/steps/**/*.steps.tsx` et `tests/unit/**/*.test.ts`)
 - Commande : `npm test`
 
 ## Structure des fichiers
@@ -14,11 +14,18 @@
 tests/
 ├── features/           ← Fichiers Gherkin (.feature)
 │   └── mon-ecran.feature
-└── steps/              ← Step definitions (.steps.tsx)
-    └── mon-ecran.steps.tsx
+├── steps/              ← Step definitions (.steps.tsx)
+│   └── mon-ecran.steps.tsx
+└── unit/               ← Tests unitaires logique métier (.test.ts)
+    └── maFonction.test.ts
 ```
 
 Chaque `.feature` a un `.steps.tsx` correspondant avec le même nom de base.
+
+## Deux types de tests
+
+- **Tests UI** (Gherkin) : pour les écrans et interactions utilisateur → `tests/features/` + `tests/steps/`
+- **Tests unitaires** : pour la logique métier pure dans `utils/` (calculs ARE, filtrage contrats, franchises) → `tests/unit/`
 
 ## Pattern Gherkin (.feature)
 
@@ -73,7 +80,7 @@ defineFeature(feature, (test) => {
 });
 ```
 
-### Tests d'écrans/composants (seul type autorisé)
+### Tests d'écrans/composants
 
 - Toujours tester via le rendu UI : `render` + `fireEvent` + `screen`
 - Toujours wrapper avec `ContratsProvider`
@@ -172,3 +179,27 @@ defineFeature(feature, (test) => {
 ```
 
 `fixerDate(ddmmyyyy)` (dans `tests/helpers/form.tsx`) appelle `jest.useFakeTimers()` et `jest.setSystemTime()`. Toujours restaurer avec `jest.useRealTimers()` dans `afterEach`.
+
+## Pattern Tests unitaires (.test.ts)
+
+Pour la logique métier pure (fonctions dans `utils/`), utiliser des tests unitaires classiques Jest dans `tests/unit/`.
+
+### Structure de base
+
+```ts
+import { maFonction } from "../../utils/maFonction";
+
+describe("maFonction", () => {
+  it("cas nominal", () => {
+    const resultat = maFonction(args);
+    expect(resultat.valeur).toBe(attendu);
+  });
+});
+```
+
+### Bonnes pratiques
+
+- Vérifier la concordance numérique avec les fonctions de calcul de référence (`calculerAJ`, `calculerAJNette`)
+- Vérifier la structure des objets retournés (labels, formules, parametres)
+- Vérifier que tous les `parametres` sont définis (pas de `undefined`) — protège contre les auto-références
+- Tester les cas limites : plancher, plafond, seuils de cotisation, tranches 2

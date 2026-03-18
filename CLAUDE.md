@@ -59,7 +59,8 @@ docs/                   ← Documentation du projet
 └── metier/             ← Fiches règles métier ARE intermittents + guide officiel PDF
 tests/                  ← Tests
 ├── features/           ← Fichiers Gherkin (.feature)
-└── steps/              ← Step definitions Jest/Cucumber (.steps.tsx)
+├── steps/              ← Step definitions Jest/Cucumber (.steps.tsx)
+└── unit/               ← Tests unitaires logique métier (.test.ts)
 jest.config.js          ← Configuration Jest
 app.json                ← Configuration Expo
 assets/                 ← Images et ressources
@@ -76,7 +77,9 @@ assets/                 ← Images et ressources
 - Mettre à jour ce fichier à chaque étape
 - L'utilisateur connaît TypeScript, ne pas expliquer les bases TS
 - **Toujours lancer les tests** (`npm test`) après une modification qui peut les impacter
-- **Toujours écrire des tests** pour chaque feature ou fix (Gherkin + step definitions dans `tests/`)
+- **Toujours écrire des tests** pour chaque feature ou fix
+- **Tests UI** (Gherkin + step definitions dans `tests/steps/`) pour les écrans et interactions utilisateur
+- **Tests unitaires** (`tests/unit/*.test.ts`) pour la logique métier pure (calculs ARE, filtrage contrats, franchises, etc.) — fonctions dans `utils/` qui ne dépendent pas de React
 - **Avant d'écrire des tests** : charger le skill `/test` pour connaître les conventions, patterns et mocks du projet
 
 ## Conventions de style

@@ -169,7 +169,7 @@ export function calculerAJDetaille(
     ],
   };
 
-  const pAjBrute: ParametreInfo = pAjBrute;
+  const pAjBrute: ParametreInfo = { nom: `${ajBrute.toFixed(2)}`, description: "AJ brute calculée ci-dessus" };
 
   let exonerationRaison: string | null = null;
   const cotisations: DetailCotisation[] = [];

@@ -115,3 +115,17 @@ await waitFor(() => {
 ```
 
 **Important** : utiliser `vue.unmount()` (pas `cleanup()`) pour éviter les erreurs "Can't access .root on unmounted test renderer".
+
+## Factories (données de test)
+
+Les factories partagées sont dans `tests/helpers/factories.ts`. Elles créent des objets avec des defaults raisonnables, surchargés par `overrides`.
+
+```ts
+import { contrat, formation, profil } from "../helpers/factories";
+
+contrat({ dateDebut: "01/03/2026", dateFin: "31/03/2026", heures: 80 });
+formation({ dateDebut: "05/03/2026", dateFin: "10/03/2026", option: "garderARE" });
+profil({ annexe: "10", salaireReference: 25000 });
+```
+
+Toujours utiliser ces factories dans les tests unitaires au lieu de redéfinir des helpers locaux.
