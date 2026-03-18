@@ -3,6 +3,7 @@ import { render, fireEvent, screen, within, act } from "@testing-library/react-n
 import VueMensuelleScreen from "../../app/(tabs)/vue-mensuelle";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
 import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
@@ -36,7 +37,9 @@ const renderScreen = () =>
   render(
     <ProfilProvider>
       <ContratsProvider>
-        <Setup />
+        <FormationsProvider>
+          <Setup />
+        </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>
   );

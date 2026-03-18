@@ -30,3 +30,5 @@ export const TAUX_CSG_STANDARD = 0.062;
 export const TAUX_CSG_REDUIT = 0.038;
 export const TAUX_CRDS = 0.005;
 export const TAUX_ALSACE_MOSELLE = 0.015;
+
+export const PLAFOND_HEURES_FORMATION = 338;

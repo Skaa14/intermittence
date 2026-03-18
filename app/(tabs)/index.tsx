@@ -13,16 +13,20 @@ import DateTimePicker, {
 import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
+import { useFormations } from "../../contexts/FormationsContext";
 import { useDonneesTest } from "../../contexts/DonneesTestContext";
 import { Annexe, TauxCSG } from "../../types/profil";
 import { formatDate, parseDate } from "../../utils/date";
 import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
 import { filtrerContratsPeriodeReference, trouverFCT, calculerDebutPeriodeReference } from "../../utils/filtrerContratsPeriodeReference";
+import { calculerHeuresFormationPlafonnees } from "../../utils/calculerHeuresFormation";
+import { PLAFOND_HEURES_FORMATION } from "../../utils/reglementation";
 import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
   const { contrats } = useContrats();
   const { profil, mettreAJourProfil } = useProfil();
+  const { formations } = useFormations();
   const { chargerDonneesTest } = useDonneesTest();
   const router = useRouter();
 
@@ -59,7 +63,9 @@ export default function AccueilScreen() {
     [fct]
   );
 
-  const totalHeures = contratsFiltrés.reduce((sum, c) => sum + c.heures, 0);
+  const totalHeuresContrats = contratsFiltrés.reduce((sum, c) => sum + c.heures, 0);
+  const heuresFormation = calculerHeuresFormationPlafonnees(formations);
+  const totalHeures = totalHeuresContrats + heuresFormation;
   const totalSalaire = contratsFiltrés.reduce((sum, c) => sum + c.salaireBrut, 0);
   const progression = Math.min((totalHeures / 507) * 100, 100);
 
@@ -112,6 +118,11 @@ export default function AccueilScreen() {
             ? "Seuil atteint ! Tu peux ouvrir tes droits."
             : `Il te manque ${507 - totalHeures}h`}
         </Text>
+        {heuresFormation > 0 && (
+          <Text style={styles.cardHint}>
+            dont {heuresFormation}h de formation (plafond {PLAFOND_HEURES_FORMATION}h)
+          </Text>
+        )}
         {debutPeriode && fct && (
           <Text testID="periode-reference" style={styles.cardPeriode}>
             Période : {formatDate(debutPeriode)} → {formatDate(fct)} ({contratsFiltrés.length} contrat{contratsFiltrés.length > 1 ? "s" : ""})

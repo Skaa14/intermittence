@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import AccueilScreen from "../../app/(tabs)/index";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { ProfilRow, configurerProfilViaFormulaire } from "../helpers/accueil";
 import { resetPickerCallbacks } from "../helpers/mocks";
@@ -18,9 +19,11 @@ const renderAccueil = () =>
   render(
     <ContratsProvider>
       <ProfilProvider>
-        <DonneesTestProvider>
-          <AccueilScreen />
-        </DonneesTestProvider>
+        <FormationsProvider>
+          <DonneesTestProvider>
+            <AccueilScreen />
+          </DonneesTestProvider>
+        </FormationsProvider>
       </ProfilProvider>
     </ContratsProvider>
   );

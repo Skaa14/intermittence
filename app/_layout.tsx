@@ -13,6 +13,7 @@ import {
 import { colors } from "../theme/colors";
 import { ContratsProvider } from "../contexts/ContratsContext";
 import { ProfilProvider } from "../contexts/ProfilContext";
+import { FormationsProvider } from "../contexts/FormationsContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { styles } from "../styles/root-layout.styles";
@@ -86,9 +87,11 @@ export default function RootLayout() {
     <ErrorBoundary>
       <ProfilProvider>
         <ContratsProvider>
-          <DonneesTestProvider>
-            <AppContent />
-          </DonneesTestProvider>
+          <FormationsProvider>
+            <DonneesTestProvider>
+              <AppContent />
+            </DonneesTestProvider>
+          </FormationsProvider>
         </ContratsProvider>
       </ProfilProvider>
     </ErrorBoundary>

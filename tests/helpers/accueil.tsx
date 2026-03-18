@@ -2,6 +2,7 @@ import { render, fireEvent, screen } from "@testing-library/react-native";
 import AccueilScreen from "../../app/(tabs)/index";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { selectDatePicker } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
@@ -19,9 +20,11 @@ export const renderAccueilScreen = () =>
   render(
     <ContratsProvider>
       <ProfilProvider>
-        <DonneesTestProvider>
-          <AccueilScreen />
-        </DonneesTestProvider>
+        <FormationsProvider>
+          <DonneesTestProvider>
+            <AccueilScreen />
+          </DonneesTestProvider>
+        </FormationsProvider>
       </ProfilProvider>
     </ContratsProvider>
   );

@@ -44,7 +44,7 @@ Feature: Masquage des contrats passés
 
   Scenario: Message vide quand aucun contrat n'existe
     Given aucun contrat n'existe
-    Then le message "Aucun contrat. Ajoute ton premier contrat !" est visible
+    Then le message "Aucun contrat ni formation. Ajoute ton premier contrat !" est visible
 
   Scenario: Pas de bouton quand il n'y a aucun contrat passé
     Given ces contrats existent

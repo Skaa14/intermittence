@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
+import { useFormations } from "../../contexts/FormationsContext";
 import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
@@ -85,11 +86,12 @@ function CarteMois({
 export default function VueMensuelleScreen() {
   const { contrats } = useContrats();
   const { profil } = useProfil();
+  const { formations } = useFormations();
   const router = useRouter();
 
   const mois = useMemo(
-    () => (profil ? calculerIndemnisationMensuelle(profil, contrats) : []),
-    [profil, contrats]
+    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations) : []),
+    [profil, contrats, formations]
   );
 
   if (!profil) {

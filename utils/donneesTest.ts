@@ -1,8 +1,10 @@
 import { Contrat, TypeHeures } from "../types/contrat";
+import { Formation, OptionFormation } from "../types/formation";
 import { ProfilIntermittent } from "../types/profil";
 import { formatDate } from "./date";
 
 type ContratSansId = Omit<Contrat, "id">;
+type FormationSansId = Omit<Formation, "id">;
 
 // Anniversaire = aujourd'hui - 6 mois (même jour du mois)
 function calculerAnniversaire(): Date {
@@ -72,6 +74,34 @@ export function creerProfilTechnicien(): ProfilIntermittent {
     tauxCSG: "standard",
     alsaceMoselle: false,
   };
+}
+
+function f(
+  ann: Date,
+  moisOffset: number,
+  jourDebut: number,
+  jourFin: number,
+  intitule: string,
+  heures: number,
+  option: OptionFormation
+): FormationSansId {
+  const debut = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourDebut);
+  const fin = new Date(ann.getFullYear(), ann.getMonth() + moisOffset, jourFin);
+  return { intitule, dateDebut: formatDate(debut), dateFin: formatDate(fin), heures, option };
+}
+
+export function creerFormationsArtiste(): FormationSansId[] {
+  const ann = calculerAnniversaire();
+  return [
+    f(ann, 2, 3, 20, "Technique vocale — AFDAS", 90, "compterHeures"),
+  ];
+}
+
+export function creerFormationsTechnicien(): FormationSansId[] {
+  const ann = calculerAnniversaire();
+  return [
+    f(ann, 1, 10, 24, "Habilitation électrique — AFDAS", 70, "garderARE"),
+  ];
 }
 
 // Artiste (Annexe 10)

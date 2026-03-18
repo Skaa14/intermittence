@@ -5,7 +5,7 @@ Feature: Gestion des contrats
 
   Scenario: Aucun contrat au démarrage
     Given l'écran contrats est affiché
-    Then le message "Aucun contrat. Ajoute ton premier contrat !" est visible
+    Then le message "Aucun contrat ni formation. Ajoute ton premier contrat !" est visible
 
   Scenario: Ajout d'un contrat
     Given l'écran contrats est affiché
@@ -20,4 +20,4 @@ Feature: Gestion des contrats
       | Employeur    | Début      | Fin        | Heures | Salaire |
       | Studio Canal | 01/01/2026 | 31/01/2026 | 120    | 3000    |
     When je supprime le contrat "Studio Canal"
-    Then le message "Aucun contrat. Ajoute ton premier contrat !" est visible
+    Then le message "Aucun contrat ni formation. Ajoute ton premier contrat !" est visible

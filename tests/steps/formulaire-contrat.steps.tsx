@@ -167,7 +167,7 @@ defineFeature(feature, (test) => {
     });
 
     then("aucun contrat n'est ajouté", () => {
-      expect(screen.getByText("Aucun contrat. Ajoute ton premier contrat !")).toBeTruthy();
+      expect(screen.getByText("Aucun contrat ni formation. Ajoute ton premier contrat !")).toBeTruthy();
     });
   });
 

@@ -6,6 +6,7 @@ import {
 import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
 import { selectDatePicker } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
 import { ContratRow } from "./types";
@@ -14,7 +15,9 @@ export const renderScreen = () =>
   render(
     <ProfilProvider>
       <ContratsProvider>
-        <ContratsScreen />
+        <FormationsProvider>
+          <ContratsScreen />
+        </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>
   );

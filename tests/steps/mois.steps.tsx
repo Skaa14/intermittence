@@ -3,6 +3,7 @@ import { render, screen, act, within } from "@testing-library/react-native";
 import DetailMoisScreen from "../../app/mois/[moisIndex]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
 import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
@@ -40,7 +41,9 @@ const renderScreen = () =>
   render(
     <ProfilProvider>
       <ContratsProvider>
-        <Setup />
+        <FormationsProvider>
+          <Setup />
+        </FormationsProvider>
       </ContratsProvider>
     </ProfilProvider>
   );

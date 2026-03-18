@@ -1,12 +1,15 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useContrats } from "./ContratsContext";
 import { useProfil } from "./ProfilContext";
+import { useFormations } from "./FormationsContext";
 import { charger, sauvegarder, supprimer } from "../utils/storage";
 import {
   creerProfilArtiste,
   creerProfilTechnicien,
   creerContratsArtiste,
   creerContratsTechnicien,
+  creerFormationsArtiste,
+  creerFormationsTechnicien,
 } from "../utils/donneesTest";
 
 interface DonneesTestContextType {
@@ -22,6 +25,7 @@ const DonneesTestContext = createContext<DonneesTestContextType | null>(null);
 export function DonneesTestProvider({ children }: { children: ReactNode }) {
   const { reinitialiserContrats } = useContrats();
   const { mettreAJourProfil, reinitialiserProfil } = useProfil();
+  const { reinitialiserFormations } = useFormations();
   const [modeTest, setModeTest] = useState(false);
   const [nomProfil, setNomProfil] = useState<string | null>(null);
   const [chargementTermine, setChargementTermine] = useState(false);
@@ -41,11 +45,13 @@ export function DonneesTestProvider({ children }: { children: ReactNode }) {
     if (type === "artiste") {
       mettreAJourProfil(creerProfilArtiste());
       reinitialiserContrats(creerContratsArtiste());
+      reinitialiserFormations(creerFormationsArtiste());
       setNomProfil("Artiste — Annexe 10");
       sauvegarder("nomProfil", "Artiste — Annexe 10");
     } else {
       mettreAJourProfil(creerProfilTechnicien());
       reinitialiserContrats(creerContratsTechnicien());
+      reinitialiserFormations(creerFormationsTechnicien());
       setNomProfil("Technicien — Annexe 8");
       sauvegarder("nomProfil", "Technicien — Annexe 8");
     }
@@ -56,6 +62,7 @@ export function DonneesTestProvider({ children }: { children: ReactNode }) {
   const reinitialiser = () => {
     reinitialiserProfil();
     reinitialiserContrats([]);
+    reinitialiserFormations([]);
     setModeTest(false);
     setNomProfil(null);
     supprimer("modeTest");

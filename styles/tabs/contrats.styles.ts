@@ -6,6 +6,8 @@ import { webDateInputBase } from "../../theme/webStyles";
 export const addIconColor = colors.warning;
 export const errorBorderColor = colors.error;
 export const placeholderColor = colors.textFaint;
+export const contratIconColor = colors.textMuted;
+export const formationIconColor = colors.primary;
 
 export const webDateInputStyle: React.CSSProperties = {
   ...webDateInputBase,
@@ -262,5 +264,35 @@ export const styles = StyleSheet.create({
     minWidth: 0,
     borderRadius: 0,
     textAlign: "center",
+  },
+  toggleTypeSaisie: {
+    marginBottom: 12,
+  },
+  formationCard: {
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary,
+  },
+  badgeFormation: {
+    backgroundColor: colors.primaryBg,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  badgeFormationText: {
+    fontSize: 11,
+    fontFamily: fonts.semiBold,
+    color: colors.primary,
+  },
+  formationOption: {
+    fontSize: 14,
+    fontFamily: fonts.medium,
+    color: colors.textMuted,
+  },
+  optionHint: {
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    fontSize: 13,
+    marginBottom: 8,
+    lineHeight: 18,
   },
 });
