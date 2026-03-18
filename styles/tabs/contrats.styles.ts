@@ -1,18 +1,11 @@
 import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
 import { fonts } from "../../theme/fonts";
-import { webDateInputBase } from "../../theme/webStyles";
 
 export const addIconColor = colors.warning;
-export const errorBorderColor = colors.error;
 export const placeholderColor = colors.textFaint;
 export const contratIconColor = colors.textMuted;
 export const formationIconColor = colors.primary;
-
-export const webDateInputStyle: React.CSSProperties = {
-  ...webDateInputBase,
-  flex: 1,
-};
 
 export const styles = StyleSheet.create({
   container: {
@@ -26,20 +19,41 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   formulaire: {
+    flex: 1,
+    backgroundColor: colors.bgBase,
+  },
+  formulaireContent: {
     padding: 16,
+    paddingBottom: 32,
+  },
+  formulaireActions: {
+    flexDirection: "row",
+    gap: 8,
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderLight,
     backgroundColor: colors.bgCard,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
+  },
+  fieldGroup: {
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 13,
+    fontFamily: fonts.semiBold,
+    color: colors.textMuted,
+    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 8,
     padding: 12,
-    marginBottom: 8,
     fontSize: 16,
     fontFamily: fonts.regular,
-    backgroundColor: colors.bgBase,
+    backgroundColor: colors.bgCard,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   row: {
     flexDirection: "row",
@@ -202,11 +216,11 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.error,
     fontSize: 13,
-    marginBottom: 8,
+    marginTop: 4,
   },
   toggleRow: {
     flexDirection: "row",
-    marginBottom: 8,
+    marginBottom: 12,
     borderRadius: 8,
     overflow: "hidden",
     borderWidth: 1,
@@ -242,7 +256,6 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.primaryBg,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 8,
   },
   stepperBtnLeft: {
     borderTopLeftRadius: 8,
@@ -266,7 +279,7 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   toggleTypeSaisie: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   formationCard: {
     borderLeftWidth: 3,

@@ -10,8 +10,8 @@ import {
 import { resetPickerCallbacks } from "../helpers/mocks";
 import { colors } from "../../theme/colors";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 let mockAnnexe = "10";
@@ -106,7 +106,7 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test("Le placeholder revient à heures quand on resélectionne heures", ({ given, and, when, then }) => {
+  test("Le label revient à Heures quand on resélectionne heures", ({ given, and, when, then }) => {
     fixerDateStep(given);
 
     given("le profil est en annexe 10", () => {});
@@ -124,8 +124,8 @@ defineFeature(feature, (test) => {
       fireEvent.press(screen.getByTestId(`toggle-${mode}`));
     });
 
-    then(/^le placeholder du champ est "(.*)"$/, (placeholder: string) => {
-      expect(screen.getByPlaceholderText(placeholder)).toBeTruthy();
+    then(/^le label du champ est "(.*)"$/, (label: string) => {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
   });
 

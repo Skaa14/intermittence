@@ -18,11 +18,11 @@ Feature: Saisie en cachets
     When je sélectionne le mode "cachets"
     Then le champ heures contient "1"
 
-  Scenario: Le placeholder revient à heures quand on resélectionne heures
+  Scenario: Le label revient à Heures quand on resélectionne heures
     Given le formulaire de saisie est ouvert
     And je sélectionne le mode "cachets"
     When je sélectionne le mode "heures"
-    Then le placeholder du champ est "Heures"
+    Then le label du champ est "Heures"
 
   Scenario: Ajout d'un contrat en cachets pluriel
     Given l'écran contrats est affiché

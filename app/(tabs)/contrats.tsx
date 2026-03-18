@@ -8,20 +8,26 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
+  ScrollView,
 } from "react-native";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
 import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfil } from "../../contexts/ProfilContext";
 import { useFormations } from "../../contexts/FormationsContext";
 import { Contrat, TypeHeures } from "../../types/contrat";
 import { Formation, OptionFormation } from "../../types/formation";
-import { formatDate, formatDateISO, parseDate } from "../../utils/date";
+import { formatDate, parseDate } from "../../utils/date";
+import { formatRangeCourt } from "../../utils/formatDateCourt";
 import { formaterHeures } from "../../utils/formatHeures";
 import { PLAFOND_HEURES_FORMATION } from "../../utils/reglementation";
-import { styles, webDateInputStyle, addIconColor, errorBorderColor, placeholderColor, contratIconColor, formationIconColor } from "../../styles/tabs/contrats.styles";
+import DateRangePicker from "../../components/DateRangePicker";
+import {
+  styles,
+  addIconColor,
+  placeholderColor,
+  contratIconColor,
+  formationIconColor,
+} from "../../styles/tabs/contrats.styles";
 
 type ContratAvecStatut = Contrat & { passe: boolean };
 type ChampContrat = "employeur" | "dateDebut" | "dateFin" | "heures" | "salaireBrut";
@@ -56,8 +62,7 @@ export default function ContratsScreen() {
   const [salaireBrut, setSalaireBrut] = useState("");
   const [optionFormation, setOptionFormation] = useState<OptionFormation>("compterHeures");
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
-  const [showPickerDebut, setShowPickerDebut] = useState(false);
-  const [showPickerFin, setShowPickerFin] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [afficherPasses, setAfficherPasses] = useState(false);
   const [contratEnEdition, setContratEnEdition] = useState<string | null>(null);
   const [formationEnEdition, setFormationEnEdition] = useState<string | null>(null);
@@ -90,28 +95,47 @@ export default function ContratsScreen() {
     return items;
   }, [contratsActifs, contratsPasses, formations, afficherPasses]);
 
-  const setDateDebutSafe = (d: Date) => {
-    setDateDebut(d);
-    setErreurs((e) => ({ ...e, dateDebut: false }));
+  const reinitialiserFormulaire = () => {
+    setEmployeur("");
+    setIntitule("");
+    setDateDebut(undefined);
+    setDateFin(undefined);
+    setTypeHeures("heures");
+    setHeures("");
+    setSalaireBrut("");
+    setOptionFormation("compterHeures");
+    setContratEnEdition(null);
+    setFormationEnEdition(null);
+    setFormulaireOuvert(false);
+    setShowDatePicker(false);
+    setErreurs({});
     setErreurMois(null);
-    if (dateFin && d.getTime() > dateFin.getTime()) setDateFin(undefined);
   };
 
-  const setDateFinSafe = (d: Date) => {
-    setDateFin(d);
-    setErreurs((e) => ({ ...e, dateFin: false }));
-    setErreurMois(null);
-    if (dateDebut && d.getTime() < dateDebut.getTime()) setDateDebut(undefined);
+  const lancerEdition = (contrat: Contrat) => {
+    const type = contrat.type ?? "heures";
+    setTypeSaisie("contrat");
+    setEmployeur(contrat.employeur);
+    setDateDebut(parseDate(contrat.dateDebut));
+    setDateFin(parseDate(contrat.dateFin));
+    setTypeHeures(type);
+    setHeures(type === "cachets" ? (contrat.heures / 12).toString() : contrat.heures.toString());
+    setSalaireBrut(contrat.salaireBrut.toString());
+    setContratEnEdition(contrat.id);
+    setFormationEnEdition(null);
+    setFormulaireOuvert(true);
   };
 
-  const onChangeDateDebut = (_event: DateTimePickerEvent, date?: Date) => {
-    setShowPickerDebut(Platform.OS === "ios");
-    if (date) setDateDebutSafe(date);
-  };
-
-  const onChangeDateFin = (_event: DateTimePickerEvent, date?: Date) => {
-    setShowPickerFin(Platform.OS === "ios");
-    if (date) setDateFinSafe(date);
+  const lancerEditionFormation = (formation: Formation) => {
+    setTypeSaisie("formation");
+    setIntitule(formation.intitule);
+    setDateDebut(parseDate(formation.dateDebut));
+    setDateFin(parseDate(formation.dateFin));
+    setHeures(formation.heures.toString());
+    setOptionFormation(formation.option);
+    setFormationEnEdition(formation.id);
+    setContratEnEdition(null);
+    setFormulaireOuvert(true);
   };
 
   const confirmerSuppression = (contrat: Contrat) => {
@@ -164,48 +188,6 @@ export default function ContratsScreen() {
         ],
       );
     }
-  };
-
-  const reinitialiserFormulaire = () => {
-    setEmployeur("");
-    setIntitule("");
-    setDateDebut(undefined);
-    setDateFin(undefined);
-    setTypeHeures("heures");
-    setHeures("");
-    setSalaireBrut("");
-    setOptionFormation("compterHeures");
-    setContratEnEdition(null);
-    setFormationEnEdition(null);
-    setFormulaireOuvert(false);
-    setErreurs({});
-    setErreurMois(null);
-  };
-
-  const lancerEdition = (contrat: Contrat) => {
-    const type = contrat.type ?? "heures";
-    setTypeSaisie("contrat");
-    setEmployeur(contrat.employeur);
-    setDateDebut(parseDate(contrat.dateDebut));
-    setDateFin(parseDate(contrat.dateFin));
-    setTypeHeures(type);
-    setHeures(type === "cachets" ? (contrat.heures / 12).toString() : contrat.heures.toString());
-    setSalaireBrut(contrat.salaireBrut.toString());
-    setContratEnEdition(contrat.id);
-    setFormationEnEdition(null);
-    setFormulaireOuvert(true);
-  };
-
-  const lancerEditionFormation = (formation: Formation) => {
-    setTypeSaisie("formation");
-    setIntitule(formation.intitule);
-    setDateDebut(parseDate(formation.dateDebut));
-    setDateFin(parseDate(formation.dateFin));
-    setHeures(formation.heures.toString());
-    setOptionFormation(formation.option);
-    setFormationEnEdition(formation.id);
-    setContratEnEdition(null);
-    setFormulaireOuvert(true);
   };
 
   const handleValiderContrat = () => {
@@ -281,100 +263,50 @@ export default function ContratsScreen() {
     else handleValiderContrat();
   };
 
-  const renderDateInputs = () => (
-    <>
-      <View style={styles.row}>
-        {Platform.OS === "web" ? (
-          <>
-            <input
-              type="date"
-              value={dateDebut ? formatDateISO(dateDebut) : ""}
-              max={dateFin ? formatDateISO(dateFin) : undefined}
-              onChange={(e) => {
-                const d = e.target.value ? new Date(e.target.value + "T00:00:00") : undefined;
-                if (d) setDateDebutSafe(d);
-                else setDateDebut(undefined);
-              }}
-              style={{
-                ...webDateInputStyle,
-                ...(erreurs.dateDebut && { borderColor: errorBorderColor }),
-              }}
-            />
-            <input
-              type="date"
-              value={dateFin ? formatDateISO(dateFin) : ""}
-              min={dateDebut ? formatDateISO(dateDebut) : undefined}
-              onChange={(e) => {
-                const d = e.target.value ? new Date(e.target.value + "T00:00:00") : undefined;
-                if (d) setDateFinSafe(d);
-                else setDateFin(undefined);
-              }}
-              style={{
-                ...webDateInputStyle,
-                ...(erreurs.dateFin && { borderColor: errorBorderColor }),
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <Pressable
-              testID="input-date-debut"
-              style={[styles.input, styles.inputHalf, erreurs.dateDebut && styles.inputErreur]}
-              onPress={() => setShowPickerDebut(true)}
-            >
-              <Text style={dateDebut ? styles.dateText : styles.datePlaceholder}>
-                {dateDebut ? formatDate(dateDebut) : "Date début"}
-              </Text>
-            </Pressable>
-            <Pressable
-              testID="input-date-fin"
-              style={[styles.input, styles.inputHalf, erreurs.dateFin && styles.inputErreur]}
-              onPress={() => setShowPickerFin(true)}
-            >
-              <Text style={dateFin ? styles.dateText : styles.datePlaceholder}>
-                {dateFin ? formatDate(dateFin) : "Date fin"}
-              </Text>
-            </Pressable>
-          </>
+  const handleDateRangeConfirm = (debut: Date, fin: Date) => {
+    setDateDebut(debut);
+    setDateFin(fin);
+    setErreurs((e) => ({ ...e, dateDebut: false, dateFin: false }));
+    setErreurMois(null);
+    setShowDatePicker(false);
+  };
+
+  const renderDateField = () => {
+    const hasDate = dateDebut && dateFin;
+    const hasError = erreurs.dateDebut || erreurs.dateFin;
+
+    return (
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Période</Text>
+        <Pressable
+          testID="input-date-range"
+          style={[styles.input, hasError && styles.inputErreur]}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text style={hasDate ? styles.dateText : styles.datePlaceholder}>
+            {hasDate ? formatRangeCourt(dateDebut, dateFin) : "Sélectionner les dates"}
+          </Text>
+          <Ionicons name="calendar-outline" size={20} color={placeholderColor} />
+        </Pressable>
+        {erreurMois && (
+          <Text testID="erreur-mois" style={styles.erreurMois}>{erreurMois}</Text>
         )}
       </View>
-      {erreurMois && (
-        <Text testID="erreur-mois" style={styles.erreurMois}>{erreurMois}</Text>
-      )}
-      {Platform.OS !== "web" && showPickerDebut && (
-        <DateTimePicker
-          testID="picker-debut"
-          value={dateDebut ?? new Date()}
-          mode="date"
-          display="default"
-          maximumDate={dateFin}
-          onChange={onChangeDateDebut}
-        />
-      )}
-      {Platform.OS !== "web" && showPickerFin && (
-        <DateTimePicker
-          testID="picker-fin"
-          value={dateFin ?? new Date()}
-          mode="date"
-          display="default"
-          minimumDate={dateDebut}
-          onChange={onChangeDateFin}
-        />
-      )}
-    </>
-  );
+    );
+  };
 
   const renderFormulaireContrat = () => (
     <>
-      <TextInput
-        testID="input-employeur"
-        style={[styles.input, erreurs.employeur && styles.inputErreur]}
-        placeholder="Employeur"
-        placeholderTextColor={placeholderColor}
-        value={employeur}
-        onChangeText={(v) => { setEmployeur(v); setErreurs((e) => ({ ...e, employeur: false })); }}
-      />
-      {renderDateInputs()}
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Employeur</Text>
+        <TextInput
+          testID="input-employeur"
+          style={[styles.input, erreurs.employeur && styles.inputErreur]}
+          value={employeur}
+          onChangeText={(v) => { setEmployeur(v); setErreurs((e) => ({ ...e, employeur: false })); }}
+        />
+      </View>
+      {renderDateField()}
       {estAnnexe10 && (
         <View testID="toggle-type-heures" style={styles.toggleRow}>
           <Pressable
@@ -398,7 +330,10 @@ export default function ContratsScreen() {
         </View>
       )}
       <View style={styles.row}>
-        <View style={styles.inputHalf}>
+        <View style={[styles.fieldGroup, styles.inputHalf]}>
+          <Text style={styles.label}>
+            {typeHeures === "cachets" ? "Cachets" : "Heures"}
+          </Text>
           {typeHeures === "cachets" ? (
             <View style={styles.stepperRow}>
               <Pressable
@@ -435,47 +370,48 @@ export default function ContratsScreen() {
             <TextInput
               testID="input-heures"
               style={[styles.input, erreurs.heures && styles.inputErreur]}
-              placeholder="Heures"
-              placeholderTextColor={placeholderColor}
               value={heures}
               onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
               keyboardType="numeric"
             />
           )}
         </View>
-        <TextInput
-          testID="input-salaire-brut"
-          style={[styles.input, styles.inputHalf, erreurs.salaireBrut && styles.inputErreur]}
-          placeholder="Salaire brut (€)"
-          placeholderTextColor={placeholderColor}
-          value={salaireBrut}
-          onChangeText={(v) => { setSalaireBrut(v); setErreurs((e) => ({ ...e, salaireBrut: false })); }}
-          keyboardType="numeric"
-        />
+        <View style={[styles.fieldGroup, styles.inputHalf]}>
+          <Text style={styles.label}>Salaire brut (€)</Text>
+          <TextInput
+            testID="input-salaire-brut"
+            style={[styles.input, erreurs.salaireBrut && styles.inputErreur]}
+            value={salaireBrut}
+            onChangeText={(v) => { setSalaireBrut(v); setErreurs((e) => ({ ...e, salaireBrut: false })); }}
+            keyboardType="numeric"
+          />
+        </View>
       </View>
     </>
   );
 
   const renderFormulaireFormation = () => (
     <>
-      <TextInput
-        testID="input-intitule"
-        style={[styles.input, erreurs.intitule && styles.inputErreur]}
-        placeholder="Intitulé de la formation"
-        placeholderTextColor={placeholderColor}
-        value={intitule}
-        onChangeText={(v) => { setIntitule(v); setErreurs((e) => ({ ...e, intitule: false })); }}
-      />
-      {renderDateInputs()}
-      <TextInput
-        testID="input-heures-formation"
-        style={[styles.input, erreurs.heures && styles.inputErreur]}
-        placeholder="Nombre d'heures"
-        placeholderTextColor={placeholderColor}
-        value={heures}
-        onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
-        keyboardType="numeric"
-      />
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Intitulé de la formation</Text>
+        <TextInput
+          testID="input-intitule"
+          style={[styles.input, erreurs.intitule && styles.inputErreur]}
+          value={intitule}
+          onChangeText={(v) => { setIntitule(v); setErreurs((e) => ({ ...e, intitule: false })); }}
+        />
+      </View>
+      {renderDateField()}
+      <View style={styles.fieldGroup}>
+        <Text style={styles.label}>Nombre d'heures</Text>
+        <TextInput
+          testID="input-heures-formation"
+          style={[styles.input, erreurs.heures && styles.inputErreur]}
+          value={heures}
+          onChangeText={(v) => { setHeures(v); setErreurs((e) => ({ ...e, heures: false })); }}
+          keyboardType="numeric"
+        />
+      </View>
       <View testID="toggle-option-formation" style={styles.toggleRow}>
         <Pressable
           testID="toggle-compter-heures"
@@ -578,13 +514,24 @@ export default function ContratsScreen() {
     );
   };
 
-  return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      {formulaireOuvert ? (
-        <View style={styles.formulaire}>
+  if (showDatePicker) {
+    return (
+      <DateRangePicker
+        initialStart={dateDebut}
+        initialEnd={dateFin}
+        onConfirm={handleDateRangeConfirm}
+        onCancel={() => setShowDatePicker(false)}
+      />
+    );
+  }
+
+  if (formulaireOuvert) {
+    return (
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView style={styles.formulaire} contentContainerStyle={styles.formulaireContent}>
           {!contratEnEdition && !formationEnEdition && (
             <View testID="toggle-type-saisie" style={[styles.toggleRow, styles.toggleTypeSaisie]}>
               <Pressable
@@ -608,44 +555,48 @@ export default function ContratsScreen() {
             </View>
           )}
           {typeSaisie === "contrat" ? renderFormulaireContrat() : renderFormulaireFormation()}
-          <View style={styles.row}>
-            <Pressable
-              style={styles.btnAnnuler}
-              onPress={reinitialiserFormulaire}
-            >
-              <Text style={styles.btnAnnulerText}>Annuler</Text>
-            </Pressable>
-            <Pressable style={styles.btnAjouter} onPress={handleValider}>
-              <Text style={styles.btnAjouterText}>
-                {contratEnEdition || formationEnEdition ? "Modifier" : "Ajouter"}
-              </Text>
-            </Pressable>
-          </View>
-        </View>
-      ) : (
-        <View style={styles.buttonsRow}>
+        </ScrollView>
+        <View style={styles.formulaireActions}>
           <Pressable
-            testID="btn-ouvrir-formulaire"
-            style={styles.btnOuvrir}
-            onPress={() => setFormulaireOuvert(true)}
+            style={styles.btnAnnuler}
+            onPress={reinitialiserFormulaire}
           >
-            <Ionicons name="add-circle" size={44} color={addIconColor} />
+            <Text style={styles.btnAnnulerText}>Annuler</Text>
           </Pressable>
-          {contratsPasses.length > 0 && (
-            <Pressable
-              testID="btn-toggle-passes"
-              style={styles.btnTogglePasses}
-              onPress={() => setAfficherPasses(!afficherPasses)}
-            >
-              <Text style={styles.btnTogglePassesText}>
-                {afficherPasses
-                  ? `Masquer passés (${contratsPasses.length})`
-                  : `Passés (${contratsPasses.length})`}
-              </Text>
-            </Pressable>
-          )}
+          <Pressable style={styles.btnAjouter} onPress={handleValider}>
+            <Text style={styles.btnAjouterText}>
+              {contratEnEdition || formationEnEdition ? "Modifier" : "Ajouter"}
+            </Text>
+          </Pressable>
         </View>
-      )}
+      </KeyboardAvoidingView>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.buttonsRow}>
+        <Pressable
+          testID="btn-ouvrir-formulaire"
+          style={styles.btnOuvrir}
+          onPress={() => setFormulaireOuvert(true)}
+        >
+          <Ionicons name="add-circle" size={44} color={addIconColor} />
+        </Pressable>
+        {contratsPasses.length > 0 && (
+          <Pressable
+            testID="btn-toggle-passes"
+            style={styles.btnTogglePasses}
+            onPress={() => setAfficherPasses(!afficherPasses)}
+          >
+            <Text style={styles.btnTogglePassesText}>
+              {afficherPasses
+                ? `Masquer passés (${contratsPasses.length})`
+                : `Passés (${contratsPasses.length})`}
+            </Text>
+          </Pressable>
+        )}
+      </View>
 
       <FlatList
         data={elements}
@@ -660,6 +611,6 @@ export default function ContratsScreen() {
         }
         renderItem={renderElement}
       />
-    </KeyboardAvoidingView>
+    </View>
   );
 }

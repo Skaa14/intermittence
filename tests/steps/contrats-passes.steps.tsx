@@ -8,8 +8,8 @@ import {
   fixerDate,
 } from "../helpers/form";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 const feature = loadFeature("tests/features/contrats-passes.feature");

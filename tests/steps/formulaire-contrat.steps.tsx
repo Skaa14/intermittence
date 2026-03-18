@@ -6,14 +6,14 @@ import { ContratRow } from "../helpers/types";
 import {
   renderScreen,
   ouvrirFormulaire,
-  selectDate,
+  selectDateRange,
   ajouterContratViaFormulaire,
   fixerDate,
 } from "../helpers/form";
 import { ddmmyyyyToIso } from "../helpers/date";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 const feature = loadFeature("tests/features/formulaire-contrat.feature");
@@ -58,12 +58,12 @@ defineFeature(feature, (test) => {
 
     then("le formulaire de saisie est visible", () => {
       expect(screen.getByTestId("input-employeur")).toBeTruthy();
-      expect(screen.getByText("Date début")).toBeTruthy();
-      expect(screen.getByText("Date fin")).toBeTruthy();
+      expect(screen.getByText("Période")).toBeTruthy();
+      expect(screen.getByText("Sélectionner les dates")).toBeTruthy();
     });
   });
 
-  test("Sélection des dates via le picker", ({ given, when, and, then }) => {
+  test("Sélection des dates via le calendrier", ({ given, when, then }) => {
     given(/^nous sommes le "(.*)"$/, (date: string) => {
       fixerDate(date);
     });
@@ -73,78 +73,12 @@ defineFeature(feature, (test) => {
       ouvrirFormulaire();
     });
 
-    when(/^je sélectionne la date début "(.*)"$/, (dateStr: string) => {
-      selectDate("picker-debut", dateStr);
+    when(/^je sélectionne la période "(.*)" → "(.*)"$/, (debut: string, fin: string) => {
+      selectDateRange(debut, fin);
     });
 
-    and(/^je sélectionne la date fin "(.*)"$/, (dateStr: string) => {
-      selectDate("picker-fin", dateStr);
-    });
-
-    then(/^la date début affichée est "(.*)"$/, (formatted: string) => {
-      expect(screen.getByText(formatted)).toBeTruthy();
-    });
-
-    and(/^la date fin affichée est "(.*)"$/, (formatted: string) => {
-      expect(screen.getByText(formatted)).toBeTruthy();
-    });
-  });
-
-  test("Date début après date fin réinitialise date fin", ({
-    given,
-    and,
-    when,
-    then,
-  }) => {
-    given(/^nous sommes le "(.*)"$/, (date: string) => {
-      fixerDate(date);
-    });
-
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
-      ouvrirFormulaire();
-    });
-
-    and(/^je sélectionne la date fin "(.*)"$/, (dateStr: string) => {
-      selectDate("picker-fin", dateStr);
-    });
-
-    when(/^je sélectionne la date début "(.*)"$/, (dateStr: string) => {
-      expect(screen.queryByText("Date fin")).toBeNull();
-      selectDate("picker-debut", dateStr);
-    });
-
-    then("la date fin est réinitialisée", () => {
-      expect(screen.getByText("Date fin")).toBeTruthy();
-    });
-  });
-
-  test("Date fin avant date début réinitialise date début", ({
-    given,
-    and,
-    when,
-    then,
-  }) => {
-    given(/^nous sommes le "(.*)"$/, (date: string) => {
-      fixerDate(date);
-    });
-
-    given("le formulaire de saisie est ouvert", () => {
-      renderScreen();
-      ouvrirFormulaire();
-    });
-
-    and(/^je sélectionne la date début "(.*)"$/, (dateStr: string) => {
-      selectDate("picker-debut", dateStr);
-    });
-
-    when(/^je sélectionne la date fin "(.*)"$/, (dateStr: string) => {
-      expect(screen.queryByText("Date début")).toBeNull();
-      selectDate("picker-fin", dateStr);
-    });
-
-    then("la date début est réinitialisée", () => {
-      expect(screen.getByText("Date début")).toBeTruthy();
+    then(/^la période affichée est "(.*)"$/, (attendu: string) => {
+      expect(screen.getByText(attendu)).toBeTruthy();
     });
   });
 
@@ -167,6 +101,7 @@ defineFeature(feature, (test) => {
     });
 
     then("aucun contrat n'est ajouté", () => {
+      fireEvent.press(screen.getByText("Annuler"));
       expect(screen.getByText("Aucun contrat ni formation. Ajoute ton premier contrat !")).toBeTruthy();
     });
   });
@@ -197,7 +132,7 @@ defineFeature(feature, (test) => {
     });
 
     then("tous les champs ont une bordure rouge", () => {
-      const ids = ["input-employeur", "input-date-debut", "input-date-fin", "input-heures", "input-salaire-brut"];
+      const ids = ["input-employeur", "input-date-range", "input-heures", "input-salaire-brut"];
       for (const id of ids) {
         expect(getStyleProp(id, "borderColor")).toBe("#C0483A");
       }
@@ -260,8 +195,7 @@ defineFeature(feature, (test) => {
     when("je remplis le formulaire avec les données suivantes", (table: ContratRow[]) => {
       const row = table[0];
       fireEvent.changeText(screen.getByTestId("input-employeur"), row.Employeur);
-      selectDate("picker-debut", ddmmyyyyToIso(row["Début"]));
-      selectDate("picker-fin", ddmmyyyyToIso(row.Fin));
+      selectDateRange(ddmmyyyyToIso(row["Début"]), ddmmyyyyToIso(row.Fin));
       fireEvent.changeText(screen.getByTestId("input-heures"), row.Heures);
       fireEvent.changeText(screen.getByTestId("input-salaire-brut"), row.Salaire);
     });

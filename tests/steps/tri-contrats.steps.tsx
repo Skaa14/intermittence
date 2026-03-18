@@ -4,15 +4,15 @@ import { resetPickerCallbacks } from "../helpers/mocks";
 import { ContratRow } from "../helpers/types";
 import {
   renderScreen,
-  selectDate,
+  selectDateRange,
   ajouterContratViaFormulaire,
   fixerDate,
 } from "../helpers/form";
 import { ddmmyyyyToIso } from "../helpers/date";
 import { fireEvent } from "@testing-library/react-native";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 const feature = loadFeature("tests/features/tri-contrats.feature");
@@ -84,8 +84,7 @@ defineFeature(feature, (test) => {
         );
         expect(card).toBeDefined();
         fireEvent.press(within(card!).getByText("✎"));
-        selectDate("picker-debut", ddmmyyyyToIso(nouveauDebut));
-        selectDate("picker-fin", ddmmyyyyToIso(nouvelleFin));
+        selectDateRange(ddmmyyyyToIso(nouveauDebut), ddmmyyyyToIso(nouvelleFin));
         fireEvent.press(screen.getByText("Modifier"));
       }
     );

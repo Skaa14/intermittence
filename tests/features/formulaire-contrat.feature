@@ -8,24 +8,10 @@ Feature: Formulaire de saisie d'un contrat
     When j'appuie sur "Nouveau contrat"
     Then le formulaire de saisie est visible
 
-  Scenario: Sélection des dates via le picker
+  Scenario: Sélection des dates via le calendrier
     Given le formulaire de saisie est ouvert
-    When je sélectionne la date début "2026-03-01"
-    And je sélectionne la date fin "2026-03-15"
-    Then la date début affichée est "01/03/2026"
-    And la date fin affichée est "15/03/2026"
-
-  Scenario: Date début après date fin réinitialise date fin
-    Given le formulaire de saisie est ouvert
-    And je sélectionne la date fin "2026-03-10"
-    When je sélectionne la date début "2026-03-20"
-    Then la date fin est réinitialisée
-
-  Scenario: Date fin avant date début réinitialise date début
-    Given le formulaire de saisie est ouvert
-    And je sélectionne la date début "2026-03-20"
-    When je sélectionne la date fin "2026-03-10"
-    Then la date début est réinitialisée
+    When je sélectionne la période "2026-03-01" → "2026-03-15"
+    Then la période affichée est "1 mars → 15 mars"
 
   Scenario: Soumission avec champs manquants ne crée pas de contrat
     Given le formulaire de saisie est ouvert

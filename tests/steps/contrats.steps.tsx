@@ -9,8 +9,8 @@ import {
 } from "../helpers/form";
 import { resetPickerCallbacks } from "../helpers/mocks";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 const feature = loadFeature("tests/features/contrats.feature");

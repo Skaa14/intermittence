@@ -7,7 +7,7 @@ import ContratsScreen from "../../app/(tabs)/contrats";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
-import { selectDatePicker } from "./mocks";
+import { simulateDayPress } from "./mocks";
 import { ddmmyyyyToIso } from "./date";
 import { ContratRow } from "./types";
 
@@ -26,16 +26,17 @@ export const ouvrirFormulaire = () => {
   fireEvent.press(screen.getByTestId("btn-ouvrir-formulaire"));
 };
 
-export const selectDate = (pickerTestID: string, dateStr: string) => {
-  const inputTestID = pickerTestID === "picker-debut" ? "input-date-debut" : "input-date-fin";
-  selectDatePicker(inputTestID, pickerTestID, dateStr);
+export const selectDateRange = (isoDateDebut: string, isoDateFin: string) => {
+  fireEvent.press(screen.getByTestId("input-date-range"));
+  simulateDayPress(isoDateDebut);
+  simulateDayPress(isoDateFin);
+  fireEvent.press(screen.getByText("Sélectionner"));
 };
 
 export const ajouterContratViaFormulaire = (row: ContratRow) => {
   ouvrirFormulaire();
   fireEvent.changeText(screen.getByTestId("input-employeur"), row.Employeur);
-  selectDate("picker-debut", ddmmyyyyToIso(row["Début"]));
-  selectDate("picker-fin", ddmmyyyyToIso(row.Fin));
+  selectDateRange(ddmmyyyyToIso(row["Début"]), ddmmyyyyToIso(row.Fin));
   if (row.Type === "cachets") {
     fireEvent.press(screen.getByTestId("toggle-cachets"));
   }

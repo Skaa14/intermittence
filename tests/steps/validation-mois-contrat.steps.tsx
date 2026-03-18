@@ -2,11 +2,11 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import { fireEvent, screen } from "@testing-library/react-native";
 import { resetPickerCallbacks } from "../helpers/mocks";
 import { ContratRow } from "../helpers/types";
-import { renderScreen, ouvrirFormulaire, selectDate, fixerDate } from "../helpers/form";
+import { renderScreen, ouvrirFormulaire, selectDateRange, fixerDate } from "../helpers/form";
 import { ddmmyyyyToIso } from "../helpers/date";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 const feature = loadFeature("tests/features/validation-mois-contrat.feature");
@@ -22,8 +22,7 @@ defineFeature(feature, (test) => {
 
   const remplirFormulaire = (row: ContratRow) => {
     fireEvent.changeText(screen.getByTestId("input-employeur"), row.Employeur);
-    selectDate("picker-debut", ddmmyyyyToIso(row["Début"]));
-    selectDate("picker-fin", ddmmyyyyToIso(row.Fin));
+    selectDateRange(ddmmyyyyToIso(row["Début"]), ddmmyyyyToIso(row.Fin));
     fireEvent.changeText(screen.getByTestId("input-heures"), row.Heures);
     fireEvent.changeText(screen.getByTestId("input-salaire-brut"), row.Salaire);
   };
@@ -93,6 +92,7 @@ defineFeature(feature, (test) => {
     });
 
     then("aucun contrat n'est ajouté", () => {
+      fireEvent.press(screen.getByText("Annuler"));
       expect(screen.getByText("Aucun contrat ni formation. Ajoute ton premier contrat !")).toBeTruthy();
     });
   });

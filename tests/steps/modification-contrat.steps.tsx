@@ -9,13 +9,13 @@ import { ddmmyyyyToIso } from "../helpers/date";
 import { ContratRow } from "../helpers/types";
 import {
   renderScreen,
-  selectDate,
+  selectDateRange,
   ajouterContratViaFormulaire,
   fixerDate,
 } from "../helpers/form";
 
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
+jest.mock("react-native-calendars", () =>
+  require("../helpers/mocks").mockCalendarsFactory()
 );
 
 const feature = loadFeature("tests/features/modification-contrat.feature");
@@ -115,8 +115,7 @@ defineFeature(feature, (test) => {
       (employeur: string, newDebut: string, newFin: string) => {
         const carte = trouverCarte(employeur);
         fireEvent.press(within(carte).getByText("✎"));
-        selectDate("picker-debut", ddmmyyyyToIso(newDebut));
-        selectDate("picker-fin", ddmmyyyyToIso(newFin));
+        selectDateRange(ddmmyyyyToIso(newDebut), ddmmyyyyToIso(newFin));
         fireEvent.press(screen.getByText("Modifier"));
       }
     );
