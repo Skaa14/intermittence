@@ -1,32 +1,22 @@
 Feature: Gestion du profil intermittent
 
   Scenario: Configuration du profil
-    Given l'écran d'accueil est affiché
-    When je configure mon profil
+    Given un profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
       | Jean | 8      | 600    | 18000   | 15/09/2026        |
+    When l'écran d'accueil est affiché
     Then l'indemnité journalière estimée est affichée
 
   Scenario: Le nom du profil est affiché dans la carte AJ
-    Given l'écran d'accueil est affiché
-    When je configure mon profil
+    Given un profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
       | Jean | 8      | 600    | 18000   | 15/09/2026        |
+    When l'écran d'accueil est affiché
     Then la carte AJ contient "Jean (Technicien)"
 
-  Scenario: Modification du profil existant
-    Given l'écran d'accueil est affiché
-    And je configure mon profil
-      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
-      | Jean | 8      | 600    | 18000   | 15/09/2026        |
-    When je reconfigure mon profil
-      | Nom   | Annexe | Heures | Salaire | Date anniversaire |
-      | Marie | 10     | 510    | 22000   | 01/10/2026        |
-    Then l'annexe affichée est "10"
-
-  Scenario: Le bouton Valider est désactivé si le nom est vide
-    Given l'écran d'accueil est affiché
-    When j'ouvre le formulaire profil et je vide le nom
+  Scenario: Le bouton Valider est désactivé si le nom est vide dans l'onboarding
+    Given l'écran d'onboarding est affiché
+    When je vide le champ nom
     Then le bouton Valider est désactivé
 
   Scenario: Erreur hors du Provider

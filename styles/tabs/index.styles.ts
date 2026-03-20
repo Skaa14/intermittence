@@ -121,37 +121,6 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.textMuted,
   },
-  row: {
-    flexDirection: "row",
-    gap: 8,
-    marginTop: 8,
-  },
-  demoHint: {
-    fontSize: 13,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    marginBottom: 12,
-  },
-  demoBtn: {
-    flex: 1,
-    backgroundColor: colors.bgSubtle,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 8,
-    padding: 12,
-    alignItems: "center",
-  },
-  demoBtnLabel: {
-    fontSize: 14,
-    fontFamily: fonts.bold,
-    color: colors.textDark,
-  },
-  demoBtnSub: {
-    fontSize: 12,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
   simulationSection: {
     marginTop: 16,
     paddingTop: 16,

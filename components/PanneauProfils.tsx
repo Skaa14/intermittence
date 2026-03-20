@@ -18,6 +18,7 @@ import { useProfils } from "../contexts/ProfilsContext";
 import { ProfilIntermittent } from "../types/profil";
 import FormulaireProfil from "./FormulaireProfil";
 import DialogueTexte from "./DialogueTexte";
+import { TypeDonneesTest, sauvegarderDonneesTest } from "../utils/donneesTest";
 import { colors } from "../theme/colors";
 import {
   styles,
@@ -109,8 +110,11 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     onFermer();
   };
 
-  const handleValiderCreation = (profil: Omit<ProfilIntermittent, "id">) => {
+  const handleValiderCreation = async (profil: Omit<ProfilIntermittent, "id">, donneesTest?: TypeDonneesTest) => {
     const id = ajouterProfil(profil);
+    if (donneesTest) {
+      await sauvegarderDonneesTest(id, donneesTest);
+    }
     changerProfilActif(id);
     onFermer();
   };
@@ -199,7 +203,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
 
   const renderFormulaire = (
     profilInitial: ProfilIntermittent | undefined,
-    onValider: (profil: Omit<ProfilIntermittent, "id">) => void,
+    onValider: (profil: Omit<ProfilIntermittent, "id">, donneesTest?: TypeDonneesTest) => void | Promise<void>,
     onAnnuler: () => void,
   ) => (
     <ScrollView style={styles.formulaireScroll} keyboardShouldPersistTaps="handled">

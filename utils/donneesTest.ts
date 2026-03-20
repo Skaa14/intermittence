@@ -3,6 +3,9 @@ import { Formation, OptionFormation } from "../types/formation";
 import { Enseignement } from "../types/enseignement";
 import { ProfilIntermittent } from "../types/profil";
 import { formatDate } from "./date";
+import { sauvegarderParCle, cleProfilData } from "./storage";
+
+export type TypeDonneesTest = "artiste" | "technicien";
 
 type ContratSansId = Omit<Contrat, "id">;
 type FormationSansId = Omit<Formation, "id">;
@@ -172,4 +175,13 @@ export function creerContratsTechnicien(): ContratSansId[] {
     c(ann, 7, 6, 12, "Festival des nuits", 70, 2450),
     c(ann, 9, 8, 14, "Festival d'été", 70, 2450),
   ];
+}
+
+export async function sauvegarderDonneesTest(profilId: string, type: TypeDonneesTest): Promise<void> {
+  const contrats = type === "artiste" ? creerContratsArtiste() : creerContratsTechnicien();
+  const formations = type === "artiste" ? creerFormationsArtiste() : creerFormationsTechnicien();
+  const enseignements = type === "artiste" ? creerEnseignementsArtiste() : creerEnseignementsTechnicien();
+  await sauvegarderParCle(cleProfilData(profilId, "contrats"), contrats.map((c, i) => ({ ...c, id: String(i + 1) })));
+  await sauvegarderParCle(cleProfilData(profilId, "formations"), formations.map((f, i) => ({ ...f, id: String(i + 1) })));
+  await sauvegarderParCle(cleProfilData(profilId, "enseignements"), enseignements.map((e, i) => ({ ...e, id: String(i + 1) })));
 }

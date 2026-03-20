@@ -7,9 +7,10 @@ Feature: Persistance des données
     And le dashboard affiche des contrats
 
   Scenario: Le profil configuré manuellement est restauré au redémarrage
-    Given je configure un profil sur l'écran d'accueil
+    Given un profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
       | Test | 10     | 700    | 18000   | 01/01/2026        |
+    And l'écran d'accueil est affiché
     When l'application redémarre
     Then l'indemnité journalière estimée est affichée
 

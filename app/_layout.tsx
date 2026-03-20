@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
-import { View, Text, Pressable } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View } from "react-native";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import {
@@ -14,7 +13,6 @@ import { colors } from "../theme/colors";
 import { ContratsProvider } from "../contexts/ContratsContext";
 import { FormationsProvider } from "../contexts/FormationsContext";
 import { EnseignementsProvider } from "../contexts/EnseignementsContext";
-import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
 import { ProfilsProvider, useProfils } from "../contexts/ProfilsContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import EcranOnboarding from "../components/EcranOnboarding";
@@ -22,24 +20,7 @@ import { styles } from "../styles/root-layout.styles";
 
 SplashScreen.preventAutoHideAsync();
 
-function BannerModeTest() {
-  const { nomProfil, reinitialiser } = useDonneesTest();
-  const insets = useSafeAreaInsets();
-
-  return (
-    <View style={[styles.bannerWrapper, { paddingTop: insets.top + 8 }]}>
-      <View style={styles.banner}>
-        <Text style={styles.bannerText}>Mode démo — {nomProfil}</Text>
-        <Pressable style={styles.bannerBtn} onPress={reinitialiser}>
-          <Text style={styles.bannerBtnText}>Réinitialiser</Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
 function AppContent() {
-  const { modeTest } = useDonneesTest();
   const { profils, chargementTermine } = useProfils();
 
   if (!chargementTermine) return null;
@@ -50,7 +31,6 @@ function AppContent() {
 
   return (
     <View style={styles.container}>
-      {modeTest && <BannerModeTest />}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
@@ -98,9 +78,7 @@ export default function RootLayout() {
         <ContratsProvider>
           <FormationsProvider>
             <EnseignementsProvider>
-              <DonneesTestProvider>
-                <AppContent />
-              </DonneesTestProvider>
+              <AppContent />
             </EnseignementsProvider>
           </FormationsProvider>
         </ContratsProvider>

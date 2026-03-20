@@ -1,19 +1,18 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { render, screen, fireEvent, waitFor, RenderResult } from "@testing-library/react-native";
+import { render, screen, waitFor, RenderResult } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AccueilScreen from "../../app/(tabs)/index";
 import { ProfilsProvider } from "../../contexts/ProfilsContext";
 import { ContratsProvider } from "../../contexts/ContratsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
-import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
-import { ProfilRow, configurerProfilViaFormulaire, prechargerProfilParDefaut } from "../helpers/accueil";
-import { resetPickerCallbacks } from "../helpers/mocks";
+import { ProfilRow, prechargerProfil } from "../helpers/accueil";
 import { flushAsync } from "../helpers/act";
-
-jest.mock("@react-native-community/datetimepicker", () =>
-  require("../helpers/mocks").mockDateTimePickerFactory()
-);
+import {
+  creerProfilArtiste,
+  creerProfilTechnicien,
+  sauvegarderDonneesTest,
+} from "../../utils/donneesTest";
 
 const feature = loadFeature("tests/features/persistance.feature");
 
@@ -23,9 +22,7 @@ const renderAccueil = async () => {
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
-            <DonneesTestProvider>
-              <AccueilScreen />
-            </DonneesTestProvider>
+            <AccueilScreen />
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
@@ -35,12 +32,18 @@ const renderAccueil = async () => {
   return result;
 };
 
+const seedDonneesTest = async (type: "artiste" | "technicien") => {
+  const profil = type === "artiste" ? creerProfilArtiste() : creerProfilTechnicien();
+  await AsyncStorage.setItem("intermittence:profils", JSON.stringify([profil]));
+  await AsyncStorage.setItem("intermittence:profilActifId", JSON.stringify(profil.id));
+  await sauvegarderDonneesTest(profil.id, type);
+};
+
 defineFeature(feature, (test) => {
   let vue: RenderResult;
 
   beforeEach(async () => {
     await AsyncStorage.clear();
-    resetPickerCallbacks();
   });
 
   test("Les contrats et le profil sont restaurés au redémarrage", ({
@@ -52,8 +55,8 @@ defineFeature(feature, (test) => {
     given(
       /^je charge les données de test "(.*)" sur l'écran d'accueil$/,
       async (type: string) => {
+        await seedDonneesTest(type as "artiste" | "technicien");
         vue = await renderAccueil();
-        fireEvent.press(screen.getByTestId(`btn-demo-${type}`));
       }
     );
 
@@ -77,17 +80,20 @@ defineFeature(feature, (test) => {
 
   test("Le profil configuré manuellement est restauré au redémarrage", ({
     given,
+    and,
     when,
     then,
   }) => {
     given(
-      "je configure un profil sur l'écran d'accueil",
+      "un profil est configuré",
       async (table: ProfilRow[]) => {
-        await prechargerProfilParDefaut();
-        vue = await renderAccueil();
-        configurerProfilViaFormulaire(table[0]);
+        await prechargerProfil(table[0]);
       }
     );
+
+    and("l'écran d'accueil est affiché", async () => {
+      vue = await renderAccueil();
+    });
 
     when("l'application redémarre", async () => {
       vue.unmount();
@@ -111,8 +117,8 @@ defineFeature(feature, (test) => {
     given(
       /^je charge les données de test "(.*)" sur l'écran d'accueil$/,
       async (type: string) => {
+        await seedDonneesTest(type as "artiste" | "technicien");
         vue = await renderAccueil();
-        fireEvent.press(screen.getByTestId(`btn-demo-${type}`));
       }
     );
 

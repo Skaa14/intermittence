@@ -10,8 +10,6 @@ import { useContrats } from "../../contexts/ContratsContext";
 import { useProfils } from "../../contexts/ProfilsContext";
 import { useFormations } from "../../contexts/FormationsContext";
 import { useEnseignements } from "../../contexts/EnseignementsContext";
-import { useDonneesTest } from "../../contexts/DonneesTestContext";
-import { ProfilIntermittent } from "../../types/profil";
 import { formatDate } from "../../utils/date";
 import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
 import { filtrerContratsPeriodeReference, trouverFCT, calculerDebutPeriodeReference, filtrerParPeriodeReference } from "../../utils/filtrerContratsPeriodeReference";
@@ -19,18 +17,15 @@ import { calculerHeuresFormationPlafonnees } from "../../utils/calculerHeuresFor
 import { calculerHeuresEnseignementPlafonnees } from "../../utils/calculerHeuresEnseignement";
 import { trouverDatesOuvertureEligibles, simulerOuverture } from "../../utils/simulerOuvertureDroits";
 import { PLAFOND_HEURES_FORMATION, PLAFOND_HEURES_ENSEIGNEMENT } from "../../utils/reglementation";
-import FormulaireProfil from "../../components/FormulaireProfil";
 import { styles } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
   const { contrats } = useContrats();
-  const { profilActif: profil, modifierProfil, ajouterProfil } = useProfils();
+  const { profilActif: profil } = useProfils();
   const { formations } = useFormations();
   const { enseignements } = useEnseignements();
-  const { chargerDonneesTest } = useDonneesTest();
   const router = useRouter();
 
-  const [formulaireOuvert, setFormulaireOuvert] = useState(false);
   const [contratFctId, setContratFctId] = useState<string | null>(null);
 
   const { ajBrute, ajNette } = useMemo(() => {
@@ -71,15 +66,6 @@ export default function AccueilScreen() {
   const totalHeures = totalHeuresContrats + heuresFormation + heuresEnseignement;
   const totalSalaire = contratsFiltrés.reduce((sum, c) => sum + c.salaireBrut, 0);
   const progression = Math.min((totalHeures / 507) * 100, 100);
-
-  const handleValider = (donnees: Omit<ProfilIntermittent, "id">) => {
-    if (profil) {
-      modifierProfil(profil.id, donnees);
-    } else {
-      ajouterProfil(donnees);
-    }
-    setFormulaireOuvert(false);
-  };
 
   const annexeLabel = profil?.annexe === "10" ? "Artiste" : "Technicien";
 
@@ -192,30 +178,28 @@ export default function AccueilScreen() {
         <Text testID="contrats-count" style={styles.cardValue}>{contrats.length}</Text>
       </View>
 
-      {profil && !formulaireOuvert && (
+      {profil && (
         <View testID="aj-card" style={styles.ajCard}>
-          <Pressable testID="btn-modifier-profil" onPress={() => setFormulaireOuvert(true)}>
-            <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
-            <View style={styles.ajRow}>
-              <View style={styles.ajCol}>
-                <Text style={styles.ajColLabel}>Brut</Text>
-                <Text testID="aj-value" style={styles.ajValue}>
-                  {ajBrute.toFixed(2)} €
-                </Text>
-              </View>
-              <View style={styles.ajCol}>
-                <Text style={styles.ajColLabel}>Net</Text>
-                <Text testID="aj-nette-value" style={styles.ajNetteValue}>
-                  {ajNette.toFixed(2)} €
-                </Text>
-              </View>
+          <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
+          <View style={styles.ajRow}>
+            <View style={styles.ajCol}>
+              <Text style={styles.ajColLabel}>Brut</Text>
+              <Text testID="aj-value" style={styles.ajValue}>
+                {ajBrute.toFixed(2)} €
+              </Text>
             </View>
-            <Text style={styles.ajDetail}>
-              {profil.nom} ({annexeLabel}) — Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
-              {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
-              {profil.dateAnniversaire}
-            </Text>
-          </Pressable>
+            <View style={styles.ajCol}>
+              <Text style={styles.ajColLabel}>Net</Text>
+              <Text testID="aj-nette-value" style={styles.ajNetteValue}>
+                {ajNette.toFixed(2)} €
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.ajDetail}>
+            {profil.nom} ({annexeLabel}) — Annexe {profil.annexe} — {profil.heuresTravaillees}h —{" "}
+            {profil.salaireReference.toFixed(0)} € — Anniversaire :{" "}
+            {profil.dateAnniversaire}
+          </Text>
           <Pressable
             testID="btn-detail-calcul"
             style={styles.btnDetailCalcul}
@@ -226,40 +210,6 @@ export default function AccueilScreen() {
         </View>
       )}
 
-      {!formulaireOuvert && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Données de test</Text>
-          <Text style={styles.demoHint}>
-            Charge un profil fictif pour explorer l'application
-          </Text>
-          <View style={styles.row}>
-            <Pressable
-              testID="btn-demo-artiste"
-              style={styles.demoBtn}
-              onPress={() => chargerDonneesTest("artiste")}
-            >
-              <Text style={styles.demoBtnLabel}>Artiste</Text>
-              <Text style={styles.demoBtnSub}>Anx. 10</Text>
-            </Pressable>
-            <Pressable
-              testID="btn-demo-technicien"
-              style={styles.demoBtn}
-              onPress={() => chargerDonneesTest("technicien")}
-            >
-              <Text style={styles.demoBtnLabel}>Technicien</Text>
-              <Text style={styles.demoBtnSub}>Anx. 8</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-
-      {formulaireOuvert && (
-        <FormulaireProfil
-          profilInitial={profil ?? undefined}
-          onValider={handleValider}
-          onAnnuler={() => setFormulaireOuvert(false)}
-        />
-      )}
     </ScrollView>
   );
 }

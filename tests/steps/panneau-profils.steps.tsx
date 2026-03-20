@@ -3,6 +3,9 @@ import { render, fireEvent, screen, act, waitFor } from "@testing-library/react-
 import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ProfilsProvider } from "../../contexts/ProfilsContext";
+import { ContratsProvider } from "../../contexts/ContratsContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import BoutonProfil from "../../components/BoutonProfil";
 import PanneauProfils from "../../components/PanneauProfils";
 import { ProfilIntermittent } from "../../types/profil";
@@ -43,8 +46,14 @@ const renderComposants = async (visible = false) => {
 
   const result = render(
     <ProfilsProvider>
-      <BoutonProfil onPress={() => { panneauVisible = true; }} />
-      <PanneauProfils visible={panneauVisible} onFermer={onFermer} />
+      <ContratsProvider>
+        <FormationsProvider>
+          <EnseignementsProvider>
+            <BoutonProfil onPress={() => { panneauVisible = true; }} />
+            <PanneauProfils visible={panneauVisible} onFermer={onFermer} />
+          </EnseignementsProvider>
+        </FormationsProvider>
+      </ContratsProvider>
     </ProfilsProvider>
   );
   await flushAsync();
@@ -57,8 +66,14 @@ const renderAvecPanneau = async (profils: ProfilIntermittent[], actifId: string)
 
   const result = render(
     <ProfilsProvider>
-      <BoutonProfil onPress={() => {}} />
-      <PanneauProfils visible={true} onFermer={onFermer} />
+      <ContratsProvider>
+        <FormationsProvider>
+          <EnseignementsProvider>
+            <BoutonProfil onPress={() => {}} />
+            <PanneauProfils visible={true} onFermer={onFermer} />
+          </EnseignementsProvider>
+        </FormationsProvider>
+      </ContratsProvider>
     </ProfilsProvider>
   );
   await flushAsync();

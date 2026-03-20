@@ -1,14 +1,17 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { fireEvent, renderHook, screen } from "@testing-library/react-native";
+import { render, fireEvent, renderHook, screen } from "@testing-library/react-native";
 import { useProfils } from "../../contexts/ProfilsContext";
-import { resetPickerCallbacks } from "../helpers/mocks";
+import { ProfilsProvider } from "../../contexts/ProfilsContext";
+import { ContratsProvider } from "../../contexts/ContratsContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
+import EcranOnboarding from "../../components/EcranOnboarding";
 import {
   renderAccueilScreen,
-  configurerProfilViaFormulaire,
-  ouvrirFormulaireProfil,
-  prechargerProfilParDefaut,
+  prechargerProfil,
   ProfilRow,
 } from "../helpers/accueil";
+import { flushAsync } from "../helpers/act";
 
 jest.mock("@react-native-community/datetimepicker", () =>
   require("../helpers/mocks").mockDateTimePickerFactory()
@@ -16,19 +19,29 @@ jest.mock("@react-native-community/datetimepicker", () =>
 
 const feature = loadFeature("tests/features/profil.feature");
 
-defineFeature(feature, (test) => {
-  beforeEach(() => {
-    resetPickerCallbacks();
-  });
+const renderOnboarding = async () => {
+  render(
+    <ProfilsProvider>
+      <ContratsProvider>
+        <FormationsProvider>
+          <EnseignementsProvider>
+            <EcranOnboarding />
+          </EnseignementsProvider>
+        </FormationsProvider>
+      </ContratsProvider>
+    </ProfilsProvider>
+  );
+  await flushAsync();
+};
 
+defineFeature(feature, (test) => {
   test("Configuration du profil", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await prechargerProfilParDefaut();
-      await renderAccueilScreen();
+    given("un profil est configuré", async (table: ProfilRow[]) => {
+      await prechargerProfil(table[0]);
     });
 
-    when("je configure mon profil", (table: ProfilRow[]) => {
-      configurerProfilViaFormulaire(table[0]);
+    when("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then("l'indemnité journalière estimée est affichée", () => {
@@ -37,13 +50,12 @@ defineFeature(feature, (test) => {
   });
 
   test("Le nom du profil est affiché dans la carte AJ", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await prechargerProfilParDefaut();
-      await renderAccueilScreen();
+    given("un profil est configuré", async (table: ProfilRow[]) => {
+      await prechargerProfil(table[0]);
     });
 
-    when("je configure mon profil", (table: ProfilRow[]) => {
-      configurerProfilViaFormulaire(table[0]);
+    when("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
     });
 
     then(/^la carte AJ contient "(.*)"$/, (texte: string) => {
@@ -52,33 +64,12 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test("Modification du profil existant", ({ given, when, then, and }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await prechargerProfilParDefaut();
-      await renderAccueilScreen();
+  test("Le bouton Valider est désactivé si le nom est vide dans l'onboarding", ({ given, when, then }) => {
+    given("l'écran d'onboarding est affiché", async () => {
+      await renderOnboarding();
     });
 
-    and("je configure mon profil", (table: ProfilRow[]) => {
-      configurerProfilViaFormulaire(table[0]);
-    });
-
-    when("je reconfigure mon profil", (table: ProfilRow[]) => {
-      configurerProfilViaFormulaire(table[0]);
-    });
-
-    then(/^l'annexe affichée est "(.*)"$/, (annexe: string) => {
-      expect(screen.getByText(new RegExp(`Annexe ${annexe}`))).toBeTruthy();
-    });
-  });
-
-  test("Le bouton Valider est désactivé si le nom est vide", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await prechargerProfilParDefaut();
-      await renderAccueilScreen();
-    });
-
-    when("j'ouvre le formulaire profil et je vide le nom", () => {
-      ouvrirFormulaireProfil();
+    when("je vide le champ nom", () => {
       fireEvent.changeText(screen.getByTestId("input-nom-profil"), "");
     });
 

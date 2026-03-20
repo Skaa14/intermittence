@@ -5,11 +5,12 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { ProfilIntermittent, Annexe, TauxCSG } from "../types/profil";
 import { formatDate, parseDate } from "../utils/date";
+import { creerProfilArtiste, creerProfilTechnicien, TypeDonneesTest } from "../utils/donneesTest";
 import { styles, webDateInputStyle } from "./FormulaireProfil.styles";
 
 interface FormulaireProfilProps {
   profilInitial?: ProfilIntermittent;
-  onValider: (profil: Omit<ProfilIntermittent, "id">) => void;
+  onValider: (profil: Omit<ProfilIntermittent, "id">, donneesTest?: TypeDonneesTest) => void | Promise<void>;
   onAnnuler?: () => void;
 }
 
@@ -33,7 +34,14 @@ export default function FormulaireProfil({
   const [tauxCSG, setTauxCSG] = useState<TauxCSG>(profilInitial?.tauxCSG ?? "standard");
   const [alsaceMoselle, setAlsaceMoselle] = useState(profilInitial?.alsaceMoselle ?? false);
 
+  const estCreation = !profilInitial;
   const nomValide = nom.trim().length > 0;
+
+  const appliquerDonneesTest = async (type: TypeDonneesTest) => {
+    const profil = type === "artiste" ? creerProfilArtiste() : creerProfilTechnicien();
+    const { id: _, ...sanId } = profil;
+    await onValider(sanId, type);
+  };
 
   const handleValider = () => {
     const salaire = Number(salaireReference);
@@ -62,6 +70,30 @@ export default function FormulaireProfil({
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mon profil intermittent</Text>
+
+      {estCreation && (
+        <View style={styles.demoRow}>
+          <Text style={styles.demoHint}>Charger un profil de test :</Text>
+          <View style={styles.demoBtns}>
+            <Pressable
+              testID="btn-test-artiste"
+              style={styles.demoBtn}
+              onPress={() => appliquerDonneesTest("artiste")}
+            >
+              <Text style={styles.demoBtnLabel}>Artiste</Text>
+              <Text style={styles.demoBtnSub}>Anx. 10</Text>
+            </Pressable>
+            <Pressable
+              testID="btn-test-technicien"
+              style={styles.demoBtn}
+              onPress={() => appliquerDonneesTest("technicien")}
+            >
+              <Text style={styles.demoBtnLabel}>Technicien</Text>
+              <Text style={styles.demoBtnSub}>Anx. 8</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
 
       <Text style={styles.label}>Nom du profil</Text>
       <TextInput

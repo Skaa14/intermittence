@@ -54,7 +54,7 @@ contexts/ContratsContext.tsx ← Contrats scopés par profil actif
 contexts/ProfilsContext.tsx  ← Gestion multi-profils (profils, profilActif, CRUD)
 contexts/FormationsContext.tsx ← Formations scopées par profil actif
 contexts/EnseignementsContext.tsx ← Enseignements scopés par profil actif
-contexts/DonneesTestContext.tsx ← Chargement de données de démo
+utils/donneesTest.ts            ← Données de démo (profils, contrats, formations, enseignements)
 utils/calculerAJ.ts         ← Calcul de l'indemnité journalière
 utils/calculerIndemnisationMensuelle.ts ← Calcul des 12 mois de la période d'indemnisation
 docs/                   ← Documentation du projet

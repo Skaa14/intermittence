@@ -1,46 +1,75 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { screen, fireEvent } from "@testing-library/react-native";
-import { renderAccueilScreen } from "../helpers/accueil";
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import EcranOnboarding from "../../components/EcranOnboarding";
+import { ProfilsProvider } from "../../contexts/ProfilsContext";
+import { ContratsProvider } from "../../contexts/ContratsContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
+import { flushAsync } from "../helpers/act";
 
 const feature = loadFeature("tests/features/donnees-test.feature");
 
+const renderOnboarding = async () => {
+  render(
+    <ProfilsProvider>
+      <ContratsProvider>
+        <FormationsProvider>
+          <EnseignementsProvider>
+            <EcranOnboarding />
+          </EnseignementsProvider>
+        </FormationsProvider>
+      </ContratsProvider>
+    </ProfilsProvider>
+  );
+  await flushAsync();
+};
+
 defineFeature(feature, (test) => {
-  test("Les boutons de démo sont visibles", ({ given, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await renderAccueilScreen();
+  test("Les boutons de test sont visibles en mode création", ({ given, then }) => {
+    given("l'écran d'onboarding est affiché", async () => {
+      await renderOnboarding();
     });
 
     then("les boutons de données de test sont visibles", () => {
-      expect(screen.getByTestId("btn-demo-artiste")).toBeTruthy();
-      expect(screen.getByTestId("btn-demo-technicien")).toBeTruthy();
+      expect(screen.getByTestId("btn-test-artiste")).toBeTruthy();
+      expect(screen.getByTestId("btn-test-technicien")).toBeTruthy();
     });
   });
 
-  test("Chargement du profil artiste", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await renderAccueilScreen();
+  test("Application du profil artiste", ({ given, when, then }) => {
+    given("l'écran d'onboarding est affiché", async () => {
+      await renderOnboarding();
     });
 
-    when(/^je charge les données de test "(.*)"$/, (type: string) => {
-      fireEvent.press(screen.getByTestId(`btn-demo-${type}`));
+    when(/^j'applique le profil de test "(.*)"$/, async (type: string) => {
+      fireEvent.press(screen.getByTestId(`btn-test-${type}`));
+      await flushAsync();
     });
 
-    then("l'indemnité journalière estimée est affichée", () => {
-      expect(screen.getByTestId("aj-value")).toBeTruthy();
+    then(/^le profil est enregistré avec le nom "(.*)"$/, async (nom: string) => {
+      const stored = await AsyncStorage.getItem("intermittence:profils");
+      const profils = JSON.parse(stored!);
+      expect(profils).toHaveLength(1);
+      expect(profils[0].nom).toBe(nom);
     });
   });
 
-  test("Chargement du profil technicien", ({ given, when, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await renderAccueilScreen();
+  test("Application du profil technicien", ({ given, when, then }) => {
+    given("l'écran d'onboarding est affiché", async () => {
+      await renderOnboarding();
     });
 
-    when(/^je charge les données de test "(.*)"$/, (type: string) => {
-      fireEvent.press(screen.getByTestId(`btn-demo-${type}`));
+    when(/^j'applique le profil de test "(.*)"$/, async (type: string) => {
+      fireEvent.press(screen.getByTestId(`btn-test-${type}`));
+      await flushAsync();
     });
 
-    then("l'indemnité journalière estimée est affichée", () => {
-      expect(screen.getByTestId("aj-value")).toBeTruthy();
+    then(/^le profil est enregistré avec le nom "(.*)"$/, async (nom: string) => {
+      const stored = await AsyncStorage.getItem("intermittence:profils");
+      const profils = JSON.parse(stored!);
+      expect(profils).toHaveLength(1);
+      expect(profils[0].nom).toBe(nom);
     });
   });
 });

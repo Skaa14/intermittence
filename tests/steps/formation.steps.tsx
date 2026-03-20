@@ -6,7 +6,6 @@ import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider, useFormations } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
-import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
 import { ProfilIntermittent } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { Formation, OptionFormation } from "../../types/formation";
@@ -67,9 +66,7 @@ const renderAccueil = async () => {
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
-            <DonneesTestProvider>
-              <SetupAccueil />
-            </DonneesTestProvider>
+            <SetupAccueil />
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>

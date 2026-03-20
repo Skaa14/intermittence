@@ -1,8 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CLES = {
-  modeTest: "intermittence:modeTest",
-  nomProfil: "intermittence:nomProfil",
   profils: "intermittence:profils",
   profilActifId: "intermittence:profilActifId",
 } as const;

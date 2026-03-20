@@ -54,8 +54,8 @@ Permettre de gérer plusieurs profils intermittents dans l'application. Chaque p
 | 3 | Extraire le formulaire profil + champ nom | Done | [iteration-3-formulaire-profil.md](iteration-3-formulaire-profil.md) |
 | 4 | Bouton profil + side panel basique | Done | [iteration-4-bouton-panel.md](iteration-4-bouton-panel.md) |
 | 5 | Menu actions (3 points) + édition profil | Done | [iteration-5-menu-actions.md](iteration-5-menu-actions.md) |
-| 6 | Onboarding premier lancement | | [iteration-6-onboarding.md](iteration-6-onboarding.md) |
-| 7 | Données de test + nettoyage | | [iteration-7-donnees-test.md](iteration-7-donnees-test.md) |
+| 6 | Onboarding premier lancement | Done | [iteration-6-onboarding.md](iteration-6-onboarding.md) |
+| 7 | Données de test + nettoyage | Done | [iteration-7-donnees-test.md](iteration-7-donnees-test.md) |
 
 ---
 

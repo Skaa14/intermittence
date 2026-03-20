@@ -3,6 +3,9 @@ import { render, fireEvent, screen } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import EcranOnboarding from "../../components/EcranOnboarding";
 import { ProfilsProvider } from "../../contexts/ProfilsContext";
+import { ContratsProvider } from "../../contexts/ContratsContext";
+import { FormationsProvider } from "../../contexts/FormationsContext";
+import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { resetPickerCallbacks, selectDatePicker } from "../helpers/mocks";
 import { ddmmyyyyToIso } from "../helpers/date";
 import { flushAsync } from "../helpers/act";
@@ -17,7 +20,13 @@ const feature = loadFeature("tests/features/onboarding.feature");
 const renderOnboarding = async () => {
   render(
     <ProfilsProvider>
-      <EcranOnboarding />
+      <ContratsProvider>
+        <FormationsProvider>
+          <EnseignementsProvider>
+            <EcranOnboarding />
+          </EnseignementsProvider>
+        </FormationsProvider>
+      </ContratsProvider>
     </ProfilsProvider>
   );
   await flushAsync();

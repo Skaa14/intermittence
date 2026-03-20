@@ -106,6 +106,40 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     color: colors.textDark,
   },
+  demoRow: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  demoHint: {
+    fontSize: 13,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginBottom: 8,
+  },
+  demoBtns: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  demoBtn: {
+    flex: 1,
+    backgroundColor: colors.bgSubtle,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    padding: 12,
+    alignItems: "center",
+  },
+  demoBtnLabel: {
+    fontSize: 14,
+    fontFamily: fonts.bold,
+    color: colors.textDark,
+  },
+  demoBtnSub: {
+    fontSize: 12,
+    fontFamily: fonts.regular,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
   btnValider: {
     flex: 1,
     backgroundColor: colors.primary,
@@ -114,7 +148,6 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnValiderFull: {
-    flex: 0,
     width: "100%",
   },
   btnValiderDisabled: {
