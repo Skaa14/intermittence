@@ -2,6 +2,9 @@ import { StyleSheet } from "react-native";
 import { colors } from "../../theme/colors";
 
 export const styles = StyleSheet.create({
+  conteneur: {
+    flex: 1,
+  },
   tabBar: {
     flexDirection: "row",
     minHeight: 56,

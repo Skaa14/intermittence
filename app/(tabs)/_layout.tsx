@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Pressable } from "react-native";
@@ -5,6 +6,8 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../theme/colors";
 import { styles } from "../../styles/tabs/layout.styles";
+import BoutonProfil from "../../components/BoutonProfil";
+import PanneauProfils from "../../components/PanneauProfils";
 
 const TAB_ICONS: Record<string, { active: keyof typeof Ionicons.glyphMap; inactive: keyof typeof Ionicons.glyphMap }> = {
   index: { active: "home", inactive: "home-outline" },
@@ -38,17 +41,28 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 }
 
 export default function TabsLayout() {
+  const [panneauOuvert, setPanneauOuvert] = useState(false);
+
   return (
-    <Tabs
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.primary },
-        headerTintColor: colors.textOnPrimary,
-      }}
-    >
-      <Tabs.Screen name="index" options={{ title: "Simulateur ARE" }} />
-      <Tabs.Screen name="contrats" options={{ title: "Contrats" }} />
-      <Tabs.Screen name="vue-mensuelle" options={{ title: "Vue mensuelle" }} />
-    </Tabs>
+    <View style={styles.conteneur}>
+      <Tabs
+        tabBar={(props) => <CustomTabBar {...props} />}
+        screenOptions={{
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.textOnPrimary,
+          headerRight: () => (
+            <BoutonProfil onPress={() => setPanneauOuvert(true)} />
+          ),
+        }}
+      >
+        <Tabs.Screen name="index" options={{ title: "Simulateur ARE" }} />
+        <Tabs.Screen name="contrats" options={{ title: "Contrats" }} />
+        <Tabs.Screen name="vue-mensuelle" options={{ title: "Vue mensuelle" }} />
+      </Tabs>
+      <PanneauProfils
+        visible={panneauOuvert}
+        onFermer={() => setPanneauOuvert(false)}
+      />
+    </View>
   );
 }

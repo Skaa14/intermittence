@@ -39,6 +39,9 @@ export const colors = {
   enseignement: "#5B6ABF",
   enseignementBg: "#EAECF7",
 
+  // Overlay
+  overlay: "rgba(0, 0, 0, 0.4)",
+
   // Divers
   shadow: "#001C2F",
   textOnPrimary: "#FFFFFF",
