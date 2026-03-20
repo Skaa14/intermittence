@@ -8,8 +8,8 @@ Feature: Persistance des données
 
   Scenario: Le profil configuré manuellement est restauré au redémarrage
     Given je configure un profil sur l'écran d'accueil
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 10     | 700    | 18000   | 01/01/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 10     | 700    | 18000   | 01/01/2026        |
     When l'application redémarre
     Then l'indemnité journalière estimée est affichée
 

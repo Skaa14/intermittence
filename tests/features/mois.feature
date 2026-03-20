@@ -5,8 +5,8 @@ Feature: Détail d'un mois
 
   Scenario: Décomposition du calcul sans contrat
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then les jours calendaires affichés sont "30"
     And les jours travaillés affichés sont "0"
@@ -16,8 +16,8 @@ Feature: Détail d'un mois
 
   Scenario: Contrat du mois affiché dans le détail
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Théâtre   | 01/04/2026 | 30/04/2026 | 40     | 1500    |
@@ -32,8 +32,8 @@ Feature: Détail d'un mois
 
   Scenario: Totaux du mois affichés dans le détail
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then l'ARE versée affichée est "1221 €"
     And le salaire brut affiché est "0 €"
@@ -41,37 +41,37 @@ Feature: Détail d'un mois
 
   Scenario: Franchise salaire affichée quand le salaire de référence est élevé
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 400    | 30000   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 400    | 30000   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then la franchise salaire affichée est "4"
 
   Scenario: Franchises nulles quand les heures travaillées sont zéro
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 0      | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 0      | 13800   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then les jours indemnisés affichés sont "23"
 
   Scenario: Exemple officiel 6 — AJ technicien annexe 8 avec 800h et 18000 euros
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 800    | 18000   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 800    | 18000   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then l'ARE versée affichée est "1360 €"
     And la franchise congés payés affichée est "2"
 
   Scenario: Exemple officiel 10 — Franchise CP musicien annexe 10 avec 176 jours travaillés
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 10     | 1760   | 20000   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 10     | 1760   | 20000   | 01/04/2026        |
     And je suis sur le détail du mois d'index 0
     Then la franchise congés payés affichée est "2"
 
   Scenario: Exemple officiel 12 — Plafond mensuel réduit l'ARE
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 800    | 18000   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 800    | 18000   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Studio    | 01/05/2026 | 31/05/2026 | 80     | 4000    |
@@ -81,8 +81,8 @@ Feature: Détail d'un mois
 
   Scenario: Salaire mensuel seul dépasse le plafond — ARE nulle
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 800    | 18000   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 800    | 18000   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Studio    | 01/05/2026 | 31/05/2026 | 40     | 5000    |
@@ -92,8 +92,8 @@ Feature: Détail d'un mois
 
   Scenario: Jours indemnisés nuls mais salaire dépasse le plafond
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 0      | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 0      | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Studio    | 01/04/2026 | 30/04/2026 | 200    | 5000    |
@@ -104,8 +104,8 @@ Feature: Détail d'un mois
 
   Scenario: Seuil de non-indemnisation atteint annexe 8
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Studio    | 01/05/2026 | 31/05/2026 | 210    | 3000    |
@@ -116,8 +116,8 @@ Feature: Détail d'un mois
 
   Scenario: Seuil de non-indemnisation atteint annexe 10
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 10     | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 10     | 507    | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Studio    | 01/05/2026 | 31/05/2026 | 280    | 4000    |
@@ -128,23 +128,23 @@ Feature: Détail d'un mois
 
   Scenario: Jours calendaires réduits le mois de la date d'anniversaire
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 21/08/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 21/08/2026        |
     And je suis sur le détail du mois d'index 0
     Then les jours calendaires affichés sont "11"
     And les jours indemnisés affichés sont "2"
 
   Scenario: Jours calendaires complets le mois suivant la date d'anniversaire
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 21/08/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 21/08/2026        |
     And je suis sur le détail du mois d'index 1
     Then les jours calendaires affichés sont "30"
 
   Scenario: Seuil de non-indemnisation non atteint annexe 8
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Studio    | 01/05/2026 | 31/05/2026 | 100    | 1500    |

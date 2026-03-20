@@ -5,6 +5,7 @@ import { resetPickerCallbacks } from "../helpers/mocks";
 import {
   renderAccueilScreen,
   configurerProfilViaFormulaire,
+  ouvrirFormulaireProfil,
   ProfilRow,
 } from "../helpers/accueil";
 
@@ -43,6 +44,21 @@ defineFeature(feature, (test) => {
     });
   });
 
+  test("Le nom du profil est affiché dans la carte AJ", ({ given, when, then }) => {
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
+    });
+
+    when("je configure mon profil", (table: ProfilRow[]) => {
+      configurerProfilViaFormulaire(table[0]);
+    });
+
+    then(/^la carte AJ contient "(.*)"$/, (texte: string) => {
+      const escaped = texte.replace(/[()]/g, "\\$&");
+      expect(screen.getByText(new RegExp(escaped))).toBeTruthy();
+    });
+  });
+
   test("Modification du profil existant", ({ given, when, then, and }) => {
     given("l'écran d'accueil est affiché", async () => {
       await renderAccueilScreen();
@@ -58,6 +74,21 @@ defineFeature(feature, (test) => {
 
     then(/^l'annexe affichée est "(.*)"$/, (annexe: string) => {
       expect(screen.getByText(new RegExp(`Annexe ${annexe}`))).toBeTruthy();
+    });
+  });
+
+  test("Le bouton Valider est désactivé si le nom est vide", ({ given, when, then }) => {
+    given("l'écran d'accueil est affiché", async () => {
+      await renderAccueilScreen();
+    });
+
+    when("j'ouvre le formulaire profil", () => {
+      ouvrirFormulaireProfil();
+    });
+
+    then("le bouton Valider est désactivé", () => {
+      const btn = screen.getByTestId("btn-valider-profil");
+      expect(btn.props.accessibilityState?.disabled).toBe(true);
     });
   });
 

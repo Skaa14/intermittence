@@ -9,14 +9,14 @@ Feature: Vue mensuelle
 
   Scenario: 12 cartes affichées avec profil configuré
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     Then 12 cartes de mois sont affichées
 
   Scenario: Heures travaillées affichées sur la carte d'un mois avec contrat
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     And ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Théâtre   | 01/04/2026 | 30/04/2026 | 40     | 1500    |
@@ -25,13 +25,13 @@ Feature: Vue mensuelle
 
   Scenario: Jours indemnisés affichés sur la carte
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     Then la carte du mois 1 affiche les jours indemnisés
 
   Scenario: Navigation vers le détail d'un mois
     Given le profil est configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 507    | 13800   | 01/04/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
     When je tape sur la carte du mois 1
     Then je suis redirigé vers "/mois/1"

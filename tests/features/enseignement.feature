@@ -13,8 +13,8 @@ Feature: Heures d'enseignement
 
   Scenario: Les heures d'enseignement comptent pour les 507h sur le dashboard
     Given un profil configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 600    | 18000   | 15/03/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 600    | 18000   | 15/03/2026        |
     And un contrat existe
       | Employeur   | Début      | Fin        | Heures | Salaire |
       | Cie Lumière | 01/04/2026 | 15/04/2026 | 400    | 6000    |
@@ -26,8 +26,8 @@ Feature: Heures d'enseignement
 
   Scenario: Les heures d'enseignement sont plafonnées à 70h
     Given un profil configuré
-      | Annexe | Heures | Salaire | Date anniversaire |
-      | 8      | 600    | 18000   | 15/03/2026        |
+      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
+      | Test | 8      | 600    | 18000   | 15/03/2026        |
     And un contrat existe
       | Employeur   | Début      | Fin        | Heures | Salaire |
       | Cie Lumière | 01/04/2026 | 15/04/2026 | 400    | 6000    |

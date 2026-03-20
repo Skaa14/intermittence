@@ -10,6 +10,7 @@ import { ddmmyyyyToIso } from "./date";
 import { flushAsync } from "./act";
 
 export type ProfilRow = {
+  Nom: string;
   Annexe: string;
   Heures: string;
   Salaire: string;
@@ -56,6 +57,7 @@ export const selectDateAnniversaire = (isoDate: string) => {
 
 export const configurerProfilViaFormulaire = (row: ProfilRow) => {
   ouvrirFormulaireProfil();
+  fireEvent.changeText(screen.getByTestId("input-nom-profil"), row.Nom);
   const testID = `btn-annexe-${row.Annexe}`;
   if (!["8", "10"].includes(row.Annexe)) throw new Error(`Annexe inconnue dans le helper : "${row.Annexe}"`);
   fireEvent.press(screen.getByTestId(testID));
@@ -68,5 +70,5 @@ export const configurerProfilViaFormulaire = (row: ProfilRow) => {
   if (row["Alsace-Moselle"] === "oui") {
     fireEvent.press(screen.getByTestId("btn-alsace-moselle"));
   }
-  fireEvent.press(screen.getByText("Valider"));
+  fireEvent.press(screen.getByTestId("btn-valider-profil"));
 };

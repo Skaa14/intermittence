@@ -50,8 +50,8 @@ Permettre de gérer plusieurs profils intermittents dans l'application. Chaque p
 | # | Titre | Statut | Doc |
 |---|-------|--------|-----|
 | 1 | Modèle de données + ProfilsContext | Done | [iteration-1-modele-donnees.md](iteration-1-modele-donnees.md) |
-| 2 | Scoper les contextes existants par profil | | [iteration-2-scoper-contextes.md](iteration-2-scoper-contextes.md) |
-| 3 | Extraire le formulaire profil + champ nom | | [iteration-3-formulaire-profil.md](iteration-3-formulaire-profil.md) |
+| 2 | Scoper les contextes existants par profil | Done | [iteration-2-scoper-contextes.md](iteration-2-scoper-contextes.md) |
+| 3 | Extraire le formulaire profil + champ nom | Done | [iteration-3-formulaire-profil.md](iteration-3-formulaire-profil.md) |
 | 4 | Bouton profil + side panel basique | | [iteration-4-bouton-panel.md](iteration-4-bouton-panel.md) |
 | 5 | Menu actions (3 points) + édition profil | | [iteration-5-menu-actions.md](iteration-5-menu-actions.md) |
 | 6 | Onboarding premier lancement | | [iteration-6-onboarding.md](iteration-6-onboarding.md) |
