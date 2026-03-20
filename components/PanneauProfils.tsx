@@ -18,6 +18,7 @@ import { useProfils } from "../contexts/ProfilsContext";
 import { ProfilIntermittent, ProfilSansId } from "../types/profil";
 import FormulaireProfil from "./FormulaireProfil";
 import DialogueTexte from "./DialogueTexte";
+import DialogueCreationProfil from "./DialogueCreationProfil";
 import { TypeDonneesTest, sauvegarderDonneesTest } from "../utils/donneesTest";
 import { colors } from "../theme/colors";
 import {
@@ -31,7 +32,7 @@ interface PanneauProfilsProps {
   onFermer: () => void;
 }
 
-type ModePanel = "liste" | "creation" | "edition";
+type ModePanel = "liste" | "edition";
 
 interface MenuState {
   profilId: string;
@@ -50,6 +51,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
   const [profilEdite, setProfilEdite] = useState<ProfilIntermittent | null>(null);
   const [menu, setMenu] = useState<MenuState | null>(null);
   const [dialogue, setDialogue] = useState<DialogueState | null>(null);
+  const [dialogueCreation, setDialogueCreation] = useState(false);
   const [estMonte, setEstMonte] = useState(false);
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -66,6 +68,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
       setProfilEdite(null);
       setMenu(null);
       setDialogue(null);
+      setDialogueCreation(false);
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -116,6 +119,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
       await sauvegarderDonneesTest(id, donneesTest);
     }
     changerProfilActif(id);
+    setDialogueCreation(false);
     onFermer();
   };
 
@@ -237,9 +241,6 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
             { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 8 },
           ]}
         >
-          {mode === "creation" &&
-            renderFormulaire(undefined, handleValiderCreation, () => setMode("liste"))}
-
           {mode === "edition" &&
             renderFormulaire(profilEdite ?? undefined, handleValiderEdition, () => {
               setMode("liste");
@@ -301,7 +302,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
               <Pressable
                 testID="btn-ajouter-profil"
                 style={styles.btnAjouter}
-                onPress={() => setMode("creation")}
+                onPress={() => setDialogueCreation(true)}
               >
                 <Ionicons name="add" size={20} color={colors.primary} />
                 <Text style={styles.btnAjouterTexte}>Ajouter un profil</Text>
@@ -350,6 +351,12 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
         labelValider={dialogue?.type === "renommer" ? "Renommer" : "Dupliquer"}
         onValider={handleValiderDialogue}
         onAnnuler={() => setDialogue(null)}
+      />
+
+      <DialogueCreationProfil
+        visible={dialogueCreation}
+        onValider={handleValiderCreation}
+        onAnnuler={() => setDialogueCreation(false)}
       />
     </View>
   );

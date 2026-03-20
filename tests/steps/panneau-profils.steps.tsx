@@ -209,7 +209,7 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test("Ajout d'un profil via le formulaire dans le panneau", ({ given, when, then, and }) => {
+  test("Ajout d'un profil ouvre la dialogue de création", ({ given, when, then, and }) => {
     given(/^un profil actif avec le nom "(.*)"$/, async (nom: string) => {
       const p = profilFactory({ nom });
       await renderAvecPanneau([p], p.id);
@@ -221,9 +221,31 @@ defineFeature(feature, (test) => {
       fireEvent.press(screen.getByTestId("btn-ajouter-profil"));
     });
 
-    then("le formulaire de création est affiché", () => {
+    then("le formulaire de création est affiché dans une dialogue", () => {
       expect(screen.getByTestId("input-nom-profil")).toBeTruthy();
       expect(screen.getByTestId("btn-valider-profil")).toBeTruthy();
+    });
+  });
+
+  test("Fermeture de la dialogue de création par annulation", ({ given, when, then, and }) => {
+    given(/^un profil actif avec le nom "(.*)"$/, async (nom: string) => {
+      const p = profilFactory({ nom });
+      await renderAvecPanneau([p], p.id);
+    });
+
+    when("j'appuie sur le bouton profil", () => {});
+
+    and("j'appuie sur le bouton ajouter un profil", () => {
+      fireEvent.press(screen.getByTestId("btn-ajouter-profil"));
+    });
+
+    and("j'annule la création", () => {
+      const btnAnnuler = screen.getByText("Annuler");
+      fireEvent.press(btnAnnuler);
+    });
+
+    then("le formulaire de création n'est plus affiché", () => {
+      expect(screen.queryByTestId("input-nom-profil")).toBeNull();
     });
   });
 

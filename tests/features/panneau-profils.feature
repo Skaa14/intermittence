@@ -47,11 +47,18 @@ Feature: Panneau de sélection de profils
     And je tape sur l'overlay
     Then le panneau se ferme
 
-  Scenario: Ajout d'un profil via le formulaire dans le panneau
+  Scenario: Ajout d'un profil ouvre la dialogue de création
     Given un profil actif avec le nom "Marie"
     When j'appuie sur le bouton profil
     And j'appuie sur le bouton ajouter un profil
-    Then le formulaire de création est affiché
+    Then le formulaire de création est affiché dans une dialogue
+
+  Scenario: Fermeture de la dialogue de création par annulation
+    Given un profil actif avec le nom "Marie"
+    When j'appuie sur le bouton profil
+    And j'appuie sur le bouton ajouter un profil
+    And j'annule la création
+    Then le formulaire de création n'est plus affiché
 
   Scenario: Le menu actions s'ouvre au tap sur les 3 points
     Given les profils suivants existent
