@@ -4,4 +4,9 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  boutonRetour: {
+    paddingHorizontal: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

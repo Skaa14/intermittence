@@ -5,6 +5,7 @@ module.exports = {
   testMatch: [
     "<rootDir>/tests/steps/**/*.steps.tsx",
     "<rootDir>/tests/unit/**/*.test.ts",
+    "<rootDir>/tests/unit/**/*.test.tsx",
   ],
   setupFiles: expoPreset.setupFiles?.filter(
     (f) => !f.replace(/\\/g, "/").includes("jest-expo/src/preset/setup")

@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.semiBold,
     color: colors.textDark,
-    marginBottom: 2,
+    marginBottom: 6,
   },
   etapeFormule: {
     fontSize: 13,
@@ -52,6 +52,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.bold,
     color: colors.primary,
+    marginTop: 4,
   },
   separateur: {
     borderBottomWidth: 1,
@@ -165,6 +166,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    marginBottom: 6,
   },
   infoButton: {
     padding: 4,

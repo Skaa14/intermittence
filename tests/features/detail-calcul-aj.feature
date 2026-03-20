@@ -16,7 +16,7 @@ Feature: Page de détail du calcul AJ
     When la page de détail est affichée
     Then le titre de section contient "Annexe 8"
     And la composante A affiche la formule "0.42 × 14400 + 0.05 × (18000 − 14400)"
-    And la composante B affiche la formule "0.26 × 600 / 507"
+    And la composante B affiche la formule "0.26 × 600"
     And la composante C affiche la formule "31.96 × 0.4"
     And l'AJ brute affichée en résumé est "62.41"
     And l'AJ nette affichée en résumé est "56.01"
@@ -68,7 +68,7 @@ Feature: Page de détail du calcul AJ
   Scenario: Affichage du SJM
     Given un profil annexe 8 avec 600h et 18000 euros
     When la page de détail est affichée
-    Then le SJM affiche la formule "18000 × 8 / 600"
+    Then le SJM affiche la formule "18000 × 8"
 
   Scenario: Les paramètres sont masqués par défaut
     Given un profil annexe 8 avec 600h et 18000 euros

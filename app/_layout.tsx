@@ -1,5 +1,6 @@
-import { Stack } from "expo-router";
-import { View } from "react-native";
+import { Stack, useRouter } from "expo-router";
+import { View, TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import {
@@ -19,6 +20,19 @@ import EcranOnboarding from "../components/EcranOnboarding";
 import { styles } from "../styles/root-layout.styles";
 
 SplashScreen.preventAutoHideAsync();
+
+function BoutonRetour() {
+  const router = useRouter();
+  return (
+    <TouchableOpacity
+      onPress={() => router.back()}
+      style={styles.boutonRetour}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
+      <Ionicons name="chevron-back" size={24} color={colors.textOnPrimary} />
+    </TouchableOpacity>
+  );
+}
 
 function AppContent() {
   const { profils, chargementTermine } = useProfils();
@@ -40,6 +54,7 @@ function AppContent() {
             title: "Détail du mois",
             headerStyle: { backgroundColor: colors.primary },
             headerTintColor: colors.textOnPrimary,
+            headerLeft: () => <BoutonRetour />,
           }}
         />
         <Stack.Screen
@@ -49,6 +64,7 @@ function AppContent() {
             title: "Détail du calcul AJ",
             headerStyle: { backgroundColor: colors.primary },
             headerTintColor: colors.textOnPrimary,
+            headerLeft: () => <BoutonRetour />,
           }}
         />
       </Stack>

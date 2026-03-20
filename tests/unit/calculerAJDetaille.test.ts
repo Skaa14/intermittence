@@ -1,4 +1,4 @@
-import { calculerAJDetaille, DetailCalculAJ } from "../../utils/calculerAJDetaille";
+import { calculerAJDetaille, DetailCalculAJ, formuleToString } from "../../utils/calculerAJDetaille";
 import { calculerAJ, calculerAJNette, calculerSJM } from "../../utils/calculerAJ";
 import { tronquerCentime } from "../../utils/calculAJ.common";
 import {
@@ -91,13 +91,13 @@ describe("calculerAJDetaille", () => {
   describe("formules au-dessus des seuils (tranches 2)", () => {
     it("composante A utilise la formule 2 tranches quand SR > seuil", () => {
       const detail = calculerAJDetaille("8", 20000, 600, "standard", false);
-      expect(detail.brute.composanteA.formule).toContain("14400");
+      expect(formuleToString(detail.brute.composanteA.formule)).toContain("14400");
       expect(detail.brute.composanteA.parametres!.length).toBeGreaterThan(4);
     });
 
     it("composante B utilise la formule 2 tranches quand NHT > seuil", () => {
       const detail = calculerAJDetaille("8", 18000, 800, "standard", false);
-      expect(detail.brute.composanteB.formule).toContain("720");
+      expect(formuleToString(detail.brute.composanteB.formule)).toContain("720");
       expect(detail.brute.composanteB.parametres!.length).toBeGreaterThan(4);
     });
   });
@@ -235,13 +235,13 @@ describe("calculerAJDetaille", () => {
     it("diviseur 8 pour annexe 8", () => {
       const detail = calculerAJDetaille("8", 18000, 600, "standard", false);
       expect(detail.nette.sjm.valeur).toBe((18000 * 8) / 600);
-      expect(detail.nette.sjm.formule).toContain("× 8 /");
+      expect(formuleToString(detail.nette.sjm.formule)).toContain("× 8");
     });
 
     it("diviseur 10 pour annexe 10", () => {
       const detail = calculerAJDetaille("10", 18000, 600, "standard", false);
       expect(detail.nette.sjm.valeur).toBe((18000 * 10) / 600);
-      expect(detail.nette.sjm.formule).toContain("× 10 /");
+      expect(formuleToString(detail.nette.sjm.formule)).toContain("× 10");
     });
   });
 });

@@ -15,9 +15,17 @@ export interface ParametreInfo {
   description: string;
 }
 
+export type FormuleSegment = string | { num: string; den: string };
+
+export function formuleToString(segments: FormuleSegment[]): string {
+  return segments
+    .map((s) => (typeof s === "string" ? s : `${s.num} / ${s.den}`))
+    .join("");
+}
+
 export interface EtapeCalcul {
   label: string;
-  formule: string;
+  formule: FormuleSegment[];
   valeur: number;
   parametres?: ParametreInfo[];
 }
@@ -33,7 +41,7 @@ export interface DetailAJBrute {
 
 export interface DetailCotisation {
   label: string;
-  formule: string;
+  formule: FormuleSegment[];
   montant: number;
   parametres?: ParametreInfo[];
 }
@@ -75,8 +83,8 @@ export function calculerAJDetaille(
   const composanteA: EtapeCalcul = {
     label: "Composante A (salaire)",
     formule: sr <= p.seuilSR
-      ? `${AJ_MIN} × ${p.coefSR1} × ${sr} / 5000`
-      : `${AJ_MIN} × (${p.coefSR1} × ${p.seuilSR} + ${p.coefSR2} × (${sr} − ${p.seuilSR})) / 5000`,
+      ? [{ num: `${AJ_MIN} × ${p.coefSR1} × ${sr}`, den: "5000" }]
+      : [{ num: `${AJ_MIN} × (${p.coefSR1} × ${p.seuilSR} + ${p.coefSR2} × (${sr} − ${p.seuilSR}))`, den: "5000" }],
     valeur: valA,
     parametres: [
       pAjMin,
@@ -99,8 +107,8 @@ export function calculerAJDetaille(
   const composanteB: EtapeCalcul = {
     label: "Composante B (heures)",
     formule: nht <= p.seuilNHT
-      ? `${AJ_MIN} × ${p.coefNHT1} × ${nht} / 507`
-      : `${AJ_MIN} × (${p.coefNHT1} × ${p.seuilNHT} + ${p.coefNHT2} × (${nht} − ${p.seuilNHT})) / 507`,
+      ? [{ num: `${AJ_MIN} × ${p.coefNHT1} × ${nht}`, den: "507" }]
+      : [{ num: `${AJ_MIN} × (${p.coefNHT1} × ${p.seuilNHT} + ${p.coefNHT2} × (${nht} − ${p.seuilNHT}))`, den: "507" }],
     valeur: valB,
     parametres: [
       pAjMin,
@@ -117,7 +125,7 @@ export function calculerAJDetaille(
   const valC = tronquerCentime(AJ_MIN * p.coefC);
   const composanteC: EtapeCalcul = {
     label: "Composante C (fixe)",
-    formule: `${AJ_MIN} × ${p.coefC}`,
+    formule: [`${AJ_MIN} × ${p.coefC}`],
     valeur: valC,
     parametres: [
       pAjMin,
@@ -132,13 +140,13 @@ export function calculerAJDetaille(
   if (brutAvantPlafonnement < p.plancher) {
     plafonnement = {
       label: "Plancher appliqué",
-      formule: `max(${brutAvantPlafonnement.toFixed(2)}, ${p.plancher})`,
+      formule: [`max(${brutAvantPlafonnement.toFixed(2)}, ${p.plancher})`],
       valeur: p.plancher,
     };
   } else if (brutAvantPlafonnement > p.plafond) {
     plafonnement = {
       label: "Plafond appliqué",
-      formule: `min(${brutAvantPlafonnement.toFixed(2)}, ${p.plafond})`,
+      formule: [`min(${brutAvantPlafonnement.toFixed(2)}, ${p.plafond})`],
       valeur: p.plafond,
     };
   }
@@ -149,7 +157,7 @@ export function calculerAJDetaille(
     composanteC,
     brutAvantPlafonnement: {
       label: "A + B + C",
-      formule: `${valA.toFixed(2)} + ${valB.toFixed(2)} + ${valC.toFixed(2)}`,
+      formule: [`${valA.toFixed(2)} + ${valB.toFixed(2)} + ${valC.toFixed(2)}`],
       valeur: brutAvantPlafonnement,
     },
     plafonnement,
@@ -160,7 +168,7 @@ export function calculerAJDetaille(
   const sjmVal = (sr * diviseur) / nht;
   const sjm: EtapeCalcul = {
     label: "Salaire journalier moyen (SJM)",
-    formule: `${sr} × ${diviseur} / ${nht}`,
+    formule: [{ num: `${sr} × ${diviseur}`, den: `${nht}` }],
     valeur: sjmVal,
     parametres: [
       pSR,
@@ -191,7 +199,7 @@ export function calculerAJDetaille(
   const retraite = tronquerCentime(sjmVal * TAUX_RETRAITE_COMPLEMENTAIRE);
   cotisations.push({
     label: "Retraite complémentaire",
-    formule: `SJM × ${(TAUX_RETRAITE_COMPLEMENTAIRE * 100).toFixed(2)}% = ${sjmVal.toFixed(2)} × ${TAUX_RETRAITE_COMPLEMENTAIRE}`,
+    formule: [`SJM × ${(TAUX_RETRAITE_COMPLEMENTAIRE * 100).toFixed(2)}% = ${sjmVal.toFixed(2)} × ${TAUX_RETRAITE_COMPLEMENTAIRE}`],
     montant: retraite,
     parametres: [
       { nom: "SJM", description: "Salaire journalier moyen calculé ci-dessus" },
@@ -206,7 +214,7 @@ export function calculerAJDetaille(
       const alsace = tronquerCentime(ajBrute * TAUX_ALSACE_MOSELLE);
       cotisations.push({
         label: "Alsace-Moselle",
-        formule: `${ajBrute.toFixed(2)} × ${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`,
+        formule: [`${ajBrute.toFixed(2)} × ${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`],
         montant: alsace,
         parametres: [
           pAjBrute,
@@ -219,7 +227,7 @@ export function calculerAJDetaille(
     const csg = tronquerCentime(ajBrute * tauxEffectif);
     cotisations.push({
       label: `CSG (${tauxCSG === "reduit" ? "taux réduit" : "taux standard"})`,
-      formule: `${ajBrute.toFixed(2)} × ${(tauxEffectif * 100).toFixed(1)}%`,
+      formule: [`${ajBrute.toFixed(2)} × ${(tauxEffectif * 100).toFixed(1)}%`],
       montant: csg,
       parametres: [
         pAjBrute,
@@ -230,7 +238,7 @@ export function calculerAJDetaille(
     const crds = tronquerCentime(ajBrute * TAUX_CRDS);
     cotisations.push({
       label: "CRDS",
-      formule: `${ajBrute.toFixed(2)} × ${(TAUX_CRDS * 100).toFixed(1)}%`,
+      formule: [`${ajBrute.toFixed(2)} × ${(TAUX_CRDS * 100).toFixed(1)}%`],
       montant: crds,
       parametres: [
         pAjBrute,
@@ -242,7 +250,7 @@ export function calculerAJDetaille(
       const alsace = tronquerCentime(ajBrute * TAUX_ALSACE_MOSELLE);
       cotisations.push({
         label: "Alsace-Moselle",
-        formule: `${ajBrute.toFixed(2)} × ${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`,
+        formule: [`${ajBrute.toFixed(2)} × ${(TAUX_ALSACE_MOSELLE * 100).toFixed(1)}%`],
         montant: alsace,
         parametres: [
           pAjBrute,

@@ -3,10 +3,11 @@ import {
   Text,
   FlatList,
   ScrollView,
+  TouchableOpacity,
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
 import { useProfils } from "../../contexts/ProfilsContext";
@@ -16,8 +17,16 @@ import {
   calculerIndemnisationMensuelle,
   IndemnisationMensuelle,
 } from "../../utils/calculerIndemnisationMensuelle";
+import { ProfilIntermittent } from "../../types/profil";
 import { styles, pageScrollStyle } from "../../styles/mois/moisIndex.styles";
 import { formaterHeures } from "../../utils/formatHeures";
+import {
+  InfoContenu,
+  InfoModal,
+  buildInfoDelaiAttente,
+  buildInfoFranchiseCP,
+  buildInfoFranchiseSalaire,
+} from "../../components/InfoFranchises";
 
 const NOMS_MOIS = [
   "Janvier",
@@ -47,17 +56,31 @@ function LigneDetail({
   valeur,
   testID,
   bold,
+  onInfoPress,
 }: {
   label: string;
   valeur: string;
   testID?: string;
   bold?: boolean;
+  onInfoPress?: () => void;
 }) {
   return (
     <View style={styles.ligne}>
-      <Text style={[styles.libelleValeur, bold ? styles.bold : undefined]}>
-        {label}
-      </Text>
+      <View style={styles.labelRow}>
+        <Text style={[styles.libelleValeur, bold ? styles.bold : undefined]}>
+          {label}
+        </Text>
+        {onInfoPress && (
+          <TouchableOpacity
+            style={styles.infoButton}
+            onPress={onInfoPress}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            testID={`info-${testID}`}
+          >
+            <Text style={styles.infoButtonText}>?</Text>
+          </TouchableOpacity>
+        )}
+      </View>
       <Text
         style={[styles.valeur, bold ? styles.boldValeur : undefined]}
         testID={testID}
@@ -91,9 +114,17 @@ function FormulePlafond({ mois }: { mois: IndemnisationMensuelle }) {
   );
 }
 
-type PageMoisProps = { mois: IndemnisationMensuelle; width: number; height: number; bottomInset: number };
 
-function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
+
+type PageMoisProps = { mois: IndemnisationMensuelle; profil: ProfilIntermittent; width: number; height: number; bottomInset: number };
+
+function PageMois({ mois, profil, width, height, bottomInset }: PageMoisProps) {
+  const [infoContenu, setInfoContenu] = useState<InfoContenu | null>(null);
+
+  const showInfo = useCallback((contenu: InfoContenu) => {
+    setInfoContenu(contenu);
+  }, []);
+
   return (
     <ScrollView
       style={pageScrollStyle(width, height).page}
@@ -101,6 +132,11 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
       nestedScrollEnabled
       testID={`detail-mois-${mois.index}`}
     >
+      <InfoModal
+        visible={infoContenu !== null}
+        contenu={infoContenu}
+        onClose={() => setInfoContenu(null)}
+      />
       <Text style={styles.titreMois}>{formatMois(mois.mois)}</Text>
 
       <View
@@ -191,6 +227,7 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
             label="Délai d'attente"
             valeur={`-${mois.delaiAttente} j`}
             testID={`delai-attente-${mois.index}`}
+            onInfoPress={() => showInfo(buildInfoDelaiAttente(mois))}
           />
         )}
         {mois.franchiseCP > 0 && (
@@ -198,6 +235,7 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
             label="Franchise congés payés"
             valeur={`-${mois.franchiseCP} j`}
             testID={`franchise-cp-${mois.index}`}
+            onInfoPress={() => showInfo(buildInfoFranchiseCP(mois, profil))}
           />
         )}
         {mois.franchiseSalaire > 0 && (
@@ -205,6 +243,7 @@ function PageMois({ mois, width, height, bottomInset }: PageMoisProps) {
             label="Franchise salaire"
             valeur={`-${mois.franchiseSalaire} j`}
             testID={`franchise-salaire-${mois.index}`}
+            onInfoPress={() => showInfo(buildInfoFranchiseSalaire(mois, profil))}
           />
         )}
         <LigneDetail
@@ -324,7 +363,7 @@ export default function DetailMoisScreen() {
           animated: false,
         });
       }}
-      renderItem={({ item }) => <PageMois mois={item} width={pageWidth} height={listHeight || windowHeight} bottomInset={insets.bottom} />}
+      renderItem={({ item }) => <PageMois mois={item} profil={profil} width={pageWidth} height={listHeight || windowHeight} bottomInset={insets.bottom} />}
     />
   );
 }

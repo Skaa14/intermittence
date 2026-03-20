@@ -1,8 +1,9 @@
 import { View, Text, ScrollView, Pressable, UIManager, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProfils } from "../contexts/ProfilsContext";
-import { calculerAJDetaille, DetailCotisation, ParametreInfo } from "../utils/calculerAJDetaille";
+import { calculerAJDetaille, DetailCotisation, ParametreInfo, FormuleSegment, formuleToString } from "../utils/calculerAJDetaille";
 import { styles } from "../styles/detail-calcul-aj.styles";
+import { FormuleRendu } from "../components/FormuleRendu";
 import { useAnimatedToggle } from "../hooks/useAnimatedToggle";
 import { useMemo } from "react";
 
@@ -23,14 +24,14 @@ function ParametresBlock({ testID, parametres }: { testID?: string; parametres: 
   );
 }
 
-function EtapeView({ testID, label, formule, valeur, parametres }: { testID?: string; label: string; formule: string; valeur: string; parametres?: ParametreInfo[] }) {
+function EtapeView({ testID, label, formule, valeur, parametres }: { testID?: string; label: string; formule: FormuleSegment[]; valeur: string; parametres?: ParametreInfo[] }) {
   const [expanded, toggle] = useAnimatedToggle();
 
   return (
     <View testID={testID} style={styles.etape}>
       <Text style={styles.etapeLabel}>{label}</Text>
       <View style={styles.formuleLigne}>
-        <Text style={styles.etapeFormule}>{formule}</Text>
+        <FormuleRendu segments={formule} small />
         {parametres && parametres.length > 0 && (
           <Pressable testID={testID ? `${testID}-info` : undefined} onPress={toggle} hitSlop={8} style={styles.infoButton}>
             <Text style={[styles.infoIcon, expanded && styles.infoIconActive]}>👁</Text>
@@ -53,7 +54,7 @@ function CotisationView({ testID, cotisation }: { testID?: string; cotisation: D
         <Text style={styles.cotisationMontant}>− {cotisation.montant.toFixed(2)} €</Text>
       </View>
       <View style={styles.formuleLigne}>
-        <Text style={styles.cotisationFormule}>{cotisation.formule}</Text>
+        <FormuleRendu segments={cotisation.formule} small />
         {cotisation.parametres && cotisation.parametres.length > 0 && (
           <Pressable onPress={toggle} hitSlop={8} style={styles.infoButton}>
             <Text style={[styles.infoIcon, expanded && styles.infoIconActive]}>👁</Text>
@@ -143,7 +144,7 @@ export default function DetailCalculAJScreen() {
         {brute.plafonnement && (
           <View testID="detail-aj-plafonnement" style={styles.etape}>
             <Text style={styles.plafonnement}>
-              {brute.plafonnement.label} : {brute.plafonnement.formule} = {brute.plafonnement.valeur.toFixed(2)} €
+              {brute.plafonnement.label} : {formuleToString(brute.plafonnement.formule)} = {brute.plafonnement.valeur.toFixed(2)} €
             </Text>
           </View>
         )}
@@ -151,7 +152,7 @@ export default function DetailCalculAJScreen() {
         <EtapeView
           testID="detail-aj-brute-finale"
           label="AJ brute"
-          formule={brute.plafonnement ? "Après plafonnement" : "Pas de plafonnement appliqué"}
+          formule={[brute.plafonnement ? "Après plafonnement" : "Pas de plafonnement appliqué"]}
           valeur={`= ${brute.ajBrute.toFixed(2)} €`}
         />
       </View>

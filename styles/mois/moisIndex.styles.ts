@@ -131,6 +131,27 @@ export const styles = StyleSheet.create({
     color: colors.warning,
     fontStyle: "italic",
   },
+  infoButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.textMuted,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 6,
+  },
+  infoButtonText: {
+    fontSize: 12,
+    fontFamily: fonts.semiBold,
+    color: colors.textMuted,
+    lineHeight: 14,
+  },
+  labelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
 });
 
 export const pageScrollStyle = (width: number, height: number) =>
