@@ -5,8 +5,11 @@ import { fonts } from "../../theme/fonts";
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: colors.bgBase,
+  },
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 40,
   },
   card: {
     backgroundColor: colors.bgCard,

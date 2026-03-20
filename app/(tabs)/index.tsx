@@ -70,7 +70,7 @@ export default function AccueilScreen() {
   const annexeLabel = profil?.annexe === "10" ? "Artiste" : "Technicien";
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Progression vers les 507h</Text>
         <Text style={styles.cardValue}>{totalHeures}h / 507h</Text>
