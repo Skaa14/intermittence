@@ -16,6 +16,7 @@ import { ProfilProvider } from "../contexts/ProfilContext";
 import { FormationsProvider } from "../contexts/FormationsContext";
 import { EnseignementsProvider } from "../contexts/EnseignementsContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
+import { ProfilsProvider } from "../contexts/ProfilsContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { styles } from "../styles/root-layout.styles";
 
@@ -86,17 +87,19 @@ export default function RootLayout() {
 
   return (
     <ErrorBoundary>
-      <ProfilProvider>
-        <ContratsProvider>
-          <FormationsProvider>
-            <EnseignementsProvider>
-              <DonneesTestProvider>
-                <AppContent />
-              </DonneesTestProvider>
-            </EnseignementsProvider>
-          </FormationsProvider>
-        </ContratsProvider>
-      </ProfilProvider>
+      <ProfilsProvider>
+        <ProfilProvider>
+          <ContratsProvider>
+            <FormationsProvider>
+              <EnseignementsProvider>
+                <DonneesTestProvider>
+                  <AppContent />
+                </DonneesTestProvider>
+              </EnseignementsProvider>
+            </FormationsProvider>
+          </ContratsProvider>
+        </ProfilProvider>
+      </ProfilsProvider>
     </ErrorBoundary>
   );
 }

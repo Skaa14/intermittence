@@ -107,6 +107,8 @@ export default function AccueilScreen() {
     if (!dateAnniversaire || isNaN(salaire) || isNaN(heures)) return;
 
     mettreAJourProfil({
+      id: profil?.id ?? crypto.randomUUID(),
+      nom: profil?.nom ?? "Mon profil",
       annexe,
       dateAnniversaire: formatDate(dateAnniversaire),
       salaireReference: salaire,

@@ -41,6 +41,8 @@ export function enseignement(overrides: Partial<Enseignement> = {}): Enseignemen
 
 export function profil(overrides: Partial<ProfilIntermittent> = {}): ProfilIntermittent {
   return {
+    id: "profil-1",
+    nom: "Profil test",
     annexe: "8",
     dateAnniversaire: "15/09/2026",
     salaireReference: 18000,

@@ -58,6 +58,8 @@ function contratsCurrentMonth(ann: Date): { artiste: ContratSansId[]; technicien
 
 export function creerProfilArtiste(): ProfilIntermittent {
   return {
+    id: crypto.randomUUID(),
+    nom: "Artiste — Annexe 10",
     annexe: "10",
     dateAnniversaire: formatDate(calculerAnniversaire()),
     salaireReference: 16200,
@@ -69,6 +71,8 @@ export function creerProfilArtiste(): ProfilIntermittent {
 
 export function creerProfilTechnicien(): ProfilIntermittent {
   return {
+    id: crypto.randomUUID(),
+    nom: "Technicien — Annexe 8",
     annexe: "8",
     dateAnniversaire: formatDate(calculerAnniversaire()),
     salaireReference: 19800,
