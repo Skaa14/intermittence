@@ -1,3 +1,4 @@
+import * as Crypto from "expo-crypto";
 import { Contrat, TypeHeures } from "../types/contrat";
 import { Formation, OptionFormation } from "../types/formation";
 import { Enseignement } from "../types/enseignement";
@@ -61,7 +62,7 @@ function contratsCurrentMonth(ann: Date): { artiste: ContratSansId[]; technicien
 
 export function creerProfilArtiste(): ProfilIntermittent {
   return {
-    id: crypto.randomUUID(),
+    id: Crypto.randomUUID(),
     nom: "Artiste — Annexe 10",
     annexe: "10",
     aOuvertDroits: true,
@@ -75,7 +76,7 @@ export function creerProfilArtiste(): ProfilIntermittent {
 
 export function creerProfilTechnicien(): ProfilIntermittent {
   return {
-    id: crypto.randomUUID(),
+    id: Crypto.randomUUID(),
     nom: "Technicien — Annexe 8",
     annexe: "8",
     aOuvertDroits: true,
