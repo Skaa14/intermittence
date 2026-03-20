@@ -16,6 +16,7 @@ module.exports = {
       "@react-native-async-storage/async-storage/jest/async-storage-mock",
     "^expo-router$": "<rootDir>/tests/__mocks__/expo-router.js",
     "^react-native-safe-area-context$": "<rootDir>/tests/__mocks__/react-native-safe-area-context.js",
+    "^expo-crypto$": "<rootDir>/tests/__mocks__/expo-crypto.js",
   },
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
   transformIgnorePatterns: [

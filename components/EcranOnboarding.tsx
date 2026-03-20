@@ -23,7 +23,10 @@ export default function EcranOnboarding() {
       <Text style={styles.sousTitre}>
         Crée ton premier profil pour commencer à simuler tes droits ARE.
       </Text>
-      <ScrollView keyboardShouldPersistTaps="handled">
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
+      >
         <FormulaireProfil onValider={handleValider} />
       </ScrollView>
     </View>

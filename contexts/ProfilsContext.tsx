@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo, ReactNode } from "react";
 import { ProfilIntermittent, ProfilSansId } from "../types/profil";
+import * as Crypto from "expo-crypto";
 import {
   charger,
   sauvegarder,
@@ -67,7 +68,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const ajouterProfil = useCallback((donnees: ProfilSansId): string => {
-    const id = crypto.randomUUID();
+    const id = Crypto.randomUUID();
     const nouveau: ProfilIntermittent = { id, ...donnees };
     setProfils((prev) => {
       const mis = [...prev, nouveau];
@@ -112,7 +113,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
     const source = profilsRef.current.find((p) => p.id === id);
     if (!source) return;
 
-    const nouvelId = crypto.randomUUID();
+    const nouvelId = Crypto.randomUUID();
     const copie: ProfilIntermittent = { ...source, id: nouvelId, nom: nouveauNom };
 
     setProfils((prev) => {

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Intermittence",
-    "slug": "Intermittence",
+    "slug": "intermittence",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -40,10 +40,13 @@
       "expo-font"
     ],
     "extra": {
-      "router": {},
+      "router": {
+        "origin": "https://intermittence.app"
+      },
       "eas": {
-        "projectId": "c981d3b3-4c55-4c0d-a52d-55736ae834a8"
+        "projectId": "db1b2719-359f-4bf2-a94f-c3cf7c44deba"
       }
-    }
+    },
+    "owner": "mimiche2"
   }
 }
