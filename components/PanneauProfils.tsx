@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,12 +8,15 @@ import {
   ScrollView,
   StyleSheet,
   useWindowDimensions,
+  Alert,
+  LayoutChangeEvent,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProfils } from "../contexts/ProfilsContext";
 import { ProfilIntermittent } from "../types/profil";
 import FormulaireProfil from "./FormulaireProfil";
+import DialogueTexte from "./DialogueTexte";
 import { colors } from "../theme/colors";
 import {
   styles,
@@ -26,9 +29,25 @@ interface PanneauProfilsProps {
   onFermer: () => void;
 }
 
+type ModePanel = "liste" | "creation" | "edition";
+
+interface MenuState {
+  profilId: string;
+  top: number;
+}
+
+interface DialogueState {
+  type: "renommer" | "dupliquer";
+  profilId: string;
+  valeurInitiale: string;
+}
+
 export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProps) {
-  const { profils, profilActifId, changerProfilActif, ajouterProfil } = useProfils();
-  const [modeFormulaire, setModeFormulaire] = useState(false);
+  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil } = useProfils();
+  const [mode, setMode] = useState<ModePanel>("liste");
+  const [profilEdite, setProfilEdite] = useState<ProfilIntermittent | null>(null);
+  const [menu, setMenu] = useState<MenuState | null>(null);
+  const [dialogue, setDialogue] = useState<DialogueState | null>(null);
   const [estMonte, setEstMonte] = useState(false);
   const insets = useSafeAreaInsets();
   const { width: screenWidth } = useWindowDimensions();
@@ -36,11 +55,15 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
   const panelWidth = Math.min(PANEL_WIDTH, screenWidth * 0.75);
   const slideAnim = useRef(new Animated.Value(panelWidth)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
+  const itemLayouts = useRef<Record<string, { y: number; height: number }>>({});
 
   useEffect(() => {
     if (visible) {
       setEstMonte(true);
-      setModeFormulaire(false);
+      setMode("liste");
+      setProfilEdite(null);
+      setMenu(null);
+      setDialogue(null);
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -91,7 +114,98 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     onFermer();
   };
 
+  const handleValiderEdition = (donnees: Omit<ProfilIntermittent, "id">) => {
+    if (!profilEdite) return;
+    modifierProfil(profilEdite.id, donnees);
+    setMode("liste");
+    setProfilEdite(null);
+  };
+
+  const handleOuvrirMenu = useCallback((profilId: string) => {
+    const layout = itemLayouts.current[profilId];
+    const top = layout ? layout.y + layout.height : 0;
+    setMenu({ profilId, top });
+  }, []);
+
+  const handleFermerMenu = useCallback(() => {
+    setMenu(null);
+  }, []);
+
+  const handleModifier = useCallback(() => {
+    if (!menu) return;
+    const profil = profils.find((p) => p.id === menu.profilId);
+    if (!profil) return;
+    setMenu(null);
+    setProfilEdite(profil);
+    setMode("edition");
+  }, [menu, profils]);
+
+  const handleRenommer = useCallback(() => {
+    if (!menu) return;
+    const profil = profils.find((p) => p.id === menu.profilId);
+    if (!profil) return;
+    setMenu(null);
+    setDialogue({ type: "renommer", profilId: profil.id, valeurInitiale: profil.nom });
+  }, [menu, profils]);
+
+  const handleDupliquer = useCallback(() => {
+    if (!menu) return;
+    const profil = profils.find((p) => p.id === menu.profilId);
+    if (!profil) return;
+    setMenu(null);
+    setDialogue({ type: "dupliquer", profilId: profil.id, valeurInitiale: `${profil.nom} (copie)` });
+  }, [menu, profils]);
+
+  const handleSupprimer = useCallback(() => {
+    if (!menu) return;
+    const profilId = menu.profilId;
+    const profil = profils.find((p) => p.id === profilId);
+    if (!profil) return;
+    setMenu(null);
+    Alert.alert(
+      "Supprimer le profil",
+      `Supprimer "${profil.nom}" et toutes ses données ? Cette action est irréversible.`,
+      [
+        { text: "Annuler", style: "cancel" },
+        { text: "Supprimer", style: "destructive", onPress: () => supprimerProfil(profilId) },
+      ]
+    );
+  }, [menu, profils, supprimerProfil]);
+
+  const handleValiderDialogue = useCallback((valeur: string) => {
+    if (!dialogue) return;
+    if (dialogue.type === "renommer") {
+      const profil = profils.find((p) => p.id === dialogue.profilId);
+      if (profil) {
+        const { id, ...donnees } = profil;
+        modifierProfil(id, { ...donnees, nom: valeur });
+      }
+    } else {
+      dupliquerProfil(dialogue.profilId, valeur);
+    }
+    setDialogue(null);
+  }, [dialogue, profils, modifierProfil, dupliquerProfil]);
+
+  const handleItemLayout = useCallback((profilId: string, event: LayoutChangeEvent) => {
+    const { y, height } = event.nativeEvent.layout;
+    itemLayouts.current[profilId] = { y, height };
+  }, []);
+
   if (!estMonte && !visible) return null;
+
+  const renderFormulaire = (
+    profilInitial: ProfilIntermittent | undefined,
+    onValider: (profil: Omit<ProfilIntermittent, "id">) => void,
+    onAnnuler: () => void,
+  ) => (
+    <ScrollView style={styles.formulaireScroll} keyboardShouldPersistTaps="handled">
+      <FormulaireProfil
+        profilInitial={profilInitial}
+        onValider={onValider}
+        onAnnuler={onAnnuler}
+      />
+    </ScrollView>
+  );
 
   return (
     <View style={StyleSheet.absoluteFillObject} testID="panneau-profils">
@@ -115,17 +229,16 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
             { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 8 },
           ]}
         >
-          {modeFormulaire ? (
-            <ScrollView
-              style={styles.formulaireScroll}
-              keyboardShouldPersistTaps="handled"
-            >
-              <FormulaireProfil
-                onValider={handleValiderCreation}
-                onAnnuler={() => setModeFormulaire(false)}
-              />
-            </ScrollView>
-          ) : (
+          {mode === "creation" &&
+            renderFormulaire(undefined, handleValiderCreation, () => setMode("liste"))}
+
+          {mode === "edition" &&
+            renderFormulaire(profilEdite ?? undefined, handleValiderEdition, () => {
+              setMode("liste");
+              setProfilEdite(null);
+            })}
+
+          {mode === "liste" && (
             <>
               <Text style={styles.titre}>Mes profils</Text>
 
@@ -141,6 +254,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
                         estActif && styles.profilItemActif,
                       ]}
                       onPress={() => handleSelectionProfil(profil.id)}
+                      onLayout={(e) => handleItemLayout(profil.id, e)}
                     >
                       <View
                         style={[
@@ -163,6 +277,14 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
                           Annexe {profil.annexe}
                         </Text>
                       </View>
+                      <Pressable
+                        testID={`btn-menu-${profil.id}`}
+                        style={styles.btnMenu}
+                        onPress={() => handleOuvrirMenu(profil.id)}
+                        hitSlop={8}
+                      >
+                        <Ionicons name="ellipsis-vertical" size={18} color={colors.textMuted} />
+                      </Pressable>
                     </Pressable>
                   );
                 })}
@@ -171,15 +293,56 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
               <Pressable
                 testID="btn-ajouter-profil"
                 style={styles.btnAjouter}
-                onPress={() => setModeFormulaire(true)}
+                onPress={() => setMode("creation")}
               >
                 <Ionicons name="add" size={20} color={colors.primary} />
                 <Text style={styles.btnAjouterTexte}>Ajouter un profil</Text>
               </Pressable>
+
+              {menu && (
+                <>
+                  <Pressable
+                    testID="menu-overlay"
+                    style={styles.menuOverlay}
+                    onPress={handleFermerMenu}
+                  />
+                  <View
+                    testID="menu-actions"
+                    style={[styles.menu, { top: menu.top }]}
+                  >
+                    <Pressable testID="menu-modifier" style={styles.menuItem} onPress={handleModifier}>
+                      <Ionicons name="create-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Modifier</Text>
+                    </Pressable>
+                    <Pressable testID="menu-renommer" style={styles.menuItem} onPress={handleRenommer}>
+                      <Ionicons name="pencil-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Renommer</Text>
+                    </Pressable>
+                    <Pressable testID="menu-dupliquer" style={styles.menuItem} onPress={handleDupliquer}>
+                      <Ionicons name="copy-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Dupliquer</Text>
+                    </Pressable>
+                    <Pressable testID="menu-supprimer" style={styles.menuItem} onPress={handleSupprimer}>
+                      <Ionicons name="trash-outline" size={18} color={colors.error} />
+                      <Text style={[styles.menuItemTexte, styles.menuItemDanger]}>Supprimer</Text>
+                    </Pressable>
+                  </View>
+                </>
+              )}
             </>
           )}
         </View>
       </Animated.View>
+
+      <DialogueTexte
+        visible={dialogue !== null}
+        titre={dialogue?.type === "renommer" ? "Renommer le profil" : "Dupliquer le profil"}
+        valeurInitiale={dialogue?.valeurInitiale ?? ""}
+        placeholder="Nom du profil"
+        labelValider={dialogue?.type === "renommer" ? "Renommer" : "Dupliquer"}
+        onValider={handleValiderDialogue}
+        onAnnuler={() => setDialogue(null)}
+      />
     </View>
   );
 }

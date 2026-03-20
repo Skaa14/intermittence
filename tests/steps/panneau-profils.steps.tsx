@@ -1,5 +1,6 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, fireEvent, screen, act, waitFor } from "@testing-library/react-native";
+import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ProfilsProvider } from "../../contexts/ProfilsContext";
 import BoutonProfil from "../../components/BoutonProfil";
@@ -16,6 +17,12 @@ const feature = loadFeature("tests/features/panneau-profils.feature");
 
 let onFermer: jest.Mock;
 let panneauVisible: boolean;
+let profilsCrees: ProfilIntermittent[];
+
+const appuyerMenuProfil = (nom: string) => {
+  const profil = profilsCrees.find((p) => p.nom === nom);
+  fireEvent.press(screen.getByTestId(`btn-menu-${profil!.id}`));
+};
 
 const seedProfils = async (profils: ProfilIntermittent[], actifId: string) => {
   await AsyncStorage.setItem(
@@ -202,6 +209,186 @@ defineFeature(feature, (test) => {
     then("le formulaire de création est affiché", () => {
       expect(screen.getByTestId("input-nom-profil")).toBeTruthy();
       expect(screen.getByTestId("btn-valider-profil")).toBeTruthy();
+    });
+  });
+
+  test("Le menu actions s'ouvre au tap sur les 3 points", ({ given, when, then }) => {
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    then(/^le menu actions est visible avec les options "(.*)" "(.*)" "(.*)" "(.*)"$/, (a: string, b: string, c: string, d: string) => {
+      expect(screen.getByTestId("menu-actions")).toBeTruthy();
+      expect(screen.getByText(a)).toBeTruthy();
+      expect(screen.getByText(b)).toBeTruthy();
+      expect(screen.getByText(c)).toBeTruthy();
+      expect(screen.getByText(d)).toBeTruthy();
+    });
+  });
+
+  test("Le menu se ferme au tap sur l'overlay du menu", ({ given, when, then, and }) => {
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    and("je tape sur l'overlay du menu", () => {
+      fireEvent.press(screen.getByTestId("menu-overlay"));
+    });
+
+    then("le menu actions n'est plus visible", () => {
+      expect(screen.queryByTestId("menu-actions")).toBeNull();
+    });
+  });
+
+  test("Modifier un profil via le menu actions", ({ given, when, then, and }) => {
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    and(/^je choisis "(.*)" dans le menu$/, () => {
+      fireEvent.press(screen.getByTestId("menu-modifier"));
+    });
+
+    then(/^le formulaire d'édition est affiché avec le nom "(.*)"$/, (nom: string) => {
+      const input = screen.getByTestId("input-nom-profil");
+      expect(input.props.value).toBe(nom);
+    });
+  });
+
+  test("Renommer un profil via le menu actions", ({ given, when, then, and }) => {
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    and(/^je choisis "(.*)" dans le menu$/, () => {
+      fireEvent.press(screen.getByTestId("menu-renommer"));
+    });
+
+    then(/^le dialogue de renommage s'affiche avec "(.*)"$/, (nom: string) => {
+      const input = screen.getByTestId("dialogue-texte-input");
+      expect(input.props.value).toBe(nom);
+    });
+  });
+
+  test("Dupliquer un profil via le menu actions", ({ given, when, then, and }) => {
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    and(/^je choisis "(.*)" dans le menu$/, () => {
+      fireEvent.press(screen.getByTestId("menu-dupliquer"));
+    });
+
+    then(/^le dialogue de duplication s'affiche avec "(.*)"$/, (valeur: string) => {
+      const input = screen.getByTestId("dialogue-texte-input");
+      expect(input.props.value).toBe(valeur);
+    });
+  });
+
+  test("Supprimer un profil via le menu actions", ({ given, when, then, and }) => {
+    let alertSpy: jest.SpyInstance;
+    let lastAlertButtons: any[];
+
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      lastAlertButtons = [];
+      alertSpy = jest.spyOn(Alert, "alert").mockImplementation(
+        (_title, _message, buttons) => {
+          lastAlertButtons = buttons ?? [];
+        }
+      );
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    and(/^je choisis "(.*)" dans le menu$/, () => {
+      fireEvent.press(screen.getByTestId("menu-supprimer"));
+    });
+
+    then(/^une alerte de confirmation s'affiche pour "(.*)"$/, (nom: string) => {
+      expect(alertSpy).toHaveBeenCalled();
+      const [, message] = alertSpy.mock.calls[0];
+      expect(message).toContain(nom);
+      alertSpy.mockRestore();
+    });
+  });
+
+  test("Confirmer la suppression d'un profil", ({ given, when, then, and }) => {
+    let alertSpy: jest.SpyInstance;
+    let lastAlertButtons: any[];
+
+    given("les profils suivants existent", async (table: ProfilRow[]) => {
+      lastAlertButtons = [];
+      alertSpy = jest.spyOn(Alert, "alert").mockImplementation(
+        (_title, _message, buttons) => {
+          lastAlertButtons = buttons ?? [];
+        }
+      );
+      profilsCrees = table.map((row, i) =>
+        profilFactory({ id: `profil-${i}`, nom: row.Nom, annexe: row.Annexe as "8" | "10" })
+      );
+      await renderAvecPanneau(profilsCrees, profilsCrees[0].id);
+    });
+
+    when(/^j'appuie sur le menu 3 points du profil "(.*)"$/, (nom: string) => {
+      appuyerMenuProfil(nom);
+    });
+
+    and(/^je choisis "(.*)" dans le menu$/, () => {
+      fireEvent.press(screen.getByTestId("menu-supprimer"));
+    });
+
+    and("je confirme la suppression", () => {
+      const btnSupprimer = lastAlertButtons.find((b: any) => b.style === "destructive");
+      expect(btnSupprimer).toBeDefined();
+      act(() => { btnSupprimer?.onPress?.(); });
+    });
+
+    then(/^le profil "(.*)" n'est plus dans la liste$/, async (nom: string) => {
+      await waitFor(() => {
+        expect(screen.queryByText(nom)).toBeNull();
+      });
+      alertSpy.mockRestore();
     });
   });
 });

@@ -102,4 +102,43 @@ export const styles = StyleSheet.create({
   formulaireScroll: {
     flex: 1,
   },
+  btnMenu: {
+    padding: 6,
+    marginLeft: 4,
+  },
+  menuOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 200,
+  },
+  menu: {
+    position: "absolute",
+    right: 16,
+    backgroundColor: colors.bgBase,
+    borderRadius: 10,
+    paddingVertical: 4,
+    minWidth: 160,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 201,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 10,
+  },
+  menuItemTexte: {
+    fontSize: 15,
+    fontFamily: fonts.regular,
+    color: colors.textDark,
+  },
+  menuItemDanger: {
+    color: colors.error,
+  },
 });
