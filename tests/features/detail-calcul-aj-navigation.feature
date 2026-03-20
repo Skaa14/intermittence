@@ -15,6 +15,3 @@ Feature: Navigation vers le détail du calcul AJ
     When j'appuie sur le bouton de détail du calcul
     Then la navigation vers "/detail-calcul-aj" est déclenchée
 
-  Scenario: Le bouton de détail n'apparaît pas sans profil
-    Given l'écran d'accueil est affiché
-    Then le bouton "Voir le détail du calcul" n'est pas visible

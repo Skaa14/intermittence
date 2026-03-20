@@ -1,11 +1,12 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { renderHook, screen } from "@testing-library/react-native";
+import { fireEvent, renderHook, screen } from "@testing-library/react-native";
 import { useProfils } from "../../contexts/ProfilsContext";
 import { resetPickerCallbacks } from "../helpers/mocks";
 import {
   renderAccueilScreen,
   configurerProfilViaFormulaire,
   ouvrirFormulaireProfil,
+  prechargerProfilParDefaut,
   ProfilRow,
 } from "../helpers/accueil";
 
@@ -20,18 +21,9 @@ defineFeature(feature, (test) => {
     resetPickerCallbacks();
   });
 
-  test("Pas de profil au démarrage", ({ given, then }) => {
-    given("l'écran d'accueil est affiché", async () => {
-      await renderAccueilScreen();
-    });
-
-    then("le bouton de configuration du profil est visible", () => {
-      expect(screen.getByTestId("btn-configurer-profil")).toBeTruthy();
-    });
-  });
-
   test("Configuration du profil", ({ given, when, then }) => {
     given("l'écran d'accueil est affiché", async () => {
+      await prechargerProfilParDefaut();
       await renderAccueilScreen();
     });
 
@@ -46,6 +38,7 @@ defineFeature(feature, (test) => {
 
   test("Le nom du profil est affiché dans la carte AJ", ({ given, when, then }) => {
     given("l'écran d'accueil est affiché", async () => {
+      await prechargerProfilParDefaut();
       await renderAccueilScreen();
     });
 
@@ -61,6 +54,7 @@ defineFeature(feature, (test) => {
 
   test("Modification du profil existant", ({ given, when, then, and }) => {
     given("l'écran d'accueil est affiché", async () => {
+      await prechargerProfilParDefaut();
       await renderAccueilScreen();
     });
 
@@ -79,11 +73,13 @@ defineFeature(feature, (test) => {
 
   test("Le bouton Valider est désactivé si le nom est vide", ({ given, when, then }) => {
     given("l'écran d'accueil est affiché", async () => {
+      await prechargerProfilParDefaut();
       await renderAccueilScreen();
     });
 
-    when("j'ouvre le formulaire profil", () => {
+    when("j'ouvre le formulaire profil et je vide le nom", () => {
       ouvrirFormulaireProfil();
+      fireEvent.changeText(screen.getByTestId("input-nom-profil"), "");
     });
 
     then("le bouton Valider est désactivé", () => {

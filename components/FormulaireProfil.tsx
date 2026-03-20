@@ -10,7 +10,7 @@ import { styles, webDateInputStyle } from "./FormulaireProfil.styles";
 interface FormulaireProfilProps {
   profilInitial?: ProfilIntermittent;
   onValider: (profil: Omit<ProfilIntermittent, "id">) => void;
-  onAnnuler: () => void;
+  onAnnuler?: () => void;
 }
 
 export default function FormulaireProfil({
@@ -184,12 +184,14 @@ export default function FormulaireProfil({
       </Pressable>
 
       <View style={styles.row}>
-        <Pressable style={styles.btnAnnuler} onPress={onAnnuler}>
-          <Text style={styles.btnAnnulerText}>Annuler</Text>
-        </Pressable>
+        {onAnnuler && (
+          <Pressable style={styles.btnAnnuler} onPress={onAnnuler}>
+            <Text style={styles.btnAnnulerText}>Annuler</Text>
+          </Pressable>
+        )}
         <Pressable
           testID="btn-valider-profil"
-          style={[styles.btnValider, !nomValide && styles.btnValiderDisabled]}
+          style={[styles.btnValider, !onAnnuler && styles.btnValiderFull, !nomValide && styles.btnValiderDisabled]}
           onPress={handleValider}
           disabled={!nomValide}
         >

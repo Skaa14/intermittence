@@ -4,6 +4,7 @@ import { resetPickerCallbacks } from "../helpers/mocks";
 import {
   renderAccueilScreen,
   configurerProfilViaFormulaire,
+  prechargerProfilParDefaut,
   ProfilRow,
 } from "../helpers/accueil";
 
@@ -27,6 +28,7 @@ defineFeature(feature, (test) => {
 
   const givenAccueil = (given: Function) => {
     given("l'écran d'accueil est affiché", async () => {
+      await prechargerProfilParDefaut();
       await renderAccueilScreen();
     });
   };
@@ -60,11 +62,4 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test("Le bouton de détail n'apparaît pas sans profil", ({ given, then }) => {
-    givenAccueil(given);
-
-    then(/^le bouton "(.*)" n'est pas visible$/, () => {
-      expect(screen.queryByTestId("btn-detail-calcul")).toBeNull();
-    });
-  });
 });

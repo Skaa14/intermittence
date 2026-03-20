@@ -16,5 +16,5 @@ Feature: Persistance des données
   Scenario: La réinitialisation supprime les données persistées
     Given je charge les données de test "artiste" sur l'écran d'accueil
     When le storage est vidé et l'application redémarre
-    Then le bouton de configuration du profil est visible
+    Then aucun profil n'est configuré
     And le dashboard affiche "0" contrats

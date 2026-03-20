@@ -4,6 +4,7 @@ import { resetPickerCallbacks } from "../helpers/mocks";
 import {
   renderAccueilScreen,
   configurerProfilViaFormulaire,
+  prechargerProfilParDefaut,
   ProfilRow,
 } from "../helpers/accueil";
 
@@ -20,6 +21,7 @@ defineFeature(feature, (test) => {
 
   const givenAccueil = (given: Function) => {
     given("l'écran d'accueil est affiché", async () => {
+      await prechargerProfilParDefaut();
       await renderAccueilScreen();
     });
   };

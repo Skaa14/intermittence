@@ -9,6 +9,7 @@ import {
   StyleSheet,
   useWindowDimensions,
   Alert,
+  Platform,
   LayoutChangeEvent,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -162,14 +163,17 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     const profil = profils.find((p) => p.id === profilId);
     if (!profil) return;
     setMenu(null);
-    Alert.alert(
-      "Supprimer le profil",
-      `Supprimer "${profil.nom}" et toutes ses données ? Cette action est irréversible.`,
-      [
+    const message = `Supprimer "${profil.nom}" et toutes ses données ? Cette action est irréversible.`;
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) {
+        supprimerProfil(profilId);
+      }
+    } else {
+      Alert.alert("Supprimer le profil", message, [
         { text: "Annuler", style: "cancel" },
         { text: "Supprimer", style: "destructive", onPress: () => supprimerProfil(profilId) },
-      ]
-    );
+      ]);
+    }
   }, [menu, profils, supprimerProfil]);
 
   const handleValiderDialogue = useCallback((valeur: string) => {

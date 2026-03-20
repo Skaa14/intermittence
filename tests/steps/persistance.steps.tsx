@@ -7,7 +7,7 @@ import { ContratsProvider } from "../../contexts/ContratsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
-import { ProfilRow, configurerProfilViaFormulaire } from "../helpers/accueil";
+import { ProfilRow, configurerProfilViaFormulaire, prechargerProfilParDefaut } from "../helpers/accueil";
 import { resetPickerCallbacks } from "../helpers/mocks";
 import { flushAsync } from "../helpers/act";
 
@@ -83,6 +83,7 @@ defineFeature(feature, (test) => {
     given(
       "je configure un profil sur l'écran d'accueil",
       async (table: ProfilRow[]) => {
+        await prechargerProfilParDefaut();
         vue = await renderAccueil();
         configurerProfilViaFormulaire(table[0]);
       }
@@ -119,13 +120,11 @@ defineFeature(feature, (test) => {
       vue.unmount();
       await AsyncStorage.clear();
       vue = await renderAccueil();
-      await waitFor(() => {
-        expect(screen.getByTestId("btn-configurer-profil")).toBeTruthy();
-      });
+      await flushAsync();
     });
 
-    then("le bouton de configuration du profil est visible", () => {
-      expect(screen.getByTestId("btn-configurer-profil")).toBeTruthy();
+    then("aucun profil n'est configuré", () => {
+      expect(screen.queryByTestId("aj-card")).toBeNull();
     });
 
     and(

@@ -1,9 +1,5 @@
 Feature: Gestion du profil intermittent
 
-  Scenario: Pas de profil au démarrage
-    Given l'écran d'accueil est affiché
-    Then le bouton de configuration du profil est visible
-
   Scenario: Configuration du profil
     Given l'écran d'accueil est affiché
     When je configure mon profil
@@ -30,7 +26,7 @@ Feature: Gestion du profil intermittent
 
   Scenario: Le bouton Valider est désactivé si le nom est vide
     Given l'écran d'accueil est affiché
-    When j'ouvre le formulaire profil
+    When j'ouvre le formulaire profil et je vide le nom
     Then le bouton Valider est désactivé
 
   Scenario: Erreur hors du Provider

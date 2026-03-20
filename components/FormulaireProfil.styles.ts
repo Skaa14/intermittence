@@ -113,6 +113,10 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
+  btnValiderFull: {
+    flex: 0,
+    width: "100%",
+  },
   btnValiderDisabled: {
     opacity: 0.5,
   },

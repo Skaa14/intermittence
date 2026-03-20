@@ -226,14 +226,6 @@ export default function AccueilScreen() {
         </View>
       )}
 
-      {!profil && !formulaireOuvert && (
-        <Pressable testID="btn-configurer-profil" style={styles.configurerBtn} onPress={() => setFormulaireOuvert(true)}>
-          <Text style={styles.configurerBtnText}>
-            Configurer mon profil pour estimer mon indemnité journalière
-          </Text>
-        </Pressable>
-      )}
-
       {!formulaireOuvert && (
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Données de test</Text>
