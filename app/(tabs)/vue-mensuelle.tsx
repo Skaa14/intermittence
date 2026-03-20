@@ -81,15 +81,17 @@ export default function VueMensuelleScreen() {
   const router = useRouter();
 
   const mois = useMemo(
-    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations, enseignements) : []),
+    () => (profil?.aOuvertDroits ? calculerIndemnisationMensuelle(profil, contrats, formations, enseignements) : []),
     [profil, contrats, formations, enseignements]
   );
 
-  if (!profil) {
+  if (!profil || !profil.aOuvertDroits) {
     return (
       <View style={styles.container}>
         <Text style={styles.empty} testID="message-profil-manquant">
-          Configurez votre profil pour voir la simulation
+          {!profil
+            ? "Configurez votre profil pour voir la simulation"
+            : "Ouvrez vos droits ARE pour voir la simulation"}
         </Text>
       </View>
     );

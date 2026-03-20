@@ -41,3 +41,10 @@ Feature: Calcul de l'indemnité journalière (AJ)
       | Test | 8      | 800    | 14400   | 15/09/2026        |
     When l'écran d'accueil est affiché
     Then l'AJ affichée est "63.63"
+
+  Scenario: Carte AJ masquée si droits non ouverts
+    Given un profil sans droits ARE est configuré
+      | Nom  | Annexe |
+      | Test | 8      |
+    When l'écran d'accueil est affiché
+    Then la carte AJ n'est pas visible

@@ -5,7 +5,7 @@ import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
-import { ProfilIntermittent } from "../../types/profil";
+import { ProfilSansId } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
 import { fixerDate } from "../helpers/form";
@@ -27,7 +27,7 @@ type ProfilRow = {
 };
 
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
-let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
+let capturedAjouterProfil: ((p: ProfilSansId) => void) | null = null;
 let pendingProfil: ProfilRow | null = null;
 let pendingContrats: ContratRow[] = [];
 
@@ -91,6 +91,7 @@ const setupMoisScreen = async (index: string) => {
       capturedAjouterProfil!({
         nom: "Test",
         annexe: pendingProfil!.Annexe as "8" | "10",
+        aOuvertDroits: true,
         heuresTravaillees: Number(pendingProfil!.Heures),
         salaireReference: Number(pendingProfil!.Salaire),
         dateAnniversaire: pendingProfil!["Date anniversaire"],

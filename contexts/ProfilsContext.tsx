@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo, ReactNode } from "react";
-import { ProfilIntermittent } from "../types/profil";
+import { ProfilIntermittent, ProfilSansId } from "../types/profil";
 import {
   charger,
   sauvegarder,
@@ -16,8 +16,8 @@ interface ProfilsContextType {
   profilActifId: string | null;
   profilActif: ProfilIntermittent | null;
   chargementTermine: boolean;
-  ajouterProfil: (profil: Omit<ProfilIntermittent, "id">) => string;
-  modifierProfil: (id: string, donnees: Omit<ProfilIntermittent, "id">) => void;
+  ajouterProfil: (profil: ProfilSansId) => string;
+  modifierProfil: (id: string, donnees: ProfilSansId) => void;
   supprimerProfil: (id: string) => void;
   dupliquerProfil: (id: string, nouveauNom: string) => void;
   changerProfilActif: (id: string) => void;
@@ -40,7 +40,18 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
       charger<string>("profilActifId"),
     ])
       .then(([profilsCharges, idActif]) => {
-        if (profilsCharges) setProfils(profilsCharges);
+        if (profilsCharges) {
+          let aMigre = false;
+          const migres = profilsCharges.map((p) => {
+            if (p.aOuvertDroits === undefined) {
+              aMigre = true;
+              return { ...p, aOuvertDroits: true } as ProfilIntermittent;
+            }
+            return p;
+          });
+          setProfils(migres);
+          if (aMigre) sauvegarder("profils", migres);
+        }
         if (idActif) setProfilActifId(idActif);
       })
       .finally(() => setChargementTermine(true));
@@ -55,7 +66,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const ajouterProfil = useCallback((donnees: Omit<ProfilIntermittent, "id">): string => {
+  const ajouterProfil = useCallback((donnees: ProfilSansId): string => {
     const id = crypto.randomUUID();
     const nouveau: ProfilIntermittent = { id, ...donnees };
     setProfils((prev) => {
@@ -67,7 +78,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
     return id;
   }, [persisterProfilActifId]);
 
-  const modifierProfil = useCallback((id: string, donnees: Omit<ProfilIntermittent, "id">) => {
+  const modifierProfil = useCallback((id: string, donnees: ProfilSansId) => {
     setProfils((prev) => {
       const mis = prev.map((p) => (p.id === id ? { id, ...donnees } : p));
       sauvegarder("profils", mis);

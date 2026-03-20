@@ -41,6 +41,7 @@ const creerProfil = (
   id: "test-profil-id",
   nom: "Test",
   annexe,
+  aOuvertDroits: true,
   heuresTravaillees: Number(heures),
   salaireReference: Number(salaire),
   dateAnniversaire: "15/09/2026",
@@ -54,6 +55,28 @@ const escapeRegex = (str: string) =>
 defineFeature(feature, (test) => {
   test("Affichage sans profil configuré", ({ given, then }) => {
     given("la page de détail est affichée sans profil", async () => {
+      await renderDetailScreen();
+    });
+
+    then(/^le message "(.*)" est affiché$/, (message: string) => {
+      expect(screen.getByText(message)).toBeTruthy();
+    });
+  });
+
+  test("Affichage sans droits ARE ouverts", ({ given, when, then }) => {
+    given("un profil sans droits ARE est configuré", async (table: { Nom: string; Annexe: string }[]) => {
+      const row = table[0];
+      await sauvegarderProfil({
+        id: "test-profil-id",
+        nom: row.Nom,
+        annexe: row.Annexe as Annexe,
+        aOuvertDroits: false,
+        tauxCSG: "standard",
+        alsaceMoselle: false,
+      });
+    });
+
+    when("la page de détail est affichée", async () => {
       await renderDetailScreen();
     });
 

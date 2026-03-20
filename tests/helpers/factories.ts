@@ -39,16 +39,30 @@ export function enseignement(overrides: Partial<Enseignement> = {}): Enseignemen
   };
 }
 
+export function profil(overrides: { aOuvertDroits: false } & Record<string, unknown>): ProfilIntermittent;
+export function profil(overrides?: Partial<ProfilIntermittent>): ProfilIntermittent;
 export function profil(overrides: Partial<ProfilIntermittent> = {}): ProfilIntermittent {
+  if (overrides.aOuvertDroits === false) {
+    return {
+      id: overrides.id ?? "profil-1",
+      nom: overrides.nom ?? "Profil test",
+      annexe: overrides.annexe ?? "8",
+      aOuvertDroits: false,
+      tauxCSG: overrides.tauxCSG ?? "standard",
+      alsaceMoselle: overrides.alsaceMoselle ?? false,
+    };
+  }
+
   return {
     id: "profil-1",
     nom: "Profil test",
     annexe: "8",
+    aOuvertDroits: true,
     dateAnniversaire: "15/09/2026",
     salaireReference: 18000,
     heuresTravaillees: 600,
     tauxCSG: "standard",
     alsaceMoselle: false,
     ...overrides,
-  };
+  } as ProfilIntermittent;
 }

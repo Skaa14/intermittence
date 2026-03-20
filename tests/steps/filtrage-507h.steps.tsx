@@ -31,7 +31,7 @@ const injecterContrats = async (rows: ContratRow[]) => {
   );
   await AsyncStorage.setItem(
     "intermittence:profils",
-    JSON.stringify([{ id: TEST_PROFIL_ID, nom: "Test", annexe: "8", dateAnniversaire: "15/09/2026", salaireReference: 18000, heuresTravaillees: 600, tauxCSG: "standard", alsaceMoselle: false }])
+    JSON.stringify([{ id: TEST_PROFIL_ID, nom: "Test", annexe: "8", aOuvertDroits: true, dateAnniversaire: "15/09/2026", salaireReference: 18000, heuresTravaillees: 600, tauxCSG: "standard", alsaceMoselle: false }])
   );
   await AsyncStorage.setItem(
     "intermittence:profilActifId",

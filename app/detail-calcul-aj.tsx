@@ -70,7 +70,7 @@ export default function DetailCalculAJScreen() {
   const insets = useSafeAreaInsets();
 
   const detail = useMemo(() => {
-    if (!profil) return null;
+    if (!profil || !profil.aOuvertDroits) return null;
     return calculerAJDetaille(
       profil.annexe,
       profil.salaireReference,

@@ -29,7 +29,7 @@ export default function AccueilScreen() {
   const [contratFctId, setContratFctId] = useState<string | null>(null);
 
   const { ajBrute, ajNette } = useMemo(() => {
-    if (!profil) return { ajBrute: 0, ajNette: 0 };
+    if (!profil || !profil.aOuvertDroits) return { ajBrute: 0, ajNette: 0 };
     const brute = calculerAJ(profil.annexe, profil.salaireReference, profil.heuresTravaillees);
     const sjm = calculerSJM(profil.annexe, profil.salaireReference, profil.heuresTravaillees);
     const nette = calculerAJNette(brute, sjm, profil.tauxCSG, profil.alsaceMoselle);
@@ -178,7 +178,7 @@ export default function AccueilScreen() {
         <Text testID="contrats-count" style={styles.cardValue}>{contrats.length}</Text>
       </View>
 
-      {profil && (
+      {profil?.aOuvertDroits && (
         <View testID="aj-card" style={styles.ajCard}>
           <Text style={styles.ajLabel}>Indemnité journalière estimée</Text>
           <View style={styles.ajRow}>

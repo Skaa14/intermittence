@@ -280,7 +280,7 @@ export default function DetailMoisScreen() {
   const [listHeight, setListHeight] = useState(0);
 
   const mois = useMemo(
-    () => (profil ? calculerIndemnisationMensuelle(profil, contrats, formations, enseignements) : []),
+    () => (profil?.aOuvertDroits ? calculerIndemnisationMensuelle(profil, contrats, formations, enseignements) : []),
     [profil, contrats, formations, enseignements]
   );
 
@@ -290,10 +290,14 @@ export default function DetailMoisScreen() {
     }
   }, [indexNum, mois.length]);
 
-  if (!profil) {
+  if (!profil || !profil.aOuvertDroits) {
     return (
       <View style={styles.container}>
-        <Text style={styles.empty}>Configurez votre profil</Text>
+        <Text style={styles.empty}>
+          {!profil
+            ? "Configurez votre profil"
+            : "Ouvrez vos droits ARE pour voir la simulation"}
+        </Text>
       </View>
     );
   }

@@ -3,7 +3,9 @@ import { screen } from "@testing-library/react-native";
 import {
   renderAccueilScreen,
   prechargerProfil,
+  prechargerProfilSansDroits,
   ProfilRow,
+  ProfilSansDroitsRow,
 } from "../helpers/accueil";
 
 const feature = loadFeature("tests/features/indemnite-journaliere.feature");
@@ -63,5 +65,17 @@ defineFeature(feature, (test) => {
     givenProfil(given);
     whenAccueil(when);
     thenAJ(then);
+  });
+
+  test("Carte AJ masquée si droits non ouverts", ({ given, when, then }) => {
+    given("un profil sans droits ARE est configuré", async (table: ProfilSansDroitsRow[]) => {
+      await prechargerProfilSansDroits(table[0]);
+    });
+
+    whenAccueil(when);
+
+    then("la carte AJ n'est pas visible", () => {
+      expect(screen.queryByTestId("aj-card")).toBeNull();
+    });
   });
 });

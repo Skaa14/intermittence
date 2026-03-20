@@ -15,7 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProfils } from "../contexts/ProfilsContext";
-import { ProfilIntermittent } from "../types/profil";
+import { ProfilIntermittent, ProfilSansId } from "../types/profil";
 import FormulaireProfil from "./FormulaireProfil";
 import DialogueTexte from "./DialogueTexte";
 import { TypeDonneesTest, sauvegarderDonneesTest } from "../utils/donneesTest";
@@ -110,7 +110,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     onFermer();
   };
 
-  const handleValiderCreation = async (profil: Omit<ProfilIntermittent, "id">, donneesTest?: TypeDonneesTest) => {
+  const handleValiderCreation = async (profil: ProfilSansId, donneesTest?: TypeDonneesTest) => {
     const id = ajouterProfil(profil);
     if (donneesTest) {
       await sauvegarderDonneesTest(id, donneesTest);
@@ -119,7 +119,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     onFermer();
   };
 
-  const handleValiderEdition = (donnees: Omit<ProfilIntermittent, "id">) => {
+  const handleValiderEdition = (donnees: ProfilSansId) => {
     if (!profilEdite) return;
     modifierProfil(profilEdite.id, donnees);
     setMode("liste");
@@ -203,7 +203,7 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
 
   const renderFormulaire = (
     profilInitial: ProfilIntermittent | undefined,
-    onValider: (profil: Omit<ProfilIntermittent, "id">, donneesTest?: TypeDonneesTest) => void | Promise<void>,
+    onValider: (profil: ProfilSansId, donneesTest?: TypeDonneesTest) => void | Promise<void>,
     onAnnuler: () => void,
   ) => (
     <ScrollView style={styles.formulaireScroll} keyboardShouldPersistTaps="handled">

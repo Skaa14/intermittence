@@ -7,6 +7,12 @@ Feature: Vue mensuelle
     Given le profil n'est pas configuré
     Then le message d'invitation à configurer le profil est visible
 
+  Scenario: Profil sans droits ARE - invitation à ouvrir ses droits
+    Given le profil est configuré sans droits ARE
+      | Nom  | Annexe |
+      | Test | 8      |
+    Then le message d'invitation à ouvrir ses droits est visible
+
   Scenario: 12 cartes affichées avec profil configuré
     Given le profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |

@@ -3,14 +3,14 @@ import { View, Text, TextInput, Pressable, Platform } from "react-native";
 import DateTimePicker, {
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { ProfilIntermittent, Annexe, TauxCSG } from "../types/profil";
+import { ProfilIntermittent, ProfilSansId, Annexe, TauxCSG } from "../types/profil";
 import { formatDate, parseDate } from "../utils/date";
 import { creerProfilArtiste, creerProfilTechnicien, TypeDonneesTest } from "../utils/donneesTest";
 import { styles, webDateInputStyle } from "./FormulaireProfil.styles";
 
 interface FormulaireProfilProps {
   profilInitial?: ProfilIntermittent;
-  onValider: (profil: Omit<ProfilIntermittent, "id">, donneesTest?: TypeDonneesTest) => void | Promise<void>;
+  onValider: (profil: ProfilSansId, donneesTest?: TypeDonneesTest) => void | Promise<void>;
   onAnnuler?: () => void;
 }
 
@@ -21,15 +21,16 @@ export default function FormulaireProfil({
 }: FormulaireProfilProps) {
   const [nom, setNom] = useState(profilInitial?.nom ?? "");
   const [annexe, setAnnexe] = useState<Annexe>(profilInitial?.annexe ?? "8");
+  const [aOuvertDroits, setAOuvertDroits] = useState(profilInitial?.aOuvertDroits ?? true);
   const [dateAnniversaire, setDateAnniversaire] = useState<Date | undefined>(
-    profilInitial ? parseDate(profilInitial.dateAnniversaire) : undefined
+    profilInitial?.dateAnniversaire ? parseDate(profilInitial.dateAnniversaire) : undefined
   );
   const [showPicker, setShowPicker] = useState(false);
   const [salaireReference, setSalaireReference] = useState(
-    profilInitial ? profilInitial.salaireReference.toString() : ""
+    profilInitial?.salaireReference != null ? profilInitial.salaireReference.toString() : ""
   );
   const [heuresTravaillees, setHeuresTravaillees] = useState(
-    profilInitial ? profilInitial.heuresTravaillees.toString() : ""
+    profilInitial?.heuresTravaillees != null ? profilInitial.heuresTravaillees.toString() : ""
   );
   const [tauxCSG, setTauxCSG] = useState<TauxCSG>(profilInitial?.tauxCSG ?? "standard");
   const [alsaceMoselle, setAlsaceMoselle] = useState(profilInitial?.alsaceMoselle ?? false);
@@ -44,19 +45,25 @@ export default function FormulaireProfil({
   };
 
   const handleValider = () => {
-    const salaire = Number(salaireReference);
-    const heures = Number(heuresTravaillees);
-    if (!nomValide || !dateAnniversaire || isNaN(salaire) || isNaN(heures)) return;
+    if (!nomValide) return;
 
-    onValider({
-      nom: nom.trim(),
-      annexe,
-      dateAnniversaire: formatDate(dateAnniversaire),
-      salaireReference: salaire,
-      heuresTravaillees: heures,
-      tauxCSG,
-      alsaceMoselle,
-    });
+    const base = { nom: nom.trim(), annexe, tauxCSG, alsaceMoselle };
+
+    if (aOuvertDroits) {
+      const salaire = Number(salaireReference);
+      const heures = Number(heuresTravaillees);
+      if (!dateAnniversaire || isNaN(salaire) || isNaN(heures)) return;
+
+      onValider({
+        ...base,
+        aOuvertDroits: true,
+        dateAnniversaire: formatDate(dateAnniversaire),
+        salaireReference: salaire,
+        heuresTravaillees: heures,
+      });
+    } else {
+      onValider({ ...base, aOuvertDroits: false });
+    }
   };
 
   const onChangeDateAnniversaire = (
@@ -126,61 +133,76 @@ export default function FormulaireProfil({
         </Pressable>
       </View>
 
-      <Text style={styles.label}>Date anniversaire</Text>
-      {Platform.OS === "web" ? (
-        <input
-          type="date"
-          value={dateAnniversaire ? dateAnniversaire.toISOString().slice(0, 10) : ""}
-          onChange={(e) => {
-            const d = e.target.value
-              ? new Date(e.target.value + "T00:00:00")
-              : undefined;
-            setDateAnniversaire(d);
-          }}
-          style={webDateInputStyle}
-        />
-      ) : (
+      <Pressable
+        testID="btn-a-ouvert-droits"
+        style={styles.checkboxRow}
+        onPress={() => setAOuvertDroits(!aOuvertDroits)}
+      >
+        <View style={[styles.checkbox, aOuvertDroits && styles.checkboxActive]}>
+          {aOuvertDroits && <Text style={styles.checkboxCheck}>✓</Text>}
+        </View>
+        <Text style={styles.checkboxLabel}>J'ai déjà ouvert mes droits ARE</Text>
+      </Pressable>
+
+      {aOuvertDroits && (
         <>
-          <Pressable
-            testID="btn-date-anniversaire"
-            style={styles.input}
-            onPress={() => setShowPicker(true)}
-          >
-            <Text style={dateAnniversaire ? styles.dateText : styles.datePlaceholder}>
-              {dateAnniversaire ? formatDate(dateAnniversaire) : "Sélectionner une date"}
-            </Text>
-          </Pressable>
-          {showPicker && (
-            <DateTimePicker
-              testID="picker-anniversaire"
-              value={dateAnniversaire ?? new Date()}
-              mode="date"
-              display="default"
-              onChange={onChangeDateAnniversaire}
+          <Text style={styles.label}>Date anniversaire</Text>
+          {Platform.OS === "web" ? (
+            <input
+              type="date"
+              value={dateAnniversaire ? dateAnniversaire.toISOString().slice(0, 10) : ""}
+              onChange={(e) => {
+                const d = e.target.value
+                  ? new Date(e.target.value + "T00:00:00")
+                  : undefined;
+                setDateAnniversaire(d);
+              }}
+              style={webDateInputStyle}
             />
+          ) : (
+            <>
+              <Pressable
+                testID="btn-date-anniversaire"
+                style={styles.input}
+                onPress={() => setShowPicker(true)}
+              >
+                <Text style={dateAnniversaire ? styles.dateText : styles.datePlaceholder}>
+                  {dateAnniversaire ? formatDate(dateAnniversaire) : "Sélectionner une date"}
+                </Text>
+              </Pressable>
+              {showPicker && (
+                <DateTimePicker
+                  testID="picker-anniversaire"
+                  value={dateAnniversaire ?? new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={onChangeDateAnniversaire}
+                />
+              )}
+            </>
           )}
+
+          <Text style={styles.label}>Salaire de référence (€ brut)</Text>
+          <TextInput
+            testID="input-salaire-reference"
+            style={styles.input}
+            placeholder="Ex : 18000"
+            value={salaireReference}
+            onChangeText={setSalaireReference}
+            keyboardType="numeric"
+          />
+
+          <Text style={styles.label}>Heures travaillées</Text>
+          <TextInput
+            testID="input-heures-travaillees"
+            style={styles.input}
+            placeholder="Ex : 600"
+            value={heuresTravaillees}
+            onChangeText={setHeuresTravaillees}
+            keyboardType="numeric"
+          />
         </>
       )}
-
-      <Text style={styles.label}>Salaire de référence (€ brut)</Text>
-      <TextInput
-        testID="input-salaire-reference"
-        style={styles.input}
-        placeholder="Ex : 18000"
-        value={salaireReference}
-        onChangeText={setSalaireReference}
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Heures travaillées</Text>
-      <TextInput
-        testID="input-heures-travaillees"
-        style={styles.input}
-        placeholder="Ex : 600"
-        value={heuresTravaillees}
-        onChangeText={setHeuresTravaillees}
-        keyboardType="numeric"
-      />
 
       <Text style={styles.label}>Taux CSG</Text>
       <View style={styles.row}>

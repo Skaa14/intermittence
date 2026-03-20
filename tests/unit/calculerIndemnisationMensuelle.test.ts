@@ -22,6 +22,11 @@ describe("calculerIndemnisationMensuelle", () => {
       expect(mois).toHaveLength(0);
     });
 
+    it("retourne une liste vide si aOuvertDroits est false", () => {
+      const mois = calculerIndemnisationMensuelle(profil({ aOuvertDroits: false }), []);
+      expect(mois).toHaveLength(0);
+    });
+
     it("chaque mois a un index croissant de 0 à 11", () => {
       const mois = calculerIndemnisationMensuelle(profil(), []);
       mois.forEach((m, i) => expect(m.index).toBe(i));

@@ -15,6 +15,7 @@ function renderProfils() {
 const profilSanId = {
   nom: "Artiste",
   annexe: "10" as const,
+  aOuvertDroits: true,
   dateAnniversaire: "15/09/2026",
   salaireReference: 16200,
   heuresTravaillees: 545,

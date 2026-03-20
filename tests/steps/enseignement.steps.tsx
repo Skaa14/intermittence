@@ -6,7 +6,7 @@ import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider, useEnseignements } from "../../contexts/EnseignementsContext";
-import { ProfilIntermittent } from "../../types/profil";
+import { ProfilSansId } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { Enseignement } from "../../types/enseignement";
 import { fixerDate } from "../helpers/form";
@@ -23,7 +23,7 @@ jest.mock("react-native-calendars", () =>
   require("../helpers/mocks").mockCalendarsFactory()
 );
 
-let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
+let capturedAjouterProfil: ((p: ProfilSansId) => void) | null = null;
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
 let capturedAjouterEnseignement: ((e: Omit<Enseignement, "id">) => void) | null = null;
 
@@ -108,6 +108,7 @@ const configurerProfilStep = (given: Function) => {
       capturedAjouterProfil!({
         nom: "Test",
         annexe: row.Annexe as "8" | "10",
+        aOuvertDroits: true,
         dateAnniversaire: row["Date anniversaire"],
         salaireReference: Number(row.Salaire),
         heuresTravaillees: Number(row.Heures),

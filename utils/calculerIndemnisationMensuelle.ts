@@ -58,12 +58,12 @@ export interface IndemnisationMensuelle {
 function calculerFranchisesParMois(
   profil: ProfilIntermittent
 ): { franchiseCPParMois: number[]; franchiseSalaireParMois: number[] } {
-  if (profil.heuresTravaillees === 0) {
-    return {
-      franchiseCPParMois: Array(12).fill(0),
-      franchiseSalaireParMois: Array(12).fill(0),
-    };
-  }
+  const vide = {
+    franchiseCPParMois: Array(12).fill(0),
+    franchiseSalaireParMois: Array(12).fill(0),
+  };
+  if (!profil.aOuvertDroits) return vide;
+  if (profil.heuresTravaillees === 0) return vide;
 
   const diviseur = profil.annexe === "8" ? 8 : 10;
   const joursRef = profil.heuresTravaillees / diviseur;
@@ -111,6 +111,8 @@ export function calculerIndemnisationMensuelle(
   formations: Formation[] = [],
   enseignements: Enseignement[] = []
 ): IndemnisationMensuelle[] {
+  if (!profil.aOuvertDroits) return [];
+
   const dateAnniversaire = parseDate(profil.dateAnniversaire);
   if (!dateAnniversaire) return [];
 

@@ -4,6 +4,13 @@ Feature: Page de détail du calcul AJ
     Given la page de détail est affichée sans profil
     Then le message "Aucun profil configuré." est affiché
 
+  Scenario: Affichage sans droits ARE ouverts
+    Given un profil sans droits ARE est configuré
+      | Nom  | Annexe |
+      | Test | 8      |
+    When la page de détail est affichée
+    Then le message "Aucun profil configuré." est affiché
+
   Scenario: Affichage des composantes brutes annexe 8
     Given un profil annexe 8 avec 600h et 18000 euros
     When la page de détail est affichée

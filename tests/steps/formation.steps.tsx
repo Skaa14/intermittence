@@ -6,7 +6,7 @@ import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider, useFormations } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
-import { ProfilIntermittent } from "../../types/profil";
+import { ProfilSansId } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { Formation, OptionFormation } from "../../types/formation";
 import { fixerDate } from "../helpers/form";
@@ -36,7 +36,7 @@ type FormationRow = {
   Option: string;
 };
 
-let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
+let capturedAjouterProfil: ((p: ProfilSansId) => void) | null = null;
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
 let capturedAjouterFormation: ((f: Omit<Formation, "id">) => void) | null = null;
 
@@ -126,6 +126,7 @@ const injecterDonnees = async () => {
       capturedAjouterProfil!({
         nom: "Test",
         annexe: pendingProfil!.Annexe as "8" | "10",
+        aOuvertDroits: true,
         heuresTravaillees: Number(pendingProfil!.Heures),
         salaireReference: Number(pendingProfil!.Salaire),
         dateAnniversaire: pendingProfil!["Date anniversaire"],

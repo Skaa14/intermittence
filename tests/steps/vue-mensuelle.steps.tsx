@@ -5,7 +5,7 @@ import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
-import { ProfilIntermittent } from "../../types/profil";
+import { ProfilSansId } from "../../types/profil";
 import { Contrat } from "../../types/contrat";
 import { ContratRow } from "../helpers/types";
 import { fixerDate } from "../helpers/form";
@@ -25,7 +25,7 @@ type ProfilRow = {
 };
 
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
-let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
+let capturedAjouterProfil: ((p: ProfilSansId) => void) | null = null;
 
 function Setup() {
   const { ajouterProfil } = useProfils();
@@ -62,6 +62,7 @@ const configurerProfil = async (row: ProfilRow) => {
     capturedAjouterProfil!({
       nom: "Test",
       annexe: row.Annexe as "8" | "10",
+      aOuvertDroits: true,
       heuresTravaillees: Number(row.Heures),
       salaireReference: Number(row.Salaire),
       dateAnniversaire: row["Date anniversaire"],
@@ -108,6 +109,31 @@ defineFeature(feature, (test) => {
 
     then("le message d'invitation à configurer le profil est visible", () => {
       expect(screen.getByTestId("message-profil-manquant")).toBeTruthy();
+    });
+  });
+
+  test("Profil sans droits ARE - invitation à ouvrir ses droits", ({ given, then }) => {
+    fixerDateStep(given);
+
+    given("le profil est configuré sans droits ARE", async (table: { Nom: string; Annexe: string }[]) => {
+      await renderScreen();
+      act(() => {
+        capturedAjouterProfil!({
+          nom: table[0].Nom,
+          annexe: table[0].Annexe as "8" | "10",
+          aOuvertDroits: false,
+          tauxCSG: "standard",
+          alsaceMoselle: false,
+        });
+      });
+      await flushAsync();
+    });
+
+    then("le message d'invitation à ouvrir ses droits est visible", () => {
+      expect(screen.getByTestId("message-profil-manquant")).toBeTruthy();
+      expect(screen.getByTestId("message-profil-manquant").props.children).toBe(
+        "Ouvrez vos droits ARE pour voir la simulation"
+      );
     });
   });
 
