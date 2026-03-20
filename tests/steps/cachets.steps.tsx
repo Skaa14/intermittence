@@ -16,10 +16,12 @@ jest.mock("react-native-calendars", () =>
 
 let mockAnnexe = "10";
 
-jest.mock("../../contexts/ProfilContext", () => ({
-  ...jest.requireActual("../../contexts/ProfilContext"),
-  useProfil: () => ({
-    profil: {
+jest.mock("../../contexts/ProfilsContext", () => ({
+  ...jest.requireActual("../../contexts/ProfilsContext"),
+  useProfils: () => ({
+    profilActif: {
+      id: "test-id",
+      nom: "Test",
       annexe: mockAnnexe,
       dateAnniversaire: "01/01/2026",
       salaireReference: 20000,
@@ -27,9 +29,14 @@ jest.mock("../../contexts/ProfilContext", () => ({
       tauxCSG: "standard",
       alsaceMoselle: false,
     },
+    profilActifId: "test-id",
+    profils: [],
     chargementTermine: true,
-    mettreAJourProfil: jest.fn(),
-    reinitialiserProfil: jest.fn(),
+    modifierProfil: jest.fn(),
+    ajouterProfil: jest.fn(),
+    supprimerProfil: jest.fn(),
+    dupliquerProfil: jest.fn(),
+    changerProfilActif: jest.fn(),
   }),
 }));
 

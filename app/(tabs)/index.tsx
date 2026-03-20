@@ -12,7 +12,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
-import { useProfil } from "../../contexts/ProfilContext";
+import { useProfils } from "../../contexts/ProfilsContext";
 import { useFormations } from "../../contexts/FormationsContext";
 import { useEnseignements } from "../../contexts/EnseignementsContext";
 import { useDonneesTest } from "../../contexts/DonneesTestContext";
@@ -28,7 +28,7 @@ import { styles, webDateInputStyle } from "../../styles/tabs/index.styles";
 
 export default function AccueilScreen() {
   const { contrats } = useContrats();
-  const { profil, mettreAJourProfil } = useProfil();
+  const { profilActif: profil, modifierProfil, ajouterProfil } = useProfils();
   const { formations } = useFormations();
   const { enseignements } = useEnseignements();
   const { chargerDonneesTest } = useDonneesTest();
@@ -106,8 +106,7 @@ export default function AccueilScreen() {
     const heures = Number(heuresTravaillees);
     if (!dateAnniversaire || isNaN(salaire) || isNaN(heures)) return;
 
-    mettreAJourProfil({
-      id: profil?.id ?? crypto.randomUUID(),
+    const donnees = {
       nom: profil?.nom ?? "Mon profil",
       annexe,
       dateAnniversaire: formatDate(dateAnniversaire),
@@ -115,7 +114,12 @@ export default function AccueilScreen() {
       heuresTravaillees: heures,
       tauxCSG,
       alsaceMoselle,
-    });
+    };
+    if (profil) {
+      modifierProfil(profil.id, donnees);
+    } else {
+      ajouterProfil(donnees);
+    }
     setFormulaireOuvert(false);
   };
 

@@ -14,6 +14,8 @@ type ContratRow = {
 
 const feature = loadFeature("tests/features/filtrage-507h.feature");
 
+const TEST_PROFIL_ID = "test-filtrage-id";
+
 const injecterContrats = async (rows: ContratRow[]) => {
   const contrats: Contrat[] = rows.map((row, i) => ({
     id: String(i + 1),
@@ -23,7 +25,18 @@ const injecterContrats = async (rows: ContratRow[]) => {
     heures: Number(row.Heures),
     salaireBrut: Number(row.Salaire),
   }));
-  await AsyncStorage.setItem("intermittence:contrats", JSON.stringify(contrats));
+  await AsyncStorage.setItem(
+    `intermittence:profil:${TEST_PROFIL_ID}:contrats`,
+    JSON.stringify(contrats)
+  );
+  await AsyncStorage.setItem(
+    "intermittence:profils",
+    JSON.stringify([{ id: TEST_PROFIL_ID, nom: "Test", annexe: "8", dateAnniversaire: "15/09/2026", salaireReference: 18000, heuresTravaillees: 600, tauxCSG: "standard", alsaceMoselle: false }])
+  );
+  await AsyncStorage.setItem(
+    "intermittence:profilActifId",
+    JSON.stringify(TEST_PROFIL_ID)
+  );
 };
 
 defineFeature(feature, (test) => {
@@ -87,9 +100,7 @@ defineFeature(feature, (test) => {
   });
 
   test("Aucun contrat enregistré", ({ given, when, then, and }) => {
-    given("aucun contrat n'est enregistré", () => {
-      // AsyncStorage est déjà vide (setup.ts)
-    });
+    given("aucun contrat n'est enregistré", () => {});
 
     when("l'écran d'accueil est affiché", async () => {
       await renderAccueilScreen();

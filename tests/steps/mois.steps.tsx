@@ -2,7 +2,7 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, screen, within, act } from "@testing-library/react-native";
 import DetailMoisScreen from "../../app/mois/[moisIndex]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
-import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { ProfilIntermittent } from "../../types/profil";
@@ -27,21 +27,21 @@ type ProfilRow = {
 };
 
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
-let capturedMettreAJourProfil: ((p: ProfilIntermittent) => void) | null = null;
+let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
 let pendingProfil: ProfilRow | null = null;
 let pendingContrats: ContratRow[] = [];
 
 function Setup() {
-  const { mettreAJourProfil } = useProfil();
+  const { ajouterProfil } = useProfils();
   const { ajouterContrat } = useContrats();
   capturedAjouterContrat = ajouterContrat;
-  capturedMettreAJourProfil = mettreAJourProfil;
+  capturedAjouterProfil = ajouterProfil;
   return <DetailMoisScreen />;
 }
 
 const renderScreen = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -49,7 +49,7 @@ const renderScreen = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -86,25 +86,33 @@ const franchiseSalaireStep = (
 const setupMoisScreen = async (index: string) => {
   mockIndex = index;
   await renderScreen();
-  act(() => {
-    if (pendingProfil) {
-      capturedMettreAJourProfil!({
-        annexe: pendingProfil.Annexe as "8" | "10",
-        heuresTravaillees: Number(pendingProfil.Heures),
-        salaireReference: Number(pendingProfil.Salaire),
-        dateAnniversaire: pendingProfil["Date anniversaire"],
-      });
-    }
-    pendingContrats.forEach((row) => {
-      capturedAjouterContrat!({
-        employeur: row.Employeur,
-        dateDebut: row["Début"],
-        dateFin: row.Fin,
-        heures: Number(row.Heures),
-        salaireBrut: Number(row.Salaire),
+  if (pendingProfil) {
+    act(() => {
+      capturedAjouterProfil!({
+        nom: "Test",
+        annexe: pendingProfil!.Annexe as "8" | "10",
+        heuresTravaillees: Number(pendingProfil!.Heures),
+        salaireReference: Number(pendingProfil!.Salaire),
+        dateAnniversaire: pendingProfil!["Date anniversaire"],
+        tauxCSG: "standard",
+        alsaceMoselle: false,
       });
     });
-  });
+    await flushAsync();
+  }
+  if (pendingContrats.length > 0) {
+    act(() => {
+      pendingContrats.forEach((row) => {
+        capturedAjouterContrat!({
+          employeur: row.Employeur,
+          dateDebut: row["Début"],
+          dateFin: row.Fin,
+          heures: Number(row.Heures),
+          salaireBrut: Number(row.Salaire),
+        });
+      });
+    });
+  }
 };
 
 const feature = loadFeature("tests/features/mois.feature");
@@ -113,7 +121,7 @@ defineFeature(feature, (test) => {
   beforeEach(() => {
     mockIndex = "0";
     capturedAjouterContrat = null;
-    capturedMettreAJourProfil = null;
+    capturedAjouterProfil = null;
     pendingProfil = null;
     pendingContrats = [];
   });

@@ -9,7 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useMemo, useRef, useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
-import { useProfil } from "../../contexts/ProfilContext";
+import { useProfils } from "../../contexts/ProfilsContext";
 import { useFormations } from "../../contexts/FormationsContext";
 import { useEnseignements } from "../../contexts/EnseignementsContext";
 import {
@@ -273,7 +273,7 @@ export default function DetailMoisScreen() {
   const { moisIndex } = useLocalSearchParams<{ moisIndex: string }>();
   const indexNum = Math.max(0, parseInt(moisIndex ?? "0", 10) || 0);
   const { contrats } = useContrats();
-  const { profil } = useProfil();
+  const { profilActif: profil } = useProfils();
   const { formations } = useFormations();
   const { enseignements } = useEnseignements();
   const flatListRef = useRef<FlatList>(null);

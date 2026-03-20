@@ -2,21 +2,24 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DetailCalculAJScreen from "../../app/detail-calcul-aj";
-import { ProfilProvider } from "../../contexts/ProfilContext";
+import { ProfilsProvider } from "../../contexts/ProfilsContext";
 import { Annexe, ProfilIntermittent, TauxCSG } from "../../types/profil";
 import { flushAsync } from "../helpers/act";
 
 const feature = loadFeature("tests/features/detail-calcul-aj.feature");
 
 const sauvegarderProfil = async (profil: ProfilIntermittent) => {
-  await AsyncStorage.setItem("intermittence:profil", JSON.stringify(profil));
+  const id = profil.id ?? "test-profil-id";
+  const profilComplet = { ...profil, id };
+  await AsyncStorage.setItem("intermittence:profils", JSON.stringify([profilComplet]));
+  await AsyncStorage.setItem("intermittence:profilActifId", JSON.stringify(id));
 };
 
 const renderDetailScreen = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <DetailCalculAJScreen />
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -35,6 +38,8 @@ const creerProfil = (
   tauxCSG: TauxCSG = "standard",
   alsaceMoselle = false
 ): ProfilIntermittent => ({
+  id: "test-profil-id",
+  nom: "Test",
   annexe,
   heuresTravaillees: Number(heures),
   salaireReference: Number(salaire),

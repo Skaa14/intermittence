@@ -4,8 +4,8 @@ import {
   screen,
 } from "@testing-library/react-native";
 import ContratsScreen from "../../app/(tabs)/contrats";
+import { ProfilsProvider } from "../../contexts/ProfilsContext";
 import { ContratsProvider } from "../../contexts/ContratsContext";
-import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { simulateDayPress } from "./mocks";
@@ -15,7 +15,7 @@ import { flushAsync } from "./act";
 
 export const renderScreen = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -23,7 +23,7 @@ export const renderScreen = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;

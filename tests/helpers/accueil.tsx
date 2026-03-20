@@ -1,7 +1,7 @@
 import { render, fireEvent, screen } from "@testing-library/react-native";
 import AccueilScreen from "../../app/(tabs)/index";
+import { ProfilsProvider } from "../../contexts/ProfilsContext";
 import { ContratsProvider } from "../../contexts/ContratsContext";
-import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
@@ -20,8 +20,8 @@ export type ProfilRow = {
 
 export const renderAccueilScreen = async () => {
   const result = render(
-    <ContratsProvider>
-      <ProfilProvider>
+    <ProfilsProvider>
+      <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
             <DonneesTestProvider>
@@ -29,8 +29,8 @@ export const renderAccueilScreen = async () => {
             </DonneesTestProvider>
           </EnseignementsProvider>
         </FormationsProvider>
-      </ProfilProvider>
-    </ContratsProvider>
+      </ContratsProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;

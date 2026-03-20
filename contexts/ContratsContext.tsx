@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useRef, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from "react";
 import { Contrat } from "../types/contrat";
-import { charger, sauvegarder } from "../utils/storage";
+import { chargerParCle, sauvegarderParCle, cleProfilData } from "../utils/storage";
+import { useProfils } from "./ProfilsContext";
 
 interface ContratsContextType {
   contrats: Contrat[];
@@ -33,25 +34,46 @@ function maxId(contrats: Contrat[]): number {
 }
 
 export function ContratsProvider({ children }: { children: ReactNode }) {
+  const { profilActifId } = useProfils();
   const [contrats, setContrats] = useState<Contrat[]>([]);
   const [chargementTermine, setChargementTermine] = useState(false);
   const nextId = useRef(1);
+  const profilActifIdRef = useRef(profilActifId);
+  profilActifIdRef.current = profilActifId;
 
   useEffect(() => {
-    charger<Contrat[]>("contrats").then((donnees) => {
+    if (!profilActifId) {
+      setContrats([]);
+      nextId.current = 1;
+      setChargementTermine(true);
+      return;
+    }
+
+    let ignore = false;
+    setChargementTermine(false);
+    setContrats([]);
+    nextId.current = 1;
+
+    chargerParCle<Contrat[]>(cleProfilData(profilActifId, "contrats")).then((donnees) => {
+      if (ignore) return;
       if (donnees && donnees.length > 0) {
         setContrats(trierParDate(donnees));
         nextId.current = maxId(donnees) + 1;
       }
       setChargementTermine(true);
-    }).catch(() => setChargementTermine(true));
+    }).catch(() => {
+      if (!ignore) setChargementTermine(true);
+    });
+
+    return () => { ignore = true; };
+  }, [profilActifId]);
+
+  const persister = useCallback((nouveauxContrats: Contrat[]) => {
+    const id = profilActifIdRef.current;
+    if (id) sauvegarderParCle(cleProfilData(id, "contrats"), nouveauxContrats);
   }, []);
 
-  const persister = (nouveauxContrats: Contrat[]) => {
-    sauvegarder("contrats", nouveauxContrats);
-  };
-
-  const ajouterContrat = (contratSansId: Omit<Contrat, "id">) => {
+  const ajouterContrat = useCallback((contratSansId: Omit<Contrat, "id">) => {
     const nouveau: Contrat = {
       ...contratSansId,
       id: String(nextId.current++),
@@ -61,9 +83,9 @@ export function ContratsProvider({ children }: { children: ReactNode }) {
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const modifierContrat = (id: string, contratSansId: Omit<Contrat, "id">) => {
+  const modifierContrat = useCallback((id: string, contratSansId: Omit<Contrat, "id">) => {
     setContrats((prev) => {
       const maj = trierParDate(
         prev.map((c) => (c.id === id ? { ...contratSansId, id } : c))
@@ -71,23 +93,23 @@ export function ContratsProvider({ children }: { children: ReactNode }) {
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const supprimerContrat = (id: string) => {
+  const supprimerContrat = useCallback((id: string) => {
     setContrats((prev) => {
       const maj = prev.filter((c) => c.id !== id);
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const reinitialiserContrats = (nouveauxContrats: Omit<Contrat, "id">[]) => {
+  const reinitialiserContrats = useCallback((nouveauxContrats: Omit<Contrat, "id">[]) => {
     nextId.current = 1;
     const avecIds = nouveauxContrats.map((c) => ({ ...c, id: String(nextId.current++) }));
     const maj = trierParDate(avecIds);
     setContrats(maj);
     persister(maj);
-  };
+  }, [persister]);
 
   return (
     <ContratsContext.Provider

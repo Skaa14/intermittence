@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useRef, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from "react";
 import { Enseignement } from "../types/enseignement";
-import { charger, sauvegarder } from "../utils/storage";
+import { chargerParCle, sauvegarderParCle, cleProfilData } from "../utils/storage";
+import { useProfils } from "./ProfilsContext";
 import { parseDate } from "../utils/date";
 
 interface EnseignementsContextType {
@@ -26,25 +27,46 @@ function maxId(enseignements: Enseignement[]): number {
 }
 
 export function EnseignementsProvider({ children }: { children: ReactNode }) {
+  const { profilActifId } = useProfils();
   const [enseignements, setEnseignements] = useState<Enseignement[]>([]);
   const [chargementTermine, setChargementTermine] = useState(false);
   const nextId = useRef(1);
+  const profilActifIdRef = useRef(profilActifId);
+  profilActifIdRef.current = profilActifId;
 
   useEffect(() => {
-    charger<Enseignement[]>("enseignements").then((donnees) => {
+    if (!profilActifId) {
+      setEnseignements([]);
+      nextId.current = 1;
+      setChargementTermine(true);
+      return;
+    }
+
+    let ignore = false;
+    setChargementTermine(false);
+    setEnseignements([]);
+    nextId.current = 1;
+
+    chargerParCle<Enseignement[]>(cleProfilData(profilActifId, "enseignements")).then((donnees) => {
+      if (ignore) return;
       if (donnees && donnees.length > 0) {
         setEnseignements(trierParDate(donnees));
         nextId.current = maxId(donnees) + 1;
       }
       setChargementTermine(true);
-    }).catch(() => setChargementTermine(true));
+    }).catch(() => {
+      if (!ignore) setChargementTermine(true);
+    });
+
+    return () => { ignore = true; };
+  }, [profilActifId]);
+
+  const persister = useCallback((nouveauxEnseignements: Enseignement[]) => {
+    const id = profilActifIdRef.current;
+    if (id) sauvegarderParCle(cleProfilData(id, "enseignements"), nouveauxEnseignements);
   }, []);
 
-  const persister = (nouveauxEnseignements: Enseignement[]) => {
-    sauvegarder("enseignements", nouveauxEnseignements);
-  };
-
-  const ajouterEnseignement = (enseignementSansId: Omit<Enseignement, "id">) => {
+  const ajouterEnseignement = useCallback((enseignementSansId: Omit<Enseignement, "id">) => {
     const nouveau: Enseignement = {
       ...enseignementSansId,
       id: String(nextId.current++),
@@ -54,9 +76,9 @@ export function EnseignementsProvider({ children }: { children: ReactNode }) {
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const modifierEnseignement = (id: string, enseignementSansId: Omit<Enseignement, "id">) => {
+  const modifierEnseignement = useCallback((id: string, enseignementSansId: Omit<Enseignement, "id">) => {
     setEnseignements((prev) => {
       const maj = trierParDate(
         prev.map((e) => (e.id === id ? { ...enseignementSansId, id } : e))
@@ -64,23 +86,23 @@ export function EnseignementsProvider({ children }: { children: ReactNode }) {
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const supprimerEnseignement = (id: string) => {
+  const supprimerEnseignement = useCallback((id: string) => {
     setEnseignements((prev) => {
       const maj = prev.filter((e) => e.id !== id);
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const reinitialiserEnseignements = (nouveauxEnseignements: Omit<Enseignement, "id">[]) => {
+  const reinitialiserEnseignements = useCallback((nouveauxEnseignements: Omit<Enseignement, "id">[]) => {
     nextId.current = 1;
     const avecIds = nouveauxEnseignements.map((e) => ({ ...e, id: String(nextId.current++) }));
     const maj = trierParDate(avecIds);
     setEnseignements(maj);
     persister(maj);
-  };
+  }, [persister]);
 
   return (
     <EnseignementsContext.Provider

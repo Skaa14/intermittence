@@ -12,7 +12,6 @@ import {
 } from "@expo-google-fonts/plus-jakarta-sans";
 import { colors } from "../theme/colors";
 import { ContratsProvider } from "../contexts/ContratsContext";
-import { ProfilProvider } from "../contexts/ProfilContext";
 import { FormationsProvider } from "../contexts/FormationsContext";
 import { EnseignementsProvider } from "../contexts/EnseignementsContext";
 import { DonneesTestProvider, useDonneesTest } from "../contexts/DonneesTestContext";
@@ -88,17 +87,15 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <ProfilsProvider>
-        <ProfilProvider>
-          <ContratsProvider>
-            <FormationsProvider>
-              <EnseignementsProvider>
-                <DonneesTestProvider>
-                  <AppContent />
-                </DonneesTestProvider>
-              </EnseignementsProvider>
-            </FormationsProvider>
-          </ContratsProvider>
-        </ProfilProvider>
+        <ContratsProvider>
+          <FormationsProvider>
+            <EnseignementsProvider>
+              <DonneesTestProvider>
+                <AppContent />
+              </DonneesTestProvider>
+            </EnseignementsProvider>
+          </FormationsProvider>
+        </ContratsProvider>
       </ProfilsProvider>
     </ErrorBoundary>
   );

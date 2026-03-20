@@ -2,7 +2,7 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, fireEvent, screen, within, act } from "@testing-library/react-native";
 import VueMensuelleScreen from "../../app/(tabs)/vue-mensuelle";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
-import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { ProfilIntermittent } from "../../types/profil";
@@ -25,19 +25,19 @@ type ProfilRow = {
 };
 
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
-let capturedMettreAJourProfil: ((p: ProfilIntermittent) => void) | null = null;
+let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
 
 function Setup() {
-  const { mettreAJourProfil } = useProfil();
+  const { ajouterProfil } = useProfils();
   const { ajouterContrat } = useContrats();
   capturedAjouterContrat = ajouterContrat;
-  capturedMettreAJourProfil = mettreAJourProfil;
+  capturedAjouterProfil = ajouterProfil;
   return <VueMensuelleScreen />;
 }
 
 const renderScreen = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -45,7 +45,7 @@ const renderScreen = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -57,15 +57,19 @@ const fixerDateStep = (given: (pattern: RegExp, fn: (date: string) => void) => v
   });
 };
 
-const configurerProfil = (row: ProfilRow) => {
+const configurerProfil = async (row: ProfilRow) => {
   act(() => {
-    capturedMettreAJourProfil!({
+    capturedAjouterProfil!({
+      nom: "Test",
       annexe: row.Annexe as "8" | "10",
       heuresTravaillees: Number(row.Heures),
       salaireReference: Number(row.Salaire),
       dateAnniversaire: row["Date anniversaire"],
+      tauxCSG: "standard",
+      alsaceMoselle: false,
     });
   });
+  await flushAsync();
 };
 
 const ajouterContrats = (table: ContratRow[]) => {
@@ -87,7 +91,7 @@ const feature = loadFeature("tests/features/vue-mensuelle.feature");
 defineFeature(feature, (test) => {
   beforeEach(() => {
     capturedAjouterContrat = null;
-    capturedMettreAJourProfil = null;
+    capturedAjouterProfil = null;
     mockPush.mockClear();
   });
 

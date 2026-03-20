@@ -2,8 +2,8 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, screen, fireEvent, waitFor, RenderResult } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AccueilScreen from "../../app/(tabs)/index";
+import { ProfilsProvider } from "../../contexts/ProfilsContext";
 import { ContratsProvider } from "../../contexts/ContratsContext";
-import { ProfilProvider } from "../../contexts/ProfilContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
@@ -19,8 +19,8 @@ const feature = loadFeature("tests/features/persistance.feature");
 
 const renderAccueil = async () => {
   const result = render(
-    <ContratsProvider>
-      <ProfilProvider>
+    <ProfilsProvider>
+      <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
             <DonneesTestProvider>
@@ -28,8 +28,8 @@ const renderAccueil = async () => {
             </DonneesTestProvider>
           </EnseignementsProvider>
         </FormationsProvider>
-      </ProfilProvider>
-    </ContratsProvider>
+      </ContratsProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;

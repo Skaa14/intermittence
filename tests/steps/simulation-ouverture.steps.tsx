@@ -15,6 +15,8 @@ type ContratRow = {
 
 const feature = loadFeature("tests/features/simulation-ouverture.feature");
 
+const TEST_PROFIL_ID = "test-simulation-id";
+
 const injecterContrats = async (rows: ContratRow[]) => {
   const contrats: Contrat[] = rows.map((row, i) => ({
     id: String(i + 1),
@@ -24,11 +26,16 @@ const injecterContrats = async (rows: ContratRow[]) => {
     heures: Number(row.Heures),
     salaireBrut: Number(row.Salaire),
   }));
-  await AsyncStorage.setItem("intermittence:contrats", JSON.stringify(contrats));
+  await AsyncStorage.setItem(
+    `intermittence:profil:${TEST_PROFIL_ID}:contrats`,
+    JSON.stringify(contrats)
+  );
 };
 
 const injecterProfil = async (annexe: string) => {
   const p: ProfilIntermittent = {
+    id: TEST_PROFIL_ID,
+    nom: "Test",
     annexe: annexe as "8" | "10",
     dateAnniversaire: "15/09/2026",
     salaireReference: 18000,
@@ -36,7 +43,8 @@ const injecterProfil = async (annexe: string) => {
     tauxCSG: "standard",
     alsaceMoselle: false,
   };
-  await AsyncStorage.setItem("intermittence:profil", JSON.stringify(p));
+  await AsyncStorage.setItem("intermittence:profils", JSON.stringify([p]));
+  await AsyncStorage.setItem("intermittence:profilActifId", JSON.stringify(TEST_PROFIL_ID));
 };
 
 defineFeature(feature, (test) => {
@@ -126,28 +134,4 @@ defineFeature(feature, (test) => {
     });
   });
 
-  test("Message si pas de profil", ({
-    given,
-    and,
-    when,
-    then,
-  }) => {
-    given("ces contrats existent", async (table: ContratRow[]) => {
-      await injecterContrats(table);
-    });
-
-    and("aucun profil n'est configuré", () => {
-      // AsyncStorage est vidé par setup.ts, pas de profil injecté
-    });
-
-    when("l'écran d'accueil est affiché", async () => {
-      await renderAccueilScreen();
-    });
-
-    then("un message invite à configurer le profil pour simuler", async () => {
-      await waitFor(() => {
-        expect(screen.getByTestId("simulation-profil-requis")).toBeTruthy();
-      });
-    });
-  });
 });

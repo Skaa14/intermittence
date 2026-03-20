@@ -1,6 +1,6 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
 import { renderHook, screen } from "@testing-library/react-native";
-import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { useProfils } from "../../contexts/ProfilsContext";
 import { resetPickerCallbacks } from "../helpers/mocks";
 import {
   renderAccueilScreen,
@@ -62,10 +62,10 @@ defineFeature(feature, (test) => {
   });
 
   test("Erreur hors du Provider", ({ then }) => {
-    then("useProfil lance une erreur si utilisé hors du Provider", () => {
+    then("useProfils lance une erreur si utilisé hors du Provider", () => {
       expect(() => {
-        renderHook(() => useProfil());
-      }).toThrow("useProfil doit être utilisé dans un ProfilProvider");
+        renderHook(() => useProfils());
+      }).toThrow("useProfils doit être utilisé dans un ProfilsProvider");
     });
   });
 });

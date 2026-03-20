@@ -27,12 +27,3 @@ Feature: Simulation de l'ouverture de droits
     When l'écran d'accueil est affiché
     And je sélectionne le chip "Festival Mai — 15/05/2026"
     Then les résultats de simulation sont affichés
-
-  Scenario: Message si pas de profil
-    Given ces contrats existent
-      | Employeur    | Début      | Fin        | Heures | Salaire |
-      | Prod Janvier | 05/01/2026 | 20/01/2026 | 300    | 9000    |
-      | Festival Mai | 01/05/2026 | 15/05/2026 | 250    | 7500    |
-    And aucun profil n'est configuré
-    When l'écran d'accueil est affiché
-    Then un message invite à configurer le profil pour simuler

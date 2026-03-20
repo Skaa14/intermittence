@@ -3,7 +3,7 @@ import { render, screen, act } from "@testing-library/react-native";
 import AccueilScreen from "../../app/(tabs)/index";
 import DetailMoisScreen from "../../app/mois/[moisIndex]";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
-import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider, useFormations } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
@@ -37,25 +37,25 @@ type FormationRow = {
   Option: string;
 };
 
-let capturedMettreAJourProfil: ((p: ProfilIntermittent) => void) | null = null;
+let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
 let capturedAjouterFormation: ((f: Omit<Formation, "id">) => void) | null = null;
 
 function SetupAccueil() {
-  const { mettreAJourProfil } = useProfil();
+  const { ajouterProfil } = useProfils();
   const { ajouterContrat } = useContrats();
   const { ajouterFormation } = useFormations();
-  capturedMettreAJourProfil = mettreAJourProfil;
+  capturedAjouterProfil = ajouterProfil;
   capturedAjouterContrat = ajouterContrat;
   capturedAjouterFormation = ajouterFormation;
   return <AccueilScreen />;
 }
 
 function SetupMois() {
-  const { mettreAJourProfil } = useProfil();
+  const { ajouterProfil } = useProfils();
   const { ajouterContrat } = useContrats();
   const { ajouterFormation } = useFormations();
-  capturedMettreAJourProfil = mettreAJourProfil;
+  capturedAjouterProfil = ajouterProfil;
   capturedAjouterContrat = ajouterContrat;
   capturedAjouterFormation = ajouterFormation;
   return <DetailMoisScreen />;
@@ -63,7 +63,7 @@ function SetupMois() {
 
 const renderAccueil = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -73,7 +73,7 @@ const renderAccueil = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -81,7 +81,7 @@ const renderAccueil = async () => {
 
 const renderMois = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -89,7 +89,7 @@ const renderMois = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -123,18 +123,22 @@ const formationsStep = (and: Function) => {
   });
 };
 
-const injecterDonnees = () => {
-  act(() => {
-    if (pendingProfil) {
-      capturedMettreAJourProfil!({
-        annexe: pendingProfil.Annexe as "8" | "10",
-        heuresTravaillees: Number(pendingProfil.Heures),
-        salaireReference: Number(pendingProfil.Salaire),
-        dateAnniversaire: pendingProfil["Date anniversaire"],
+const injecterDonnees = async () => {
+  if (pendingProfil) {
+    act(() => {
+      capturedAjouterProfil!({
+        nom: "Test",
+        annexe: pendingProfil!.Annexe as "8" | "10",
+        heuresTravaillees: Number(pendingProfil!.Heures),
+        salaireReference: Number(pendingProfil!.Salaire),
+        dateAnniversaire: pendingProfil!["Date anniversaire"],
         tauxCSG: "standard",
         alsaceMoselle: false,
       });
-    }
+    });
+    await flushAsync();
+  }
+  act(() => {
     pendingContrats.forEach((row) => {
       capturedAjouterContrat!({
         employeur: row.Employeur,
@@ -171,7 +175,7 @@ defineFeature(feature, (test) => {
 
   const renderEtInjecterAccueil = async () => {
     await renderAccueil();
-    injecterDonnees();
+    await injecterDonnees();
   };
 
   test("Formation option A ajoute des heures au compteur 507h", ({ given, and, then }) => {
@@ -230,7 +234,7 @@ defineFeature(feature, (test) => {
     when(/^je navigue vers le détail du mois (\d+)$/, async (index: string) => {
       mockIndex = index;
       await renderMois();
-      injecterDonnees();
+      await injecterDonnees();
     });
 
     then(/^les jours de formation affichent "(.*)"$/, (texte: string) => {

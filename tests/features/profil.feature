@@ -22,4 +22,4 @@ Feature: Gestion du profil intermittent
     Then l'annexe affichée est "10"
 
   Scenario: Erreur hors du Provider
-    Then useProfil lance une erreur si utilisé hors du Provider
+    Then useProfils lance une erreur si utilisé hors du Provider

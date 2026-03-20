@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useContrats } from "./ContratsContext";
-import { useProfil } from "./ProfilContext";
+import { useProfils } from "./ProfilsContext";
 import { useFormations } from "./FormationsContext";
 import { useEnseignements } from "./EnseignementsContext";
-import { charger, sauvegarder, supprimer } from "../utils/storage";
+import { charger, sauvegarder, supprimer, sauvegarderParCle, cleProfilData } from "../utils/storage";
 import {
   creerProfilArtiste,
   creerProfilTechnicien,
@@ -27,7 +27,7 @@ const DonneesTestContext = createContext<DonneesTestContextType | null>(null);
 
 export function DonneesTestProvider({ children }: { children: ReactNode }) {
   const { reinitialiserContrats } = useContrats();
-  const { mettreAJourProfil, reinitialiserProfil } = useProfil();
+  const { profilActif, modifierProfil, ajouterProfil, supprimerProfil } = useProfils();
   const { reinitialiserFormations } = useFormations();
   const { reinitialiserEnseignements } = useEnseignements();
   const [modeTest, setModeTest] = useState(false);
@@ -46,27 +46,37 @@ export function DonneesTestProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const chargerDonneesTest = (type: "artiste" | "technicien") => {
-    if (type === "artiste") {
-      mettreAJourProfil(creerProfilArtiste());
-      reinitialiserContrats(creerContratsArtiste());
-      reinitialiserFormations(creerFormationsArtiste());
-      reinitialiserEnseignements(creerEnseignementsArtiste());
-      setNomProfil("Artiste — Annexe 10");
-      sauvegarder("nomProfil", "Artiste — Annexe 10");
+    const donneesProfil = type === "artiste" ? creerProfilArtiste() : creerProfilTechnicien();
+    const { id: _, ...sanId } = donneesProfil;
+
+    let profilId: string;
+    if (profilActif) {
+      profilId = profilActif.id;
+      modifierProfil(profilId, sanId);
     } else {
-      mettreAJourProfil(creerProfilTechnicien());
-      reinitialiserContrats(creerContratsTechnicien());
-      reinitialiserFormations(creerFormationsTechnicien());
-      reinitialiserEnseignements(creerEnseignementsTechnicien());
-      setNomProfil("Technicien — Annexe 8");
-      sauvegarder("nomProfil", "Technicien — Annexe 8");
+      profilId = ajouterProfil(sanId);
     }
+
+    const contrats = type === "artiste" ? creerContratsArtiste() : creerContratsTechnicien();
+    const formations = type === "artiste" ? creerFormationsArtiste() : creerFormationsTechnicien();
+    const enseignements = type === "artiste" ? creerEnseignementsArtiste() : creerEnseignementsTechnicien();
+
+    sauvegarderParCle(cleProfilData(profilId, "contrats"), contrats.map((c, i) => ({ ...c, id: String(i + 1) })));
+    sauvegarderParCle(cleProfilData(profilId, "formations"), formations.map((f, i) => ({ ...f, id: String(i + 1) })));
+    sauvegarderParCle(cleProfilData(profilId, "enseignements"), enseignements.map((e, i) => ({ ...e, id: String(i + 1) })));
+
+    reinitialiserContrats(contrats);
+    reinitialiserFormations(formations);
+    reinitialiserEnseignements(enseignements);
+
+    setNomProfil(type === "artiste" ? "Artiste — Annexe 10" : "Technicien — Annexe 8");
+    sauvegarder("nomProfil", type === "artiste" ? "Artiste — Annexe 10" : "Technicien — Annexe 8");
     setModeTest(true);
     sauvegarder("modeTest", true);
   };
 
   const reinitialiser = () => {
-    reinitialiserProfil();
+    if (profilActif) supprimerProfil(profilActif.id);
     reinitialiserContrats([]);
     reinitialiserFormations([]);
     reinitialiserEnseignements([]);

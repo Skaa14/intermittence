@@ -1,6 +1,6 @@
 import { View, Text, ScrollView, Pressable, UIManager, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useProfil } from "../contexts/ProfilContext";
+import { useProfils } from "../contexts/ProfilsContext";
 import { calculerAJDetaille, DetailCotisation, ParametreInfo } from "../utils/calculerAJDetaille";
 import { styles } from "../styles/detail-calcul-aj.styles";
 import { useAnimatedToggle } from "../hooks/useAnimatedToggle";
@@ -66,7 +66,7 @@ function CotisationView({ testID, cotisation }: { testID?: string; cotisation: D
 }
 
 export default function DetailCalculAJScreen() {
-  const { profil } = useProfil();
+  const { profilActif: profil } = useProfils();
   const insets = useSafeAreaInsets();
 
   const detail = useMemo(() => {

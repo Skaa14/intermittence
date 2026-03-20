@@ -3,7 +3,7 @@ import { render, fireEvent, screen, act } from "@testing-library/react-native";
 import ContratsScreen from "../../app/(tabs)/contrats";
 import AccueilScreen from "../../app/(tabs)/index";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
-import { ProfilProvider, useProfil } from "../../contexts/ProfilContext";
+import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider, useEnseignements } from "../../contexts/EnseignementsContext";
 import { DonneesTestProvider } from "../../contexts/DonneesTestContext";
@@ -24,7 +24,7 @@ jest.mock("react-native-calendars", () =>
   require("../helpers/mocks").mockCalendarsFactory()
 );
 
-let capturedMettreAJourProfil: ((p: ProfilIntermittent) => void) | null = null;
+let capturedAjouterProfil: ((p: Omit<ProfilIntermittent, "id">) => void) | null = null;
 let capturedAjouterContrat: ((c: Omit<Contrat, "id">) => void) | null = null;
 let capturedAjouterEnseignement: ((e: Omit<Enseignement, "id">) => void) | null = null;
 
@@ -37,10 +37,10 @@ function SetupContrats() {
 }
 
 function SetupAccueil() {
-  const { mettreAJourProfil } = useProfil();
+  const { ajouterProfil } = useProfils();
   const { ajouterContrat } = useContrats();
   const { ajouterEnseignement } = useEnseignements();
-  capturedMettreAJourProfil = mettreAJourProfil;
+  capturedAjouterProfil = ajouterProfil;
   capturedAjouterContrat = ajouterContrat;
   capturedAjouterEnseignement = ajouterEnseignement;
   return <AccueilScreen />;
@@ -48,7 +48,7 @@ function SetupAccueil() {
 
 const renderContrats = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -56,7 +56,7 @@ const renderContrats = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -64,7 +64,7 @@ const renderContrats = async () => {
 
 const renderAccueil = async () => {
   const result = render(
-    <ProfilProvider>
+    <ProfilsProvider>
       <ContratsProvider>
         <FormationsProvider>
           <EnseignementsProvider>
@@ -74,7 +74,7 @@ const renderAccueil = async () => {
           </EnseignementsProvider>
         </FormationsProvider>
       </ContratsProvider>
-    </ProfilProvider>
+    </ProfilsProvider>
   );
   await flushAsync();
   return result;
@@ -108,7 +108,8 @@ const configurerProfilStep = (given: Function) => {
     await renderAccueil();
     const row = table[0];
     act(() => {
-      capturedMettreAJourProfil!({
+      capturedAjouterProfil!({
+        nom: "Test",
         annexe: row.Annexe as "8" | "10",
         dateAnniversaire: row["Date anniversaire"],
         salaireReference: Number(row.Salaire),
@@ -117,6 +118,7 @@ const configurerProfilStep = (given: Function) => {
         alsaceMoselle: false,
       });
     });
+    await flushAsync();
   });
 };
 
@@ -165,7 +167,7 @@ const verifierTexteStep = (and: Function) => {
 defineFeature(feature, (test) => {
   afterEach(() => {
     jest.useRealTimers();
-    capturedMettreAJourProfil = null;
+    capturedAjouterProfil = null;
     capturedAjouterContrat = null;
     capturedAjouterEnseignement = null;
   });

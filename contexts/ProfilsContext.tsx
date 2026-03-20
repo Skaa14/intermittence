@@ -16,7 +16,7 @@ interface ProfilsContextType {
   profilActifId: string | null;
   profilActif: ProfilIntermittent | null;
   chargementTermine: boolean;
-  ajouterProfil: (profil: Omit<ProfilIntermittent, "id">) => void;
+  ajouterProfil: (profil: Omit<ProfilIntermittent, "id">) => string;
   modifierProfil: (id: string, donnees: Omit<ProfilIntermittent, "id">) => void;
   supprimerProfil: (id: string) => void;
   dupliquerProfil: (id: string, nouveauNom: string) => void;
@@ -55,7 +55,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const ajouterProfil = useCallback((donnees: Omit<ProfilIntermittent, "id">) => {
+  const ajouterProfil = useCallback((donnees: Omit<ProfilIntermittent, "id">): string => {
     const id = crypto.randomUUID();
     const nouveau: ProfilIntermittent = { id, ...donnees };
     setProfils((prev) => {
@@ -64,6 +64,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
       return mis;
     });
     persisterProfilActifId(id);
+    return id;
   }, [persisterProfilActifId]);
 
   const modifierProfil = useCallback((id: string, donnees: Omit<ProfilIntermittent, "id">) => {

@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useRef, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from "react";
 import { Formation } from "../types/formation";
-import { charger, sauvegarder } from "../utils/storage";
+import { chargerParCle, sauvegarderParCle, cleProfilData } from "../utils/storage";
+import { useProfils } from "./ProfilsContext";
 import { parseDate } from "../utils/date";
 
 interface FormationsContextType {
@@ -26,25 +27,46 @@ function maxId(formations: Formation[]): number {
 }
 
 export function FormationsProvider({ children }: { children: ReactNode }) {
+  const { profilActifId } = useProfils();
   const [formations, setFormations] = useState<Formation[]>([]);
   const [chargementTermine, setChargementTermine] = useState(false);
   const nextId = useRef(1);
+  const profilActifIdRef = useRef(profilActifId);
+  profilActifIdRef.current = profilActifId;
 
   useEffect(() => {
-    charger<Formation[]>("formations").then((donnees) => {
+    if (!profilActifId) {
+      setFormations([]);
+      nextId.current = 1;
+      setChargementTermine(true);
+      return;
+    }
+
+    let ignore = false;
+    setChargementTermine(false);
+    setFormations([]);
+    nextId.current = 1;
+
+    chargerParCle<Formation[]>(cleProfilData(profilActifId, "formations")).then((donnees) => {
+      if (ignore) return;
       if (donnees && donnees.length > 0) {
         setFormations(trierParDate(donnees));
         nextId.current = maxId(donnees) + 1;
       }
       setChargementTermine(true);
-    }).catch(() => setChargementTermine(true));
+    }).catch(() => {
+      if (!ignore) setChargementTermine(true);
+    });
+
+    return () => { ignore = true; };
+  }, [profilActifId]);
+
+  const persister = useCallback((nouvellesFormations: Formation[]) => {
+    const id = profilActifIdRef.current;
+    if (id) sauvegarderParCle(cleProfilData(id, "formations"), nouvellesFormations);
   }, []);
 
-  const persister = (nouvellesFormations: Formation[]) => {
-    sauvegarder("formations", nouvellesFormations);
-  };
-
-  const ajouterFormation = (formationSansId: Omit<Formation, "id">) => {
+  const ajouterFormation = useCallback((formationSansId: Omit<Formation, "id">) => {
     const nouvelle: Formation = {
       ...formationSansId,
       id: String(nextId.current++),
@@ -54,9 +76,9 @@ export function FormationsProvider({ children }: { children: ReactNode }) {
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const modifierFormation = (id: string, formationSansId: Omit<Formation, "id">) => {
+  const modifierFormation = useCallback((id: string, formationSansId: Omit<Formation, "id">) => {
     setFormations((prev) => {
       const maj = trierParDate(
         prev.map((f) => (f.id === id ? { ...formationSansId, id } : f))
@@ -64,23 +86,23 @@ export function FormationsProvider({ children }: { children: ReactNode }) {
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const supprimerFormation = (id: string) => {
+  const supprimerFormation = useCallback((id: string) => {
     setFormations((prev) => {
       const maj = prev.filter((f) => f.id !== id);
       persister(maj);
       return maj;
     });
-  };
+  }, [persister]);
 
-  const reinitialiserFormations = (nouvellesFormations: Omit<Formation, "id">[]) => {
+  const reinitialiserFormations = useCallback((nouvellesFormations: Omit<Formation, "id">[]) => {
     nextId.current = 1;
     const avecIds = nouvellesFormations.map((f) => ({ ...f, id: String(nextId.current++) }));
     const maj = trierParDate(avecIds);
     setFormations(maj);
     persister(maj);
-  };
+  }, [persister]);
 
   return (
     <FormationsContext.Provider

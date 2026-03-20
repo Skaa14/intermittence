@@ -1,10 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CLES = {
-  contrats: "intermittence:contrats",
-  profil: "intermittence:profil",
-  formations: "intermittence:formations",
-  enseignements: "intermittence:enseignements",
   modeTest: "intermittence:modeTest",
   nomProfil: "intermittence:nomProfil",
   profils: "intermittence:profils",

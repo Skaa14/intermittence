@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useContrats } from "../../contexts/ContratsContext";
-import { useProfil } from "../../contexts/ProfilContext";
+import { useProfils } from "../../contexts/ProfilsContext";
 import { useFormations } from "../../contexts/FormationsContext";
 import { useEnseignements } from "../../contexts/EnseignementsContext";
 import { Contrat, TypeHeures } from "../../types/contrat";
@@ -63,7 +63,7 @@ function partitionnerParDate<T extends { dateFin: string }>(items: T[]) {
 
 export default function ContratsScreen() {
   const { contrats, ajouterContrat, modifierContrat, supprimerContrat } = useContrats();
-  const { profil } = useProfil();
+  const { profilActif: profil } = useProfils();
   const { formations, ajouterFormation, modifierFormation, supprimerFormation } = useFormations();
   const { enseignements, ajouterEnseignement, modifierEnseignement, supprimerEnseignement } = useEnseignements();
   const estAnnexe10 = profil?.annexe === "10";

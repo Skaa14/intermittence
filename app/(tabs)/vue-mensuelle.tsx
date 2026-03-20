@@ -7,7 +7,7 @@ import {
 import { useMemo } from "react";
 import { useRouter } from "expo-router";
 import { useContrats } from "../../contexts/ContratsContext";
-import { useProfil } from "../../contexts/ProfilContext";
+import { useProfils } from "../../contexts/ProfilsContext";
 import { useFormations } from "../../contexts/FormationsContext";
 import { useEnseignements } from "../../contexts/EnseignementsContext";
 import {
@@ -75,7 +75,7 @@ function CarteMois({
 
 export default function VueMensuelleScreen() {
   const { contrats } = useContrats();
-  const { profil } = useProfil();
+  const { profilActif: profil } = useProfils();
   const { formations } = useFormations();
   const { enseignements } = useEnseignements();
   const router = useRouter();
