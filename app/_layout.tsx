@@ -13,6 +13,7 @@ import {
 import { colors } from "../theme/colors";
 import { ContratsProvider } from "../contexts/ContratsContext";
 import { FormationsProvider } from "../contexts/FormationsContext";
+import { EmployeursProvider } from "../contexts/EmployeursContext";
 import { EnseignementsProvider } from "../contexts/EnseignementsContext";
 import { ProfilsProvider, useProfils } from "../contexts/ProfilsContext";
 import { ErrorBoundary } from "../components/ErrorBoundary";
@@ -91,15 +92,16 @@ export default function RootLayout() {
   return (
     <ErrorBoundary>
       <ProfilsProvider>
-        <ContratsProvider>
-          <FormationsProvider>
-            <EnseignementsProvider>
-              <AppContent />
-            </EnseignementsProvider>
-          </FormationsProvider>
-        </ContratsProvider>
+        <EmployeursProvider>
+          <ContratsProvider>
+            <FormationsProvider>
+              <EnseignementsProvider>
+                <AppContent />
+              </EnseignementsProvider>
+            </FormationsProvider>
+          </ContratsProvider>
+        </EmployeursProvider>
       </ProfilsProvider>
     </ErrorBoundary>
   );
 }
-
