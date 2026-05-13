@@ -46,7 +46,7 @@ interface DialogueState {
 }
 
 export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProps) {
-  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil } = useProfils();
+  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil } = useProfils();
   const [mode, setMode] = useState<ModePanel>("liste");
   const [profilEdite, setProfilEdite] = useState<ProfilIntermittent | null>(null);
   const [menu, setMenu] = useState<MenuState | null>(null);
@@ -164,6 +164,12 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     setMenu(null);
     setDialogue({ type: "dupliquer", profilId: profil.id, valeurInitiale: `${profil.nom} (copie)` });
   }, [menu, profils]);
+
+  const handleExporter = useCallback(() => {
+    if (!menu) return;
+    exporterProfil(menu.profilId);
+    setMenu(null);
+  }, [menu, exporterProfil]);
 
   const handleSupprimer = useCallback(() => {
     if (!menu) return;
@@ -299,14 +305,24 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
                 })}
               </ScrollView>
 
-              <Pressable
-                testID="btn-ajouter-profil"
-                style={styles.btnAjouter}
-                onPress={() => setDialogueCreation(true)}
-              >
-                <Ionicons name="add" size={20} color={colors.primary} />
-                <Text style={styles.btnAjouterTexte}>Ajouter un profil</Text>
-              </Pressable>
+              <View style={{ gap: 8, marginTop: 12 }}>
+                <Pressable
+                  testID="btn-ajouter-profil"
+                  style={styles.btnAjouter}
+                  onPress={() => setDialogueCreation(true)}
+                >
+                  <Ionicons name="add" size={20} color={colors.primary} />
+                  <Text style={styles.btnAjouterTexte}>Ajouter un profil</Text>
+                </Pressable>
+
+                <Pressable
+                  style={[styles.btnAjouter, { borderColor: colors.textMuted }]}
+                  onPress={importerProfil}
+                >
+                  <Ionicons name="download-outline" size={20} color={colors.textMuted} />
+                  <Text style={[styles.btnAjouterTexte, { color: colors.textMuted }]}>Importer un profil</Text>
+                </Pressable>
+              </View>
 
               {menu && (
                 <>
@@ -330,6 +346,10 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
                     <Pressable testID="menu-dupliquer" style={styles.menuItem} onPress={handleDupliquer}>
                       <Ionicons name="copy-outline" size={18} color={colors.textDark} />
                       <Text style={styles.menuItemTexte}>Dupliquer</Text>
+                    </Pressable>
+                    <Pressable style={styles.menuItem} onPress={handleExporter}>
+                      <Ionicons name="share-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Exporter / Partager</Text>
                     </Pressable>
                     <Pressable testID="menu-supprimer" style={styles.menuItem} onPress={handleSupprimer}>
                       <Ionicons name="trash-outline" size={18} color={colors.error} />
