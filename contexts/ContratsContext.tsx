@@ -35,7 +35,7 @@ function maxId(contrats: Contrat[]): number {
 }
 
 export function ContratsProvider({ children }: { children: ReactNode }) {
-  const { profilActifId } = useProfils();
+  const { profilActifId, versionDonneesExternes } = useProfils();
   const { ajouterEmployeur } = useEmployeurs();
   const [contrats, setContrats] = useState<Contrat[]>([]);
   const [chargementTermine, setChargementTermine] = useState(false);
@@ -68,7 +68,7 @@ export function ContratsProvider({ children }: { children: ReactNode }) {
     });
 
     return () => { ignore = true; };
-  }, [profilActifId]);
+  }, [profilActifId, versionDonneesExternes]);
 
   const persister = useCallback((nouveauxContrats: Contrat[]) => {
     const id = profilActifIdRef.current;

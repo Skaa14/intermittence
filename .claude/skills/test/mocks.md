@@ -116,6 +116,26 @@ await waitFor(() => {
 
 **Important** : utiliser `vue.unmount()` (pas `cleanup()`) pour éviter les erreurs "Can't access .root on unmounted test renderer".
 
+## utils/googleDrive (appels réseau Drive)
+
+Pour tester la logique de `ProfilsContext` qui dépend du Drive (`sauvegarderProfilSurDrive`, `restaurerProfilDepuisDrive`) sans réseau réel, mocker le module entier :
+
+```tsx
+const mockTrouverOuCreerDossier = jest.fn();
+const mockTrouverFichierProfil = jest.fn();
+const mockTelechargerFichier = jest.fn();
+const mockTeleverserFichier = jest.fn();
+
+jest.mock("../../utils/googleDrive", () => ({
+  trouverOuCreerDossier: (...args: unknown[]) => mockTrouverOuCreerDossier(...args),
+  trouverFichierProfil: (...args: unknown[]) => mockTrouverFichierProfil(...args),
+  telechargerFichier: (...args: unknown[]) => mockTelechargerFichier(...args),
+  televerserFichier: (...args: unknown[]) => mockTeleverserFichier(...args),
+}));
+```
+
+Réinitialiser dans `beforeEach` avec `jest.clearAllMocks()`, puis configurer les résolutions par test avec `mockResolvedValue`/`mockResolvedValueOnce`.
+
 ## Factories (données de test)
 
 Les factories partagées sont dans `tests/helpers/factories.ts`. Elles créent des objets avec des defaults raisonnables, surchargés par `overrides`.

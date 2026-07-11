@@ -37,7 +37,9 @@
           "origin": "https://intermittence.app"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser",
+      "expo-secure-store"
     ],
     "extra": {
       "router": {

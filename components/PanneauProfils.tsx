@@ -15,11 +15,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useProfils } from "../contexts/ProfilsContext";
+import { useGoogleAuth } from "../contexts/GoogleAuthContext";
 import { ProfilIntermittent, ProfilSansId } from "../types/profil";
 import FormulaireProfil from "./FormulaireProfil";
 import DialogueTexte from "./DialogueTexte";
 import DialogueCreationProfil from "./DialogueCreationProfil";
 import { TypeDonneesTest, sauvegarderDonneesTest } from "../utils/donneesTest";
+import { alerterInfo } from "../utils/alerte";
 import { colors } from "../theme/colors";
 import {
   styles,
@@ -46,7 +48,8 @@ interface DialogueState {
 }
 
 export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProps) {
-  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil } = useProfils();
+  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil, sauvegarderProfilSurDrive, restaurerProfilDepuisDrive } = useProfils();
+  const { obtenirToken } = useGoogleAuth();
   const [mode, setMode] = useState<ModePanel>("liste");
   const [profilEdite, setProfilEdite] = useState<ProfilIntermittent | null>(null);
   const [menu, setMenu] = useState<MenuState | null>(null);
@@ -170,6 +173,47 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
     exporterProfil(menu.profilId);
     setMenu(null);
   }, [menu, exporterProfil]);
+
+  const handleSauvegarderSurDrive = useCallback(async () => {
+    if (!menu) return;
+    const profilId = menu.profilId;
+    setMenu(null);
+    try {
+      const accessToken = await obtenirToken();
+      await sauvegarderProfilSurDrive(profilId, accessToken);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      alerterInfo("Erreur", `Connexion à Google Drive impossible: ${message}.`);
+    }
+  }, [menu, obtenirToken, sauvegarderProfilSurDrive]);
+
+  const handleRestaurerDepuisDrive = useCallback(() => {
+    if (!menu) return;
+    const profilId = menu.profilId;
+    const profil = profils.find((p) => p.id === profilId);
+    if (!profil) return;
+    setMenu(null);
+
+    const message = `Cela va remplacer les données locales de "${profil.nom}" par la version du Google Drive. Continuer ?`;
+    const executer = async () => {
+      try {
+        const accessToken = await obtenirToken();
+        await restaurerProfilDepuisDrive(profilId, accessToken);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        alerterInfo("Erreur", `Connexion à Google Drive impossible: ${msg}.`);
+      }
+    };
+
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) executer();
+    } else {
+      Alert.alert("Restaurer depuis Google Drive", message, [
+        { text: "Annuler", style: "cancel" },
+        { text: "Restaurer", style: "destructive", onPress: executer },
+      ]);
+    }
+  }, [menu, profils, obtenirToken, restaurerProfilDepuisDrive]);
 
   const handleSupprimer = useCallback(() => {
     if (!menu) return;
@@ -350,6 +394,14 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
                     <Pressable style={styles.menuItem} onPress={handleExporter}>
                       <Ionicons name="share-outline" size={18} color={colors.textDark} />
                       <Text style={styles.menuItemTexte}>Exporter / Partager</Text>
+                    </Pressable>
+                    <Pressable testID="menu-sauvegarder-drive" style={styles.menuItem} onPress={handleSauvegarderSurDrive}>
+                      <Ionicons name="cloud-upload-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Sauvegarder sur Google Drive</Text>
+                    </Pressable>
+                    <Pressable testID="menu-restaurer-drive" style={styles.menuItem} onPress={handleRestaurerDepuisDrive}>
+                      <Ionicons name="cloud-download-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Restaurer depuis Google Drive</Text>
                     </Pressable>
                     <Pressable testID="menu-supprimer" style={styles.menuItem} onPress={handleSupprimer}>
                       <Ionicons name="trash-outline" size={18} color={colors.error} />
