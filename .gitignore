@@ -15,6 +15,9 @@ node_modules/
 # Metro
 .metro-health-check*
 
+# Expo
+.expo/
+
 # debug
 npm-debug.*
 yarn-debug.*

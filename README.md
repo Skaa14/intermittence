@@ -10,6 +10,8 @@ Application mobile (Android & iOS) permettant aux intermittents du spectacle en 
 - **Vue mensuelle** — simulation mois par mois de la période d'indemnisation (12 mois)
 - **Détail par mois** — franchises CP et salaire, seuil de non-indemnisation, formules détaillées
 - **Profil intermittent** — annexe 8 ou 10, salaire de référence, taux CSG
+- **Multi-profils** — plusieurs profils intermittents dans la même app, chacun avec ses propres contrats/formations/enseignements ; export/import par fichier JSON pour partager un profil
+- **Sauvegarde Google Drive** — sauvegarder/restaurer un profil (avec ses données) sur le Google Drive de l'utilisateur, pour le retrouver sur un autre appareil (voir [Configuration Google Drive](#configuration-google-drive-optionnel))
 
 ## Stack technique
 
@@ -44,6 +46,18 @@ npm test
 npm run test:watch
 ```
 
+## Configuration Google Drive (optionnel)
+
+La sauvegarde/restauration de profil sur Google Drive nécessite un projet Google Cloud avec l'API Drive activée et deux identifiants OAuth (Web + Android). Copie `.env.example` en `.env.local` (jamais commité) et renseigne :
+
+```
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
+EXPO_PUBLIC_GOOGLE_WEB_CLIENT_SECRET=
+EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=
+```
+
+Sans cette configuration, le reste de l'app fonctionne normalement — seuls les boutons "Sauvegarder/Restaurer depuis Google Drive" sont inopérants. Détails du flow OAuth dans [docs/tech/04-oauth-google-drive.md](docs/tech/04-oauth-google-drive.md).
+
 ## Structure du projet
 
 ```
@@ -55,8 +69,8 @@ app/                    Routes (Expo Router)
 └── mois/
     └── [moisIndex].tsx Détail d'un mois d'indemnisation
 
-utils/                  Logique métier (calcul AJ, indemnisation mensuelle)
-contexts/               State partagé (contrats, profil)
+utils/                  Logique métier (calcul AJ, indemnisation mensuelle, sync Google Drive)
+contexts/               State partagé (contrats, formations, enseignements, employeurs, profils, auth Google)
 types/                  Interfaces TypeScript
 styles/                 Fichiers de styles séparés
 theme/                  Tokens (couleurs, polices)
