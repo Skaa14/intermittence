@@ -69,6 +69,16 @@ function AppContent() {
             headerLeft: () => <BoutonRetour />,
           }}
         />
+        <Stack.Screen
+          name="simulation-are"
+          options={{
+            headerShown: true,
+            title: "Simulation ARE",
+            headerStyle: { backgroundColor: colors.primary },
+            headerTintColor: colors.textOnPrimary,
+            headerLeft: () => <BoutonRetour />,
+          }}
+        />
       </Stack>
     </View>
   );

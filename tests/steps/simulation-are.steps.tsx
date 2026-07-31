@@ -1,6 +1,6 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { screen, within, act } from "@testing-library/react-native";
-import VueMensuelleScreen from "../../app/(tabs)/vue-mensuelle";
+import { fireEvent, screen, within, act } from "@testing-library/react-native";
+import SimulationAREScreen from "../../app/simulation-are";
 import {
   captures,
   resetCaptures,
@@ -12,18 +12,20 @@ import {
 } from "../helpers/simulationMensuelle";
 import { ContratRow } from "../helpers/types";
 
-const renderScreen = () => renderEcranMensuel(VueMensuelleScreen);
+const mockPush = jest.fn();
 
-const carteAfficheTexte = (index: string, texte: string) => {
-  const carte = screen.getByTestId(`carte-recap-${index}`);
-  expect(within(carte).getByText(texte)).toBeTruthy();
-};
+jest.mock("expo-router", () => ({
+  useRouter: () => ({ push: mockPush }),
+}));
 
-const feature = loadFeature("tests/features/vue-mensuelle.feature");
+const renderScreen = () => renderEcranMensuel(SimulationAREScreen);
+
+const feature = loadFeature("tests/features/simulation-are.feature");
 
 defineFeature(feature, (test) => {
   beforeEach(() => {
     resetCaptures();
+    mockPush.mockClear();
   });
 
   afterEach(() => {
@@ -61,12 +63,12 @@ defineFeature(feature, (test) => {
     then("le message d'invitation à ouvrir ses droits est visible", () => {
       expect(screen.getByTestId("message-profil-manquant")).toBeTruthy();
       expect(screen.getByTestId("message-profil-manquant").props.children).toBe(
-        "Ouvrez vos droits ARE pour voir le récap"
+        "Ouvrez vos droits ARE pour voir la simulation"
       );
     });
   });
 
-  test("Seuls les mois passés et en cours sont affichés", ({ given, then }) => {
+  test("12 cartes affichées avec profil configuré", ({ given, then }) => {
     fixerDateStep(given);
 
     given("le profil est configuré", async (table: ProfilRow[]) => {
@@ -74,13 +76,17 @@ defineFeature(feature, (test) => {
       await configurerProfil(table[0]);
     });
 
-    then("3 cartes de récap sont affichées", () => {
-      const cartes = screen.getAllByTestId(/^carte-recap-\d+$/);
-      expect(cartes).toHaveLength(3);
+    then("12 cartes de mois sont affichées", () => {
+      const cartes = screen.getAllByTestId(/^carte-mois-\d+$/);
+      expect(cartes).toHaveLength(12);
     });
   });
 
-  test("Heures et salaire affichés pour un mois avec contrat", ({ given, and, then }) => {
+  test("Heures travaillées affichées sur la carte d'un mois avec contrat", ({
+    given,
+    and,
+    then,
+  }) => {
     fixerDateStep(given);
 
     given("le profil est configuré", async (table: ProfilRow[]) => {
@@ -92,11 +98,24 @@ defineFeature(feature, (test) => {
       ajouterContrats(table);
     });
 
-    then(/^la carte du mois (\d+) affiche "(.*)"$/, carteAfficheTexte);
-    and(/^la carte du mois (\d+) affiche "(.*)"$/, carteAfficheTexte);
+    then(
+      /^la carte du mois (\d+) affiche "(.*)"$/,
+      (index: string, texte: string) => {
+        const carte = screen.getByTestId(`carte-mois-${index}`);
+        expect(within(carte).getByText(texte)).toBeTruthy();
+      }
+    );
+
+    and(
+      /^la carte du mois (\d+) affiche "(.*)" pour les jours de formation$/,
+      (index: string, texte: string) => {
+        const carte = screen.getByTestId(`carte-mois-${index}`);
+        expect(within(carte).getByText(texte)).toBeTruthy();
+      }
+    );
   });
 
-  test("Le mois en cours est marqué", ({ given, then }) => {
+  test("Jours indemnisés affichés sur la carte", ({ given, then }) => {
     fixerDateStep(given);
 
     given("le profil est configuré", async (table: ProfilRow[]) => {
@@ -104,10 +123,18 @@ defineFeature(feature, (test) => {
       await configurerProfil(table[0]);
     });
 
-    then(/^la carte du mois (\d+) affiche "(.*)"$/, carteAfficheTexte);
+    then(
+      /^la carte du mois (\d+) affiche les jours indemnisés$/,
+      (index: string) => {
+        const carte = screen.getByTestId(`carte-mois-${index}`);
+        expect(within(carte).getByText("Jours indemnisés")).toBeTruthy();
+        const lignes = within(carte).getAllByText(/^\d+ j$/);
+        expect(lignes.length).toBeGreaterThanOrEqual(1);
+      }
+    );
   });
 
-  test("Date anniversaire dans le futur - aucun mois à afficher", ({ given, then }) => {
+  test("Navigation vers le détail d'un mois", ({ given, when, then }) => {
     fixerDateStep(given);
 
     given("le profil est configuré", async (table: ProfilRow[]) => {
@@ -115,9 +142,12 @@ defineFeature(feature, (test) => {
       await configurerProfil(table[0]);
     });
 
-    then(/^le message "(.*)" est visible$/, (texte: string) => {
-      expect(screen.getByTestId("message-recap-vide")).toBeTruthy();
-      expect(screen.getByText(texte)).toBeTruthy();
+    when(/^je tape sur la carte du mois (\d+)$/, (index: string) => {
+      fireEvent.press(screen.getByTestId(`carte-mois-${index}`));
+    });
+
+    then(/^je suis redirigé vers "(.*)"$/, (route: string) => {
+      expect(mockPush).toHaveBeenCalledWith(route);
     });
   });
 });

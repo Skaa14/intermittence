@@ -1,4 +1,4 @@
-Feature: Récapitulatif mensuel de l'année d'intermittence
+Feature: Simulation ARE (12 mois)
 
   Background:
     Given nous sommes le "15/06/2026"
@@ -13,13 +13,13 @@ Feature: Récapitulatif mensuel de l'année d'intermittence
       | Test | 8      |
     Then le message d'invitation à ouvrir ses droits est visible
 
-  Scenario: Seuls les mois passés et en cours sont affichés
+  Scenario: 12 cartes affichées avec profil configuré
     Given le profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
       | Test | 8      | 507    | 13800   | 01/04/2026        |
-    Then 3 cartes de récap sont affichées
+    Then 12 cartes de mois sont affichées
 
-  Scenario: Heures et salaire affichés pour un mois avec contrat
+  Scenario: Heures travaillées affichées sur la carte d'un mois avec contrat
     Given le profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
       | Test | 8      | 507    | 13800   | 01/04/2026        |
@@ -27,16 +27,17 @@ Feature: Récapitulatif mensuel de l'année d'intermittence
       | Employeur | Début      | Fin        | Heures | Salaire |
       | Théâtre   | 01/04/2026 | 30/04/2026 | 40     | 1500    |
     Then la carte du mois 0 affiche "40 h"
-    And la carte du mois 0 affiche "1500 €"
+    And la carte du mois 0 affiche "0 j" pour les jours de formation
 
-  Scenario: Le mois en cours est marqué
+  Scenario: Jours indemnisés affichés sur la carte
     Given le profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
       | Test | 8      | 507    | 13800   | 01/04/2026        |
-    Then la carte du mois 2 affiche "Juin 2026 (en cours)"
+    Then la carte du mois 1 affiche les jours indemnisés
 
-  Scenario: Date anniversaire dans le futur - aucun mois à afficher
+  Scenario: Navigation vers le détail d'un mois
     Given le profil est configuré
       | Nom  | Annexe | Heures | Salaire | Date anniversaire |
-      | Test | 8      | 507    | 13800   | 01/09/2026        |
-    Then le message "Aucun mois à afficher pour l'instant" est visible
+      | Test | 8      | 507    | 13800   | 01/04/2026        |
+    When je tape sur la carte du mois 1
+    Then je suis redirigé vers "/mois/1"

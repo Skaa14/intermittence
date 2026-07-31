@@ -32,16 +32,17 @@ app/                    ← Dossier des routes (Expo Router) — PAS de fichiers
 │   ├── _layout.tsx     ← Config des onglets (barre du bas)
 │   ├── index.tsx           ← Onglet Accueil (dashboard)
 │   ├── contrats.tsx        ← Onglet Contrats (saisie)
-│   └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (simulation ARE mois par mois)
+│   └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (récap heures/salaire/contrats des mois passés/en cours de l'année d'intermittence en cours, ancrée sur la date anniversaire)
+├── simulation-are.tsx      ← Simulation ARE 12 mois depuis la date anniversaire (Stack, accessible depuis le dashboard si droits ouverts)
 └── mois/                   ← Écran de détail (Stack, hors tabs)
-    └── [moisIndex].tsx     ← Détail swipeable d'un mois d'indemnisation
+    └── [moisIndex].tsx     ← Détail swipeable d'un mois d'indemnisation (alimenté par simulation-are)
 styles/                 ← Styles séparés (hors app/ pour éviter conflits Expo Router)
 ├── root-layout.styles.ts  ← Styles du layout racine
 ├── tabs/
 │   ├── layout.styles.ts       ← Styles du tab bar
 │   ├── index.styles.ts        ← Styles de l'accueil
 │   ├── contrats.styles.ts     ← Styles des contrats
-│   └── vue-mensuelle.styles.ts ← Styles de la vue mensuelle
+│   └── vue-mensuelle.styles.ts ← Styles partagées par l'onglet Vue mensuelle et simulation-are.tsx
 └── mois/
     └── moisIndex.styles.ts    ← Styles du détail d'un mois
 theme/
@@ -58,7 +59,8 @@ contexts/EmployeursContext.tsx ← Liste des employeurs (autocomplétion contrat
 contexts/GoogleAuthContext.tsx ← OAuth PKCE Google (connexion, tokens, refresh)
 utils/donneesTest.ts            ← Données de démo (profils, contrats, formations, enseignements)
 utils/calculerAJ.ts         ← Calcul de l'indemnité journalière
-utils/calculerIndemnisationMensuelle.ts ← Calcul des 12 mois de la période d'indemnisation
+utils/calculerIndemnisationMensuelle.ts ← Calcul des 12 mois de la période d'indemnisation (simulation ARE)
+utils/calculerRecapAnnuel.ts ← Filtre calculerIndemnisationMensuelle aux mois passés/en cours (onglet Vue mensuelle)
 utils/storage.ts            ← Helpers AsyncStorage (par clé globale et par profil)
 utils/googleDrive.ts         ← Appels REST API Google Drive (dossier, fichiers, appProperties)
 utils/alerte.ts              ← Alerte cross-plateforme : Alert.alert natif, window.alert web (react-native-web n'implémente pas Alert.alert)
@@ -97,6 +99,6 @@ assets/                 ← Images et ressources
 
 ## Conventions de style
 - **Zéro couleur hex en dur** dans les fichiers `.tsx` ou `.styles.ts` — toujours passer par `theme/colors.ts`
-- **Styles séparés** : chaque écran a son fichier `.styles.ts` dans `styles/` (pas dans `app/` — Expo Router traite tout fichier `.ts` dans `app/` comme une route), qui exporte `styles` (et éventuellement des constantes associées)
+- **Styles séparés** : chaque écran a son fichier `.styles.ts` dans `styles/` (pas dans `app/` — Expo Router traite tout fichier `.ts` dans `app/` comme une route), qui exporte `styles` (et éventuellement des constantes associées). Exception assumée : `styles/tabs/vue-mensuelle.styles.ts` est partagé entre l'onglet Vue mensuelle et `app/simulation-are.tsx`, deux écrans avec des cartes visuellement identiques
 - **Styles web** (`React.CSSProperties`) : utiliser `webDateInputBase` depuis `theme/webStyles.ts` comme base, étendre avec les propriétés spécifiques
 - Les fichiers `.tsx` n'importent que `{ styles }` depuis leur `.styles.ts` — pas de `StyleSheet` ni de couleurs directement dans le JSX
