@@ -2,6 +2,7 @@ import { defineFeature, loadFeature } from "jest-cucumber";
 import { render, fireEvent, screen, within, act } from "@testing-library/react-native";
 import VueMensuelleScreen from "../../app/(tabs)/vue-mensuelle";
 import { ContratsProvider, useContrats } from "../../contexts/ContratsContext";
+import { EmployeursProvider } from "../../contexts/EmployeursContext";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { FormationsProvider } from "../../contexts/FormationsContext";
 import { EnseignementsProvider } from "../../contexts/EnseignementsContext";
@@ -38,13 +39,15 @@ function Setup() {
 const renderScreen = async () => {
   const result = render(
     <ProfilsProvider>
-      <ContratsProvider>
-        <FormationsProvider>
-          <EnseignementsProvider>
-            <Setup />
-          </EnseignementsProvider>
-        </FormationsProvider>
-      </ContratsProvider>
+      <EmployeursProvider>
+        <ContratsProvider>
+          <FormationsProvider>
+            <EnseignementsProvider>
+              <Setup />
+            </EnseignementsProvider>
+          </FormationsProvider>
+        </ContratsProvider>
+      </EmployeursProvider>
     </ProfilsProvider>
   );
   await flushAsync();

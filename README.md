@@ -48,15 +48,19 @@ npm run test:watch
 
 ## Configuration Google Drive (optionnel)
 
-La sauvegarde/restauration de profil sur Google Drive nécessite un projet Google Cloud avec l'API Drive activée et deux identifiants OAuth (Web + Android). Copie `.env.example` en `.env.local` (jamais commité) et renseigne :
+La sauvegarde/restauration de profil sur Google Drive nécessite un projet Google Cloud avec l'API Drive activée et deux identifiants OAuth (Web + Android).
 
-```
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID=
-EXPO_PUBLIC_GOOGLE_WEB_CLIENT_SECRET=
-EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID=
+Ces 3 valeurs sont stockées de façon sécurisée en tant qu'[EAS Environment Variables](https://docs.expo.dev/eas/environment-variables/) (projet `@skaa14/intermittence`), pas dans le dépôt git. Pour les récupérer sur une machine :
+
+```bash
+npm install        # installe eas-cli (devDependency)
+npx eas login       # une seule fois par machine, avec le compte Expo skaa14
+npm run env:pull     # régénère .env.local à partir des variables EAS
 ```
 
-Sans cette configuration, le reste de l'app fonctionne normalement — seuls les boutons "Sauvegarder/Restaurer depuis Google Drive" sont inopérants. Détails du flow OAuth dans [docs/tech/04-oauth-google-drive.md](docs/tech/04-oauth-google-drive.md).
+Si les identifiants n'existent pas encore côté Google Cloud, copie `.env.example` en `.env.local` et renseigne-les manuellement, puis enregistre-les pour les autres machines avec `npx eas env:set --name <NOM> --value <valeur> --visibility sensitive --environment development --environment preview --environment production`.
+
+Sans configuration, le reste de l'app fonctionne normalement — seuls les boutons "Sauvegarder/Restaurer depuis Google Drive" sont inopérants. Détails du flow OAuth dans [docs/tech/04-oauth-google-drive.md](docs/tech/04-oauth-google-drive.md).
 
 ## Structure du projet
 

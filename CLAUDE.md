@@ -76,6 +76,7 @@ assets/                 ← Images et ressources
 
 ## Secrets
 - Identifiants OAuth Google (Web/Android) dans `.env.local` (gitignored, jamais commité), variables `EXPO_PUBLIC_GOOGLE_*` — voir `.env.example` pour la liste et `docs/tech/04-oauth-google-drive.md` pour le détail
+- Source de vérité de ces identifiants : EAS Environment Variables (projet `@skaa14/intermittence`), pas le poste local. Pour les récupérer sur une nouvelle machine : `npx eas login` puis `npm run env:pull` (régénère `.env.local`). Voir section "Configuration Google Drive" du `README.md`
 - Ne jamais mettre de vraie valeur de secret dans `app.json`/`extra` — ce fichier est commité
 
 ## Lecture de fichiers PDF
