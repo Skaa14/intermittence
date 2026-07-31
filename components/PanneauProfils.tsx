@@ -48,7 +48,7 @@ interface DialogueState {
 }
 
 export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProps) {
-  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil, sauvegarderProfilSurDrive, restaurerProfilDepuisDrive } = useProfils();
+  const { profils, profilActifId, changerProfilActif, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil, sauvegarderProfilSurDrive, restaurerProfilDepuisDrive, annulerDerniereRestauration } = useProfils();
   const { obtenirToken } = useGoogleAuth();
   const [mode, setMode] = useState<ModePanel>("liste");
   const [profilEdite, setProfilEdite] = useState<ProfilIntermittent | null>(null);
@@ -214,6 +214,26 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
       ]);
     }
   }, [menu, profils, obtenirToken, restaurerProfilDepuisDrive]);
+
+  const handleAnnulerRestauration = useCallback(() => {
+    if (!menu) return;
+    const profilId = menu.profilId;
+    const profil = profils.find((p) => p.id === profilId);
+    if (!profil) return;
+    setMenu(null);
+
+    const message = `Cela va remplacer l'état actuel de "${profil.nom}" par celui d'avant la dernière restauration — toute modification faite depuis sera perdue. Continuer ?`;
+    const executer = () => annulerDerniereRestauration(profilId);
+
+    if (Platform.OS === "web") {
+      if (window.confirm(message)) executer();
+    } else {
+      Alert.alert("Annuler la dernière restauration", message, [
+        { text: "Annuler", style: "cancel" },
+        { text: "Confirmer", style: "destructive", onPress: executer },
+      ]);
+    }
+  }, [menu, profils, annulerDerniereRestauration]);
 
   const handleSupprimer = useCallback(() => {
     if (!menu) return;
@@ -402,6 +422,10 @@ export default function PanneauProfils({ visible, onFermer }: PanneauProfilsProp
                     <Pressable testID="menu-restaurer-drive" style={styles.menuItem} onPress={handleRestaurerDepuisDrive}>
                       <Ionicons name="cloud-download-outline" size={18} color={colors.textDark} />
                       <Text style={styles.menuItemTexte}>Restaurer depuis Google Drive</Text>
+                    </Pressable>
+                    <Pressable testID="menu-annuler-restauration" style={styles.menuItem} onPress={handleAnnulerRestauration}>
+                      <Ionicons name="arrow-undo-outline" size={18} color={colors.textDark} />
+                      <Text style={styles.menuItemTexte}>Annuler la dernière restauration</Text>
                     </Pressable>
                     <Pressable testID="menu-supprimer" style={styles.menuItem} onPress={handleSupprimer}>
                       <Ionicons name="trash-outline" size={18} color={colors.error} />

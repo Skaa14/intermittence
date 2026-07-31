@@ -11,6 +11,7 @@ import {
   sauvegarder,
   supprimer,
   cleProfilData,
+  cleBackupRestauration,
   chargerParCle,
   sauvegarderParCle,
   supprimerParCle,
@@ -39,6 +40,7 @@ interface ProfilsContextType {
   importerProfil: () => Promise<void>;
   sauvegarderProfilSurDrive: (id: string, accessToken: string) => Promise<void>;
   restaurerProfilDepuisDrive: (id: string, accessToken: string) => Promise<void>;
+  annulerDerniereRestauration: (id: string) => Promise<void>;
   listerSauvegardesDrive: (accessToken: string) => Promise<SauvegardeDrive[]>;
   changerProfilActif: (id: string) => void;
 }
@@ -109,6 +111,7 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
 
   const supprimerProfil = useCallback((id: string) => {
     Promise.all(TYPES_DONNEES.map((type) => supprimerParCle(cleProfilData(id, type))));
+    supprimerParCle(cleBackupRestauration(id));
 
     setProfils((prev) => {
       const mis = prev.filter((p) => p.id !== id);
@@ -315,6 +318,11 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
         throw new Error("Format de sauvegarde invalide.");
       }
 
+      const snapshotAvantRestauration = await construireExportProfil(id);
+      if (snapshotAvantRestauration) {
+        await sauvegarderParCle(cleBackupRestauration(id), snapshotAvantRestauration);
+      }
+
       const profilRestaure: ProfilIntermittent = { ...data.profil, id };
 
       setProfils((prev) => {
@@ -336,6 +344,42 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
       const message = e instanceof Error ? e.message : String(e);
       console.error(e);
       alerterInfo("Erreur", `Impossible de restaurer depuis Google Drive: ${message}.`);
+    }
+  }, [construireExportProfil]);
+
+  const annulerDerniereRestauration = useCallback(async (id: string) => {
+    try {
+      const snapshot = await chargerParCle<{
+        profil: ProfilIntermittent;
+        contrats: unknown;
+        formations: unknown;
+        enseignements: unknown;
+      }>(cleBackupRestauration(id));
+
+      if (!snapshot || !snapshot.profil || !snapshot.profil.nom) {
+        alerterInfo("Info", "Aucune restauration à annuler pour ce profil.");
+        return;
+      }
+
+      const profilRestaure: ProfilIntermittent = { ...snapshot.profil, id };
+
+      setProfils((prev) => {
+        const mis = prev.map((p) => (p.id === id ? profilRestaure : p));
+        sauvegarder("profils", mis);
+        return mis;
+      });
+
+      await sauvegarderParCle(cleProfilData(id, "contrats"), snapshot.contrats);
+      await sauvegarderParCle(cleProfilData(id, "formations"), snapshot.formations);
+      await sauvegarderParCle(cleProfilData(id, "enseignements"), snapshot.enseignements);
+      await supprimerParCle(cleBackupRestauration(id));
+
+      setVersionDonneesExternes((v) => v + 1);
+      alerterInfo("Succès", `La dernière restauration de "${profilRestaure.nom}" a été annulée.`);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error(e);
+      alerterInfo("Erreur", `Impossible d'annuler la restauration: ${message}.`);
     }
   }, []);
 
@@ -368,10 +412,11 @@ export function ProfilsProvider({ children }: { children: ReactNode }) {
       importerProfil,
       sauvegarderProfilSurDrive,
       restaurerProfilDepuisDrive,
+      annulerDerniereRestauration,
       listerSauvegardesDrive,
       changerProfilActif,
     }),
-    [profils, profilActifId, profilActif, chargementTermine, versionDonneesExternes, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil, sauvegarderProfilSurDrive, restaurerProfilDepuisDrive, listerSauvegardesDrive, changerProfilActif]
+    [profils, profilActifId, profilActif, chargementTermine, versionDonneesExternes, ajouterProfil, modifierProfil, supprimerProfil, dupliquerProfil, exporterProfil, importerProfil, sauvegarderProfilSurDrive, restaurerProfilDepuisDrive, annulerDerniereRestauration, listerSauvegardesDrive, changerProfilActif]
   );
 
   return (

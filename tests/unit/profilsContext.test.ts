@@ -3,7 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createElement, ReactNode } from "react";
 import { ProfilsProvider, useProfils } from "../../contexts/ProfilsContext";
 import { ProfilIntermittent } from "../../types/profil";
-import { cleProfilData } from "../../utils/storage";
+import { cleProfilData, cleBackupRestauration } from "../../utils/storage";
 
 const mockTrouverOuCreerDossier = jest.fn();
 const mockTrouverFichierProfil = jest.fn();
@@ -84,12 +84,15 @@ describe("ProfilsContext", () => {
 
     await AsyncStorage.setItem(cleProfilData(id, "contrats"), JSON.stringify([]));
     await AsyncStorage.setItem(cleProfilData(id, "formations"), JSON.stringify([]));
+    await AsyncStorage.setItem(cleBackupRestauration(id), JSON.stringify({ profil: profilSanId }));
 
     act(() => result.current.supprimerProfil(id));
 
     expect(result.current.profils).toHaveLength(0);
     const contrats = await AsyncStorage.getItem(cleProfilData(id, "contrats"));
     expect(contrats).toBeNull();
+    const backup = await AsyncStorage.getItem(cleBackupRestauration(id));
+    expect(backup).toBeNull();
   });
 
   it("switch le profil actif vers un autre après suppression", async () => {
@@ -221,6 +224,66 @@ describe("ProfilsContext", () => {
 
     expect(result.current.profils).toHaveLength(1);
     expect(result.current.profils[0].id).toBe("id-venu-du-drive");
+  });
+
+  it("sauvegarde un backup local avant restauration et permet de l'annuler", async () => {
+    const { result } = renderProfils();
+    await waitFor(() => expect(result.current.chargementTermine).toBe(true));
+
+    act(() => result.current.ajouterProfil(profilSanId));
+    const id = result.current.profils[0].id;
+
+    await AsyncStorage.setItem(
+      cleProfilData(id, "contrats"),
+      JSON.stringify([{ id: "c-local", employeur: "Local" }])
+    );
+    await AsyncStorage.setItem(
+      cleProfilData(id, "formations"),
+      JSON.stringify([{ id: "f-local", option: "garderARE" }])
+    );
+    await AsyncStorage.setItem(
+      cleProfilData(id, "enseignements"),
+      JSON.stringify([{ id: "e-local", heures: 10 }])
+    );
+
+    mockTrouverOuCreerDossier.mockResolvedValue("dossier-1");
+    mockTrouverFichierProfil.mockResolvedValue("fichier-1");
+    mockTelechargerFichier.mockResolvedValue(
+      JSON.stringify({
+        version: "1.0",
+        profil: { ...profilSanId, id, nom: "Artiste (Drive)" },
+        contrats: [{ id: "c-drive", employeur: "Depuis Drive" }],
+        formations: [{ id: "f-drive", option: "reprendreTravail" }],
+        enseignements: [],
+      })
+    );
+
+    await act(() => result.current.restaurerProfilDepuisDrive(id, "token-fake"));
+    expect(result.current.profils[0].nom).toBe("Artiste (Drive)");
+
+    await act(() => result.current.annulerDerniereRestauration(id));
+
+    expect(result.current.profils[0].nom).toBe("Artiste");
+    const contrats = await AsyncStorage.getItem(cleProfilData(id, "contrats"));
+    expect(JSON.parse(contrats!)).toEqual([{ id: "c-local", employeur: "Local" }]);
+    const formations = await AsyncStorage.getItem(cleProfilData(id, "formations"));
+    expect(JSON.parse(formations!)).toEqual([{ id: "f-local", option: "garderARE" }]);
+    const enseignements = await AsyncStorage.getItem(cleProfilData(id, "enseignements"));
+    expect(JSON.parse(enseignements!)).toEqual([{ id: "e-local", heures: 10 }]);
+    const backup = await AsyncStorage.getItem(cleBackupRestauration(id));
+    expect(backup).toBeNull();
+  });
+
+  it("n'annule rien si aucune restauration n'a eu lieu pour ce profil", async () => {
+    const { result } = renderProfils();
+    await waitFor(() => expect(result.current.chargementTermine).toBe(true));
+
+    act(() => result.current.ajouterProfil(profilSanId));
+    const id = result.current.profils[0].id;
+
+    await act(() => result.current.annulerDerniereRestauration(id));
+
+    expect(result.current.profils[0].nom).toBe("Artiste");
   });
 
   it("refuse une restauration sans sauvegarde correspondante sur le Drive", async () => {
