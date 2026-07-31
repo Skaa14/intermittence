@@ -1,42 +1,18 @@
-Feature: Récapitulatif mensuel de l'année d'intermittence
+Feature: Récapitulatif des 12 derniers mois glissants
 
   Background:
     Given nous sommes le "15/06/2026"
+    And un profil existe
 
-  Scenario: Profil non configuré - invitation à configurer
-    Given le profil n'est pas configuré
-    Then le message d'invitation à configurer le profil est visible
-
-  Scenario: Profil sans droits ARE - invitation à ouvrir ses droits
-    Given le profil est configuré sans droits ARE
-      | Nom  | Annexe |
-      | Test | 8      |
-    Then le message d'invitation à ouvrir ses droits est visible
-
-  Scenario: Seuls les mois passés et en cours sont affichés
-    Given le profil est configuré
-      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
-      | Test | 8      | 507    | 13800   | 01/04/2026        |
-    Then 3 cartes de récap sont affichées
+  Scenario: Le récap affiche toujours 12 mois glissants
+    Then 12 cartes de récap sont affichées
 
   Scenario: Heures et salaire affichés pour un mois avec contrat
-    Given le profil est configuré
-      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
-      | Test | 8      | 507    | 13800   | 01/04/2026        |
-    And ces contrats existent
+    Given ces contrats existent
       | Employeur | Début      | Fin        | Heures | Salaire |
-      | Théâtre   | 01/04/2026 | 30/04/2026 | 40     | 1500    |
-    Then la carte du mois 0 affiche "40 h"
-    And la carte du mois 0 affiche "1500 €"
+      | Théâtre   | 10/03/2026 | 20/03/2026 | 40     | 1500    |
+    Then la carte du mois 3 affiche "40 h"
+    And la carte du mois 3 affiche "1500 €"
 
-  Scenario: Le mois en cours est marqué
-    Given le profil est configuré
-      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
-      | Test | 8      | 507    | 13800   | 01/04/2026        |
-    Then la carte du mois 2 affiche "Juin 2026 (en cours)"
-
-  Scenario: Date anniversaire dans le futur - aucun mois à afficher
-    Given le profil est configuré
-      | Nom  | Annexe | Heures | Salaire | Date anniversaire |
-      | Test | 8      | 507    | 13800   | 01/09/2026        |
-    Then le message "Aucun mois à afficher pour l'instant" est visible
+  Scenario: Le mois courant est marqué comme en cours
+    Then la carte du mois 0 affiche "Juin 2026 (en cours)"

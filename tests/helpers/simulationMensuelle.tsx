@@ -60,6 +60,19 @@ export const fixerDateStep = (given: (pattern: RegExp, fn: (date: string) => voi
   });
 };
 
+export const unProfilExiste = async () => {
+  act(() => {
+    captures.ajouterProfil!({
+      nom: "Test",
+      annexe: "8",
+      aOuvertDroits: false,
+      tauxCSG: "standard",
+      alsaceMoselle: false,
+    });
+  });
+  await flushAsync();
+};
+
 export const configurerProfil = async (row: ProfilRow) => {
   act(() => {
     captures.ajouterProfil!({

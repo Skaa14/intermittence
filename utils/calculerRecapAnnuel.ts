@@ -1,8 +1,5 @@
 import { Contrat } from "../types/contrat";
-import { Formation } from "../types/formation";
-import { Enseignement } from "../types/enseignement";
-import { ProfilIntermittent } from "../types/profil";
-import { calculerIndemnisationMensuelle } from "./calculerIndemnisationMensuelle";
+import { parseDate } from "./date";
 
 export interface RecapMois {
   index: number;
@@ -14,24 +11,25 @@ export interface RecapMois {
 }
 
 export function calculerRecapAnnuel(
-  profil: ProfilIntermittent,
   contrats: Contrat[],
-  formations: Formation[] = [],
-  enseignements: Enseignement[] = []
+  aujourdhui: Date = new Date()
 ): RecapMois[] {
-  if (!profil.aOuvertDroits) return [];
+  const moisCourant = new Date(aujourdhui.getFullYear(), aujourdhui.getMonth(), 1);
 
-  const mois = calculerIndemnisationMensuelle(profil, contrats, formations, enseignements);
+  return Array.from({ length: 12 }, (_, i) => {
+    const mois = new Date(moisCourant.getFullYear(), moisCourant.getMonth() - i, 1);
+    const contratsDuMois = contrats.filter((c) => {
+      const debut = parseDate(c.dateDebut);
+      return debut && debut.getFullYear() === mois.getFullYear() && debut.getMonth() === mois.getMonth();
+    });
 
-  return mois
-    .filter((m) => m.etat !== "à venir")
-    .map((m) => ({
-      index: m.index,
-      mois: m.mois,
-      heures: m.heuresDuMois,
-      salaire: m.salaireDuMois,
-      nombreContrats: m.contratsDuMois.length,
-      enCours: m.etat === "en cours",
-    }))
-    .reverse();
+    return {
+      index: i,
+      mois,
+      heures: contratsDuMois.reduce((s, c) => s + c.heures, 0),
+      salaire: contratsDuMois.reduce((s, c) => s + c.salaireBrut, 0),
+      nombreContrats: contratsDuMois.length,
+      enCours: i === 0,
+    };
+  });
 }

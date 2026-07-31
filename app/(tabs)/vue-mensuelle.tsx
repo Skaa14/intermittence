@@ -1,9 +1,6 @@
 import { View, Text, FlatList } from "react-native";
 import { useMemo } from "react";
 import { useContrats } from "../../contexts/ContratsContext";
-import { useProfils } from "../../contexts/ProfilsContext";
-import { useFormations } from "../../contexts/FormationsContext";
-import { useEnseignements } from "../../contexts/EnseignementsContext";
 import { calculerRecapAnnuel, RecapMois } from "../../utils/calculerRecapAnnuel";
 import { formatMois } from "../../utils/formatMois";
 import { styles } from "../../styles/tabs/vue-mensuelle.styles";
@@ -35,40 +32,16 @@ function CarteRecapMois({ recap }: { recap: RecapMois }) {
 
 export default function VueMensuelleScreen() {
   const { contrats } = useContrats();
-  const { profilActif: profil } = useProfils();
-  const { formations } = useFormations();
-  const { enseignements } = useEnseignements();
 
-  const recap = useMemo(
-    () => (profil?.aOuvertDroits ? calculerRecapAnnuel(profil, contrats, formations, enseignements) : []),
-    [profil, contrats, formations, enseignements]
-  );
-
-  if (!profil || !profil.aOuvertDroits) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.empty} testID="message-profil-manquant">
-          {!profil
-            ? "Configurez votre profil pour voir le récap"
-            : "Ouvrez vos droits ARE pour voir le récap"}
-        </Text>
-      </View>
-    );
-  }
+  const recap = useMemo(() => calculerRecapAnnuel(contrats), [contrats]);
 
   return (
     <FlatList
       data={recap}
       keyExtractor={(item) => String(item.index)}
       contentContainerStyle={styles.liste}
+      initialNumToRender={12}
       renderItem={({ item }) => <CarteRecapMois recap={item} />}
-      ListEmptyComponent={
-        <View style={styles.container}>
-          <Text style={styles.empty} testID="message-recap-vide">
-            Aucun mois à afficher pour l'instant
-          </Text>
-        </View>
-      }
     />
   );
 }

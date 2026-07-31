@@ -32,7 +32,7 @@ app/                    ← Dossier des routes (Expo Router) — PAS de fichiers
 │   ├── _layout.tsx     ← Config des onglets (barre du bas)
 │   ├── index.tsx           ← Onglet Accueil (dashboard)
 │   ├── contrats.tsx        ← Onglet Contrats (saisie)
-│   └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (récap heures/salaire/contrats des mois passés/en cours de l'année d'intermittence en cours, ancrée sur la date anniversaire)
+│   └── vue-mensuelle.tsx   ← Onglet Vue mensuelle (récap heures/salaire/contrats sur 12 mois glissants se terminant au mois courant, indépendant du profil/droits ARE)
 ├── simulation-are.tsx      ← Simulation ARE 12 mois depuis la date anniversaire (Stack, accessible depuis le dashboard si droits ouverts)
 └── mois/                   ← Écran de détail (Stack, hors tabs)
     └── [moisIndex].tsx     ← Détail swipeable d'un mois d'indemnisation (alimenté par simulation-are)
@@ -60,7 +60,7 @@ contexts/GoogleAuthContext.tsx ← OAuth PKCE Google (connexion, tokens, refresh
 utils/donneesTest.ts            ← Données de démo (profils, contrats, formations, enseignements)
 utils/calculerAJ.ts         ← Calcul de l'indemnité journalière
 utils/calculerIndemnisationMensuelle.ts ← Calcul des 12 mois de la période d'indemnisation (simulation ARE)
-utils/calculerRecapAnnuel.ts ← Filtre calculerIndemnisationMensuelle aux mois passés/en cours (onglet Vue mensuelle)
+utils/calculerRecapAnnuel.ts ← Récap heures/salaire/contrats sur 12 mois glissants depuis aujourd'hui (onglet Vue mensuelle)
 utils/storage.ts            ← Helpers AsyncStorage (par clé globale et par profil)
 utils/googleDrive.ts         ← Appels REST API Google Drive (dossier, fichiers, appProperties)
 utils/alerte.ts              ← Alerte cross-plateforme : Alert.alert natif, window.alert web (react-native-web n'implémente pas Alert.alert)

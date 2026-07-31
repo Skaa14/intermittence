@@ -1,14 +1,12 @@
 import { defineFeature, loadFeature } from "jest-cucumber";
-import { screen, within, act } from "@testing-library/react-native";
+import { screen, within } from "@testing-library/react-native";
 import VueMensuelleScreen from "../../app/(tabs)/vue-mensuelle";
 import {
-  captures,
   resetCaptures,
   renderEcranMensuel,
   fixerDateStep,
-  configurerProfil,
+  unProfilExiste,
   ajouterContrats,
-  ProfilRow,
 } from "../helpers/simulationMensuelle";
 import { ContratRow } from "../helpers/types";
 
@@ -30,62 +28,26 @@ defineFeature(feature, (test) => {
     jest.useRealTimers();
   });
 
-  test("Profil non configuré - invitation à configurer", ({ given, then }) => {
+  test("Le récap affiche toujours 12 mois glissants", ({ given, then }) => {
     fixerDateStep(given);
 
-    given("le profil n'est pas configuré", async () => {
+    given("un profil existe", async () => {
       await renderScreen();
+      await unProfilExiste();
     });
 
-    then("le message d'invitation à configurer le profil est visible", () => {
-      expect(screen.getByTestId("message-profil-manquant")).toBeTruthy();
-    });
-  });
-
-  test("Profil sans droits ARE - invitation à ouvrir ses droits", ({ given, then }) => {
-    fixerDateStep(given);
-
-    given("le profil est configuré sans droits ARE", async (table: { Nom: string; Annexe: string }[]) => {
-      await renderScreen();
-      act(() => {
-        captures.ajouterProfil!({
-          nom: table[0].Nom,
-          annexe: table[0].Annexe as "8" | "10",
-          aOuvertDroits: false,
-          tauxCSG: "standard",
-          alsaceMoselle: false,
-        });
-      });
-    });
-
-    then("le message d'invitation à ouvrir ses droits est visible", () => {
-      expect(screen.getByTestId("message-profil-manquant")).toBeTruthy();
-      expect(screen.getByTestId("message-profil-manquant").props.children).toBe(
-        "Ouvrez vos droits ARE pour voir le récap"
-      );
-    });
-  });
-
-  test("Seuls les mois passés et en cours sont affichés", ({ given, then }) => {
-    fixerDateStep(given);
-
-    given("le profil est configuré", async (table: ProfilRow[]) => {
-      await renderScreen();
-      await configurerProfil(table[0]);
-    });
-
-    then("3 cartes de récap sont affichées", () => {
+    then("12 cartes de récap sont affichées", () => {
       const cartes = screen.getAllByTestId(/^carte-recap-\d+$/);
-      expect(cartes).toHaveLength(3);
+      expect(cartes).toHaveLength(12);
     });
   });
 
   test("Heures et salaire affichés pour un mois avec contrat", ({ given, and, then }) => {
     fixerDateStep(given);
 
-    given("le profil est configuré", async (table: ProfilRow[]) => {
+    given("un profil existe", async () => {
       await renderScreen();
-      await configurerProfil(table[0]);
+      await unProfilExiste();
     });
 
     and("ces contrats existent", (table: ContratRow[]) => {
@@ -96,28 +58,14 @@ defineFeature(feature, (test) => {
     and(/^la carte du mois (\d+) affiche "(.*)"$/, carteAfficheTexte);
   });
 
-  test("Le mois en cours est marqué", ({ given, then }) => {
+  test("Le mois courant est marqué comme en cours", ({ given, then }) => {
     fixerDateStep(given);
 
-    given("le profil est configuré", async (table: ProfilRow[]) => {
+    given("un profil existe", async () => {
       await renderScreen();
-      await configurerProfil(table[0]);
+      await unProfilExiste();
     });
 
     then(/^la carte du mois (\d+) affiche "(.*)"$/, carteAfficheTexte);
-  });
-
-  test("Date anniversaire dans le futur - aucun mois à afficher", ({ given, then }) => {
-    fixerDateStep(given);
-
-    given("le profil est configuré", async (table: ProfilRow[]) => {
-      await renderScreen();
-      await configurerProfil(table[0]);
-    });
-
-    then(/^le message "(.*)" est visible$/, (texte: string) => {
-      expect(screen.getByTestId("message-recap-vide")).toBeTruthy();
-      expect(screen.getByText(texte)).toBeTruthy();
-    });
   });
 });
